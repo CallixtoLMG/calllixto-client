@@ -1,14 +1,15 @@
-import { COLORS, DEFAULT_PAGE_SIZE, ICONS, SHORTKEYS, SORTING } from "@/common/constants";
+import { POPUP_POSITIONS, CONTENT_SIZES, COLORS, DEFAULT_PAGE_SIZE, ICONS, SHORTKEYS, SIZES, SORTING } from "@/common/constants";
 import { preventSend } from "@/common/utils";
 import { Loader } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
+import { Button, Checkbox, Header, Popup } from "semantic-ui-react";
 import { IconedButton, PopupActions } from "../buttons";
-import { CenteredFlex, Flex } from "../custom";
+import { CenteredFlex, Flex, Icon } from "../custom";
 import Actions from "./Actions";
 import Pagination from "./Pagination";
+
 import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, LinkContent, LinkOverlay, Table, TableHeader, TableRow } from "./styles";
 const { ASC, DESC } = SORTING;
 
@@ -20,7 +21,6 @@ const CustomTable = ({
   actions = [],
   mainKey = 'id',
   $tableHeight,
-  $actionButtonInside,
   color,
   selection = {},
   onSelectionChange,
@@ -204,6 +204,20 @@ const CustomTable = ({
                       onChange={handleToggleAll}
                     />
                   </CenteredFlex>
+                  {!!Object.keys(selection).length && (
+                    <ActionsContainer as="div" $header $open={isPopupOpen}>
+                      <InnerActionsContainer $header>
+                        <PopupActions
+                          position={POPUP_POSITIONS.RIGHT_CENTER}
+                          trigger={<Button icon circular color={COLORS.YELLOW} size="mini"><Icon name={ICONS.COG} /></Button>}
+                          buttons={selectionActions}
+                          open={isPopupOpen}
+                          onOpen={() => setIsPopupOpen(true)}
+                          onClose={() => setIsPopupOpen(false)}
+                        />
+                      </InnerActionsContainer>
+                    </ActionsContainer>
+                  )}
                 </HeaderCell>
               )}
               {headers.map((header) => (
@@ -217,19 +231,17 @@ const CustomTable = ({
                   {header.title}
                 </HeaderCell>
               ))}
-              {!!Object.keys(selection).length && (
-                <ActionsContainer $header $open={isPopupOpen}>
-                  <InnerActionsContainer $header>
-                    <PopupActions
-                      position="right center"
-                      trigger={<Button icon circular color={COLORS.YELLOW} size="mini"><Icon name={ICONS.COG} /></Button>}
-                      buttons={selectionActions}
-                      open={isPopupOpen}
-                      onOpen={() => setIsPopupOpen(true)}
-                      onClose={() => setIsPopupOpen(false)}
+              {!!actions.length && (
+                <HeaderCell $cursor="default" $width="52px" padding="0">
+                  <CenteredFlex>
+                    <Popup
+                      size={SIZES.TINY}
+                      content="Acciones"
+                      position={POPUP_POSITIONS.TOP_CENTER}
+                      trigger={<Icon $height={CONTENT_SIZES.FIT} name={ICONS.COG} color={COLORS.GREY} />}
                     />
-                  </InnerActionsContainer>
-                </ActionsContainer>
+                  </CenteredFlex>
+                </HeaderCell>
               )}
             </TableRow>
           </TableHeader>
@@ -237,7 +249,7 @@ const CustomTable = ({
             <Table.Body>
               {!currentPageElements.length ? (
                 <Table.Row>
-                  <Cell colSpan={headers.length + (isSelectable ? 2 : 1)} textAlign="center">
+                  <Cell colSpan={headers.length + (isSelectable ? 1 : 0) + (actions.length ? 1 : 0)} textAlign="center">
                     <Header as="h4">
                       No se encontraron ítems
                     </Header>
@@ -248,7 +260,7 @@ const CustomTable = ({
                   if (page) {
                     const rowKey = typeof mainKey === "function" ? mainKey(element, index) : element[mainKey];
                     return (
-                      <TableRow key={rowKey || index}>
+                      <TableRow key={rowKey || index} data-testid="table-row" data-row-id={rowKey || ""}>
                         {isSelectable && (
                           <Cell $basic={basic}>
                             <CenteredFlex>
@@ -292,6 +304,7 @@ const CustomTable = ({
                               <LinkContent
                                 data-href={href || ""}
                                 data-clickable={!!href}
+                                data-testid={`table-cell-${header.key || header.id}`}
                               >
                                 {header.value(element, index)}
                               </LinkContent>
@@ -299,15 +312,15 @@ const CustomTable = ({
                           );
                         })}
                         {!!actions.length && (
-                          <ActionsContainer $actionButtonInside={$actionButtonInside} $open={isPopupOpen}>
-                            <InnerActionsContainer $actionButtonInside={$actionButtonInside}>
+                          <ActionsContainer>
+                            <InnerActionsContainer $open={popupOpenId === element[mainKey]}>
                               {actions.length > 1 ? (
                                 <PopupActions
                                   open={popupOpenId === element[mainKey]}
                                   onOpen={() => setPopupOpenId(element[mainKey])}
                                   onClose={() => setPopupOpenId(null)}
-                                  position="left center"
-                                  trigger={<Button icon circular color={COLORS.BLUE} size="mini"><Icon name={ICONS.COG} /></Button>}
+                                  position={POPUP_POSITIONS.LEFT_CENTER}
+                                  trigger={<Button type="button" data-testid="table-row-actions-trigger" icon circular color={COLORS.BLUE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                   buttons={actions.map((action, idx) => {
                                     const resolvedIcon = resolveActionProp(action.icon, element, index);
                                     const resolvedColor = resolveActionProp(action.color, element, index);
@@ -330,6 +343,7 @@ const CustomTable = ({
                                         loading={resolvedLoading}
                                         basic={resolvedBasic}
                                         iconOnly={action.iconOnly}
+                                        dataTestId={`table-row-action-${action.id}`}
                                       />
                                     );
                                   })}
@@ -345,7 +359,7 @@ const CustomTable = ({
                   }
                   const rowKey = typeof mainKey === "function" ? mainKey(element, index) : element[mainKey];
                   return (
-                    <TableRow key={rowKey || index}>
+                    <TableRow key={rowKey || index} data-testid="table-row" data-row-id={rowKey || ""}>
                       {headers.map(header => (
                         <Cell
                           key={`cell_${header.id}`}
@@ -358,15 +372,15 @@ const CustomTable = ({
                         </Cell>
                       ))}
                       {!!actions.length && (
-                        <ActionsContainer $stillShow $actionButtonInside={$actionButtonInside} $open={isPopupOpen}>
-                          <InnerActionsContainer $actionButtonInside={$actionButtonInside}>
+                        <ActionsContainer>
+                          <InnerActionsContainer $open={popupOpenId === element[mainKey]}>
                             {actions.length > 1 ? (
                               <PopupActions
                                 open={popupOpenId === element[mainKey]}
                                 onOpen={() => setPopupOpenId(element[mainKey])}
                                 onClose={() => setPopupOpenId(null)}
-                                position="left center"
-                                trigger={<Button type="button" icon circular color={COLORS.ORANGE} size="mini"><Icon name={ICONS.COG} /></Button>}
+                                position={POPUP_POSITIONS.LEFT_CENTER}
+                                trigger={<Button type="button" data-testid="table-row-actions-trigger" icon circular color={COLORS.ORANGE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                 buttons={actions.map((action, idx) => {
                                   const resolvedIcon = resolveActionProp(action.icon, element, index);
                                   const resolvedColor = resolveActionProp(action.color, element, index);
@@ -388,6 +402,7 @@ const CustomTable = ({
                                       loading={resolvedLoading}
                                       basic={resolvedBasic}
                                       iconOnly={action.iconOnly}
+                                      dataTestId={`table-row-action-${action.id}`}
                                     />
                                   );
                                 })}
@@ -406,12 +421,12 @@ const CustomTable = ({
           )}
         </Table>
         {onDownloadExcel && (
-          <Flex width="fit-content" $alignSelf="flex-end">
+          <Flex width={CONTENT_SIZES.FIT} $alignSelf="flex-end">
             <IconedButton
               text="Descargar excel"
               icon={ICONS.FILE_EXCEL}
               onClick={() => onDownloadExcel(filteredElements)}
-              width="fit-content"
+              width={CONTENT_SIZES.FIT}
             />
           </Flex>
         )}

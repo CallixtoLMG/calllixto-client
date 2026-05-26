@@ -1,3 +1,4 @@
+import { CONTENT_SIZES } from "@/common/constants";
 import styled, { css } from "styled-components";
 
 export const MenuContainer = styled.div`
@@ -102,7 +103,7 @@ export const MenuAction = styled.button`
 `;
 
 export const BackButton = styled.button`
-  width: fit-content;
+  width: ${CONTENT_SIZES.FIT};
   border: none;
   background: transparent;
   color: #2185d0;

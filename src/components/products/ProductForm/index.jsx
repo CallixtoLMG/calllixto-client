@@ -11,7 +11,7 @@ import {
   TextField
 } from "@/common/components/form";
 import { SearchResultContent, SearchResultDescription, SearchResultTitle } from "@/common/components/form/Search/styles";
-import { COLORS, ENTITIES, ERROR_MESSAGES, FIELD_LABELS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
+import { CONTENT_SIZES, COLORS, ENTITIES, ERROR_MESSAGES, FIELD_LABELS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { removeNullish } from "@/common/utils";
 import { BRAND_STATES, getBrandSearchDescription, getBrandSearchTitle } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES, getSupplierSearchDescription, getSupplierSearchTitle } from "@/components/suppliers/suppliers.constants";
@@ -133,6 +133,7 @@ const ProductForm = forwardRef(({
                   name="supplier"
                   label="Proveedor"
                   placeholder="Suministro Estrella"
+                  dataTestId="product-supplier-search"
                   persistSelection
                   required
                   rules={{
@@ -169,6 +170,7 @@ const ProductForm = forwardRef(({
                   name="brand"
                   label="Marca"
                   placeholder="CallixtoGLM"
+                  dataTestId="product-brand-search"
                   persistSelection
                   required
                   rules={{
@@ -202,6 +204,7 @@ const ProductForm = forwardRef(({
                 <TextControlled
                   name="id"
                   label={FIELD_LABELS.ID}
+                  dataTestId="product-id-field"
                   required
                   placeholder="A0001"
                   rules={{
@@ -227,25 +230,27 @@ const ProductForm = forwardRef(({
               name="name"
               label={FIELD_LABELS.NAME}
               placeholder="Televisor 100”"
+              dataTestId="product-name-field"
               rules={RULES.REQUIRED}
               disabled={!isUpdating && view}
               required={isUpdating || !view}
             />
           </FormField>
           <FormField $flexDirection="row" flex="1">
-            <FormField $maxWidth="fit-content" flex="1" >
+            <FormField $maxWidth={CONTENT_SIZES.FIT} flex="1" >
               <IconedButtonControlled
                 name="stockControl"
                 text={watchStockControl ? "Deshabilitar control de stock" : "Habilitar control de stock"}
                 icon={ICONS.BOXES}
                 color={COLORS.BLUE}
+                dataTestId="product-stock-control-toggle"
                 disabled={!isUpdating && view}
                 iconOnly
               />
             </FormField>
             {watchStockControl &&
               <FormField flex="1">
-                <Message $minWidth="max-content" $opacity={view} height="38px" margin="0" color={COLORS.BLUE} >
+                <Message $minWidth={CONTENT_SIZES.MAX} $opacity={view} height="38px" margin="0" color={COLORS.BLUE} >
                   <Icon name={ICONS.BOXES} /> Stock: {product?.stock ?? 0}
                 </Message>
               </FormField>
@@ -258,6 +263,7 @@ const ProductForm = forwardRef(({
             <PriceControlled
               name="cost"
               label={FIELD_LABELS.COST}
+              dataTestId="product-cost-field"
               disabled={!isUpdating && view}
               maxLength={19}
             />
@@ -267,10 +273,11 @@ const ProductForm = forwardRef(({
               <PriceControlled
                 name="price"
                 label={FIELD_LABELS.PRICE}
+                dataTestId="product-price-field"
                 disabled={!isUpdating && view}
               />
             </FormField>
-            <FormField $maxWidth="max-content" $alignItems="flex-end" $flexDirection="row" flex="1">
+            <FormField $maxWidth={CONTENT_SIZES.MAX} $alignItems="flex-end" $flexDirection="row" flex="1">
               <IconedButtonControlled
                 name="editablePrice"
                 text={WatchEditablePrice ? "Deshabilitar precio editable" : "Habilitar precio editable"}
@@ -306,16 +313,18 @@ const ProductForm = forwardRef(({
               <DropdownControlled
                 name="fractionConfig.unit"
                 label="Unidad de medida"
+                dataTestId="product-unit-dropdown"
                 options={Object.values(MEASSURE_UNITS)}
                 defaultValue={Object.values(MEASSURE_UNITS)[0].value}
                 disabled={(!isUpdating && view || !watchFractionable)}
               />
             </FormField>
-            <FormField $maxWidth="max-content" $alignItems="flex-end" $flexDirection="row" flex="1">
+            <FormField $maxWidth={CONTENT_SIZES.MAX} $alignItems="flex-end" $flexDirection="row" flex="1">
               <IconedButtonControlled
                 name="fractionConfig.active"
                 text={watchFractionable ? "Deshabilitar producto fraccionable" : "Habilitar producto fraccionable"}
                 icon={ICONS.CUT}
+                dataTestId="product-fraction-toggle"
                 disabled={!isUpdating && view}
                 color={COLORS.BLUE}
                 iconOnly

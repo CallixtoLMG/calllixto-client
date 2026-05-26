@@ -4,7 +4,7 @@ import { DropdownControlled, NumberField, TextControlled, TextField } from "@/co
 import { DatePicker } from "@/common/components/form/DatePicker";
 import { ModalAction } from "@/common/components/modals";
 import { Filters, Table } from "@/common/components/table";
-import { ALL, COLORS, ICONS, IN, OUT, PAGES, RULES as VALIDATE_RULES } from "@/common/constants";
+import { CONTENT_SIZES, ALL, COLORS, ICONS, IN, OUT, PAGES, RULES as VALIDATE_RULES } from "@/common/constants";
 import { createFilter } from "@/common/utils";
 import { useFilters } from "@/hooks";
 import { useState } from "react";
@@ -100,6 +100,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
             label="Cantidad"
             value={stock.amount}
             placeholder="Ej: 50"
+            dataTestId="stock-quantity-field"
             onChange={(value) =>
               setStock({ ...stock, amount: value })
             }
@@ -116,6 +117,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
             value={stock.invoiceNumber}
             onChange={(e) => setStock({ ...stock, invoiceNumber: e.target.value })}
             placeholder="Ej: 000A12"
+            dataTestId="stock-invoice-field"
           />
         </FormField>
       </FieldsContainer>
@@ -124,6 +126,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
           flex="1"
           label="Comentarios"
           value={stock.comments}
+          dataTestId="stock-comments-field"
           onChange={(e) => setStock({ ...stock, comments: e.target.value })}
         />
       </FieldsContainer>
@@ -141,6 +144,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
               icon={ICONS.ARROW_DOWN}
               color={COLORS.GREEN}
               text="Ingreso de stock"
+              dataTestId="stock-add-button"
               disabled={isLoading}
               onClick={() => {
                 setStock(EMPTY_STOCK());
@@ -154,6 +158,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
               icon={ICONS.ARROW_UP}
               color={COLORS.RED}
               text="Egreso de stock"
+              dataTestId="stock-remove-button"
               disabled={isLoading}
               onClick={() => {
                 setStock(EMPTY_STOCK());
@@ -171,7 +176,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
           <Form onSubmit={onSubmit}>
             <Filters appliedCount={appliedCount} hydrated={hydrated} entity="STOCK" onRestoreFilters={onRestoreFilters}>
               <DropdownControlled
-                width="fit-content"
+                width={CONTENT_SIZES.FIT}
                 name="type"
                 options={STOCK_TYPE_OPTIONS}
                 label="Tipo"

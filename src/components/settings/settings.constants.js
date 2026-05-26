@@ -50,6 +50,27 @@ export const ENTITY_MAPPER = {
   GENERAL: { name: "General" },
 };
 
+export const SETTINGS_ENTITY_ORDER = [
+  "GENERAL",
+  "CUSTOMER",
+  "SUPPLIER",
+  "BRAND",
+  "PRODUCT",
+  "BUDGET",
+  "EXPENSE",
+];
+
+const SETTINGS_ENTITY_POSITION = new Map(
+  SETTINGS_ENTITY_ORDER.map((entity, index) => [entity, index])
+);
+
+export const sortSettingsByEntityOrder = (settings) => [...settings].sort((left, right) => {
+  const leftPosition = SETTINGS_ENTITY_POSITION.get(left.entity) ?? Number.MAX_SAFE_INTEGER;
+  const rightPosition = SETTINGS_ENTITY_POSITION.get(right.entity) ?? Number.MAX_SAFE_INTEGER;
+
+  return leftPosition - rightPosition;
+});
+
 export const SUPPORTED_SETTINGS = {
   PRODUCT: ['tags', 'blacklist'],
   CUSTOMER: ['tags'],

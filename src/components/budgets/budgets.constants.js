@@ -1,5 +1,5 @@
 import { Box, Flex, Icon, OverflowWrapper } from "@/common/components/custom";
-import { ALL, COLORS, DATE_FORMATS, FIELD_LABELS, ICONS, SELECT_ALL_OPTION, SORTING } from "@/common/constants";
+import { POPUP_POSITIONS, CONTENT_SIZES, ALL, COLORS, DATE_FORMATS, FIELD_LABELS, ICONS, SELECT_ALL_OPTION, SORTING } from "@/common/constants";
 import { getLabelColor } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate, getStartOfUnit, now } from "@/common/utils/dates";
 import { formatLastCount } from "@/common/utils/pluralization";
@@ -99,7 +99,7 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
                     </Label>
                   }
                   content={getBudgetListPopupContent(budget)}
-                  position="right center"
+                  position={POPUP_POSITIONS.RIGHT_CENTER}
                   size="mini"
                 />
               ) : (
@@ -110,7 +110,7 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
               {isPaid && (
                 <Popup
                   content="Pagado"
-                  position="right center"
+                  position={POPUP_POSITIONS.RIGHT_CENTER}
                   size="mini"
                   trigger={
                     <Icon
@@ -287,7 +287,7 @@ export const PAYMENT_STATES_OPTIONS = [
       key: id,
       text: (
         <Flex $alignItems="center" $justifyContent="space-between">
-          {title}&nbsp;<Label width="fit-content" color={color} circular empty />
+          {title}&nbsp;<Label width={CONTENT_SIZES.FIT} color={color} circular empty />
         </Flex>
       ),
       value: id,
@@ -531,7 +531,7 @@ export const buildBudgetDeliveriesColumns = ({
                   </Flex>
                 }
                 content="Entrega completa"
-                position="right center"
+                position={POPUP_POSITIONS.RIGHT_CENTER}
                 size="mini"
               />
             )}

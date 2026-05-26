@@ -89,6 +89,7 @@ const PaymentMethods = () => {
           active={isAccordionOpen}
           helpText={SETTINGS_HELP_TEXTS.PAYMENT_METHODS}
           onClick={toggleAccordion}
+          dataTestId="settings-payment-methods-accordion"
         >
           Métodos de pago
         </SettingsAccordionTitle>
@@ -108,6 +109,7 @@ const PaymentMethods = () => {
                     }}
                     onKeyDown={handleMethodKeyDown}
                     error={error}
+                    dataTestId="settings-payment-method-field"
                   />
                   <Button
                     size={SIZES.SMALL}
@@ -118,6 +120,7 @@ const PaymentMethods = () => {
                     type="button"
                     onClick={handleAddPaymentMethods}
                     $marginTop="25px"
+                    data-testid="settings-payment-method-add-button"
                   />
                 </Flex>
                 <Table

@@ -1,9 +1,9 @@
 import { Box, Flex, FlexColumn } from "@/common/components/custom";
 import { DropdownControlled, IconedButtonControlled, TextAreaControlled } from "@/common/components/form";
-import { COLORS, ICONS } from "@/common/constants";
+import { CONTENT_SIZES, COLORS, ICONS } from "@/common/constants";
 import { BUDGET_PDF_FORMAT } from "@/components/budgets/budgets.constants";
-import SettingsFieldLabel from "@/components/settings/Common/SettingsFieldLabel";
 import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordionTitle";
+import SettingsFieldLabel from "@/components/settings/Common/SettingsFieldLabel";
 import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
 import { SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useState } from "react";
@@ -41,7 +41,8 @@ const OnPrint = () => {
                   text="Mostrar precios"
                   icon={ICONS.EYE}
                   color={COLORS.BLUE}
-                  width="fit-content"
+                  width={CONTENT_SIZES.FIT}
+                  minWidth={CONTENT_SIZES.FIT}
                   basic={!defaultsPDF?.showPrices}
                 />
                 <DropdownControlled
@@ -53,7 +54,7 @@ const OnPrint = () => {
                   }
                   options={Object.values(BUDGET_PDF_FORMAT).map(option => ({ value: option.key, key: option.key, text: <Flex>{option.title}</Flex> }))}
                   defaultValue={BUDGET_PDF_FORMAT.CUSTOMER.key}
-                  width="fit-content"
+                  width={CONTENT_SIZES.FIT}
                 />
                 <TextAreaControlled
                   name="defaultsPDF.customPDFDisclaimer"

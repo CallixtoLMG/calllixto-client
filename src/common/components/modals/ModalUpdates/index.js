@@ -1,5 +1,5 @@
 'use client';
-import { COLORS, ICONS, SIZES } from '@/common/constants';
+import { COLORS, ICONS, POPUP_POSITIONS, SIZES } from '@/common/constants';
 import { isDateBefore } from '@/common/utils/dates';
 import { useState } from 'react';
 import { List, ListItem, Modal, Popup, Transition } from 'semantic-ui-react';
@@ -29,15 +29,16 @@ const ModalUpdates = () => {
         content="Últimas novedades"
         trigger={
           <Icon
+            $cursor
             margin="0"
-            pointer="true"
+            $pointer
             size={SIZES.LARGE}
             name={ICONS.BULLHORN}
             color={COLORS.BLUE}
             onClick={() => setOpen(true)}
           />
         }
-        position="bottom right"
+        position={POPUP_POSITIONS.BOTTOM_RIGHT}
         size={SIZES.TINY}
       />
       <Transition visible={open} animation="scale" duration={500}>

@@ -5,19 +5,26 @@ import { Accent } from "../components/custom";
 import { StyledListHeader, StyledModalContent } from "../components/modals/ModalShortcuts/styles";
 import { ENTITIES } from "./entities";
 import { MAINTENANCE_PAGE } from "./maintenance";
+import {
+  CHANGE_PASSWORD_PAGE,
+  LOGIN_PAGE,
+  NOT_FOUND_PAGE,
+  RESTORE_PASSWORD_PAGE,
+  ROOT_PAGE
+} from "./routes";
 import { ERROR_MESSAGES } from "./texts";
 
 export * from './dates';
 export * from './entities';
 export * from './maintenance';
+export * from './routes';
 export * from './semantic';
+export * from './session';
 export * from './texts';
 export * from './time';
 
-export const DEFAULT_SELECTED_ACCOUNT = "callixto";
-
 export const PAGES = {
-  BASE: "/",
+  BASE: ROOT_PAGE,
   CUSTOMERS: {
     BASE: "/clientes",
     CREATE: "/clientes/crear",
@@ -103,7 +110,7 @@ export const PAGES = {
     BASE: "/historial-ventas",
   },
   LOGIN: {
-    BASE: "/login"
+    BASE: LOGIN_PAGE
   },
   SETTINGS: {
     BASE: "/configuracion",
@@ -112,14 +119,14 @@ export const PAGES = {
     BADGE: isNewFeature('2026-01-01') ? 'new' : undefined
   },
   CHANGE_PASSWORD: {
-    BASE: "/cambiar-contrasena"
+    BASE: CHANGE_PASSWORD_PAGE
   },
   RESTORE_PASSWORD: {
-    BASE: "/recuperar-contrasena"
+    BASE: RESTORE_PASSWORD_PAGE
   },
   MAINTENANCE: MAINTENANCE_PAGE,
   NOT_FOUND: {
-    BASE: "/ups"
+    BASE: NOT_FOUND_PAGE
   },
 };
 
@@ -204,7 +211,7 @@ export const getNavigationItems = (role) => {
       badge: PAGES.PRODUCTS.BADGE,
     },
     {
-      id: "sales",
+      id: "budgets",
       label: "Ventas",
       icon: ICONS.SHOPPING_CART,
       children: buildEntityChildren(PAGES.BUDGETS, [
@@ -507,8 +514,6 @@ export const BADGE_CONFIG = {
     color: '#5e35b1',
   },
 };
-
-export const USER_DATA_KEY = "userData";
 
 export const INFO = {
   HELP: {

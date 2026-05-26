@@ -4,7 +4,7 @@ import { Box, FieldsContainer, Flex, OverflowWrapper } from "@/common/components
 import { NumberField, TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import { Table } from "@/common/components/table";
-import { COLORS, ICONS } from "@/common/constants";
+import { POPUP_POSITIONS, COLORS, ICONS } from "@/common/constants";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
@@ -332,6 +332,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
                   setShowModal(true);
                 }}
                 iconOnly
+                dataTestId="budget-open-delivery-modal-button"
               />
             </Box>
             <Box $marginLeft="15px">
@@ -345,7 +346,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
                   setShowModal(true);
                 }}
                 iconOnly
-                popupPosition="top left"
+                popupPosition={POPUP_POSITIONS.TOP_LEFT}
                 popupContent={
                   <>
                     <strong><div>Descontar entregas</div></strong>
@@ -362,7 +363,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
                   text="Imprimir entregas"
                   onClick={onPrint}
                   iconOnly
-                  popupPosition="top left"
+                  popupPosition={POPUP_POSITIONS.TOP_LEFT}
                 />
               </Box>
             )}
@@ -397,6 +398,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
               onChange={(e) =>
                 setDeliveryNote(e.target.value)
               }
+              dataTestId="budget-delivery-note-field"
             />
             <Flex $columnGap="14px" $alignSelf="flex-end" >
               <IconedButton
@@ -410,7 +412,8 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
                 onClick={handleToggleAll}
                 disabled={!operableProducts.length}
                 iconOnly
-                popupPosition="top left"
+                popupPosition={POPUP_POSITIONS.TOP_LEFT}
+                dataTestId="budget-complete-all-deliveries-button"
               />
             </Flex>
             <FlexColumn width="100%" >

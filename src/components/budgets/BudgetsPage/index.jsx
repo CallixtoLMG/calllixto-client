@@ -1,6 +1,6 @@
 import { DropdownControlled, SearchControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from '@/common/components/table';
-import { COLORS, DATE_FORMATS, ENTITIES, ICONS, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
+import { CONTENT_SIZES, COLORS, DATE_FORMATS, ENTITIES, ICONS, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
 import { createFilter, downloadExcel, getFormatedPercentage, handleUndefined } from '@/common/utils';
 import { getFormatedDate } from "@/common/utils/dates";
 import { getTotal } from "@/components/products/products.utils";
@@ -124,7 +124,7 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
             <DropdownControlled
               filter
               minWidth="150px"
-              width="min-content"
+              width={CONTENT_SIZES.MIN}
               name="state"
               label="Estado"
               options={BUDGET_STATES_OPTIONS}
@@ -164,7 +164,7 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
             />
             {filters.state === BUDGET_STATES.CONFIRMED.id && (
               <DropdownControlled
-                minWidth="min-content"
+                minWidth={CONTENT_SIZES.MIN}
                 width="130px"
                 filter
                 name="paymentStatus"

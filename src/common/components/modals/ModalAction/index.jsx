@@ -1,5 +1,5 @@
 import { ButtonsContainer } from "@/common/components/custom";
-import { BUTTON_TEXTS, COLORS, CONFIRMATION_WORDS, ICONS, PLACEHOLDERS } from "@/common/constants";
+import { CONTENT_SIZES, BUTTON_TEXTS, COLORS, CONFIRMATION_WORDS, ICONS, PLACEHOLDERS } from "@/common/constants";
 import { handleKeyPressWithSubmit } from "@/common/utils";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from "react-hook-form";
@@ -94,6 +94,7 @@ const ModalAction = ({
                 onChange={handleConfirmationTextChange}
                 tabIndex="0"
                 width="300px"
+                dataTestId="modal-confirmation-input"
               />
             )}
             <ButtonsContainer>
@@ -103,6 +104,7 @@ const ModalAction = ({
                 color={COLORS.RED}
                 onClick={() => setShowModal(false)}
                 disabled={isLoading}
+                dataTestId="modal-cancel"
               />
               <IconedButton
                 text={confirmButtonText}
@@ -111,7 +113,8 @@ const ModalAction = ({
                 loading={isLoading}
                 color={COLORS.GREEN}
                 submit
-                width="fit-content"
+                width={CONTENT_SIZES.FIT}
+                dataTestId="modal-confirm"
               />
             </ButtonsContainer>
           </Form>

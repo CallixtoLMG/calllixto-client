@@ -1,6 +1,6 @@
 import { Button as CustomButton, DropdownItem, Flex, Label } from '@/common/components/custom';
 import ModalAction from '@/common/components/modals/ModalAction';
-import { BUTTON_TEXTS, COLORS, ENTITIES, ICONS, PAGES, SIZES } from "@/common/constants";
+import { POPUP_POSITIONS, CONTENT_SIZES, BUTTON_TEXTS, COLORS, ENTITIES, ICONS, PAGES, SIZES } from "@/common/constants";
 import { LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
 import { LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
 import { LIST_CASH_BALANCES_QUERY_KEY } from '@/components/cashBalances/cashBalances.constants';
@@ -64,10 +64,10 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
         <FiltersContainer>
           <Popup
             content="Restaurar filtros"
-            position="top center"
+            position={POPUP_POSITIONS.TOP_CENTER}
             size={SIZES.TINY}
             trigger={(
-              <CustomButton $marginBottom="2px" $alignSelf="flex-end" width="fit-content" $fontSize="14px" $paddingLeft="11px" padding="11px" circular icon type="button" onClick={onRestoreFilters}>
+              <CustomButton $marginBottom="2px" $alignSelf="flex-end" width={CONTENT_SIZES.FIT} $fontSize="14px" $paddingLeft="11px" padding="11px" circular icon type="button" onClick={onRestoreFilters}>
                 <Icon name={ICONS.UNDO} />
               </CustomButton>
             )}
@@ -78,10 +78,10 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
           {hydrated && appliedCount > 0 && (
             <Popup
               content="Filtros activos"
-              position="top center"
+              position={POPUP_POSITIONS.TOP_CENTER}
               size={SIZES.TINY}
               trigger={
-                <Label $alignSelf="center" width="fit-content" circular color={COLORS.BLUE}>{appliedCount}</Label>
+                <Label $alignSelf="center" width={CONTENT_SIZES.FIT} circular color={COLORS.BLUE}>{appliedCount}</Label>
               }
             />
           )}

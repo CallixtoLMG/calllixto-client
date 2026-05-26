@@ -1,6 +1,6 @@
 import { Box, Flex, Icon } from '@/common/components/custom';
 import { StyledModalHeader } from '@/common/components/modals/ModalShortcuts/styles';
-import { COLORS, ICONS, SIZES } from '@/common/constants';
+import { POPUP_POSITIONS, COLORS, ICONS, SIZES } from '@/common/constants';
 import { createContext, useContext, useState } from 'react';
 import { Modal, Popup, Transition } from 'semantic-ui-react';
 import styled from 'styled-components';
@@ -37,6 +37,7 @@ const useNavActionsContext = () => {
 const NavActions = () => {
   const { actions, info } = useNavActionsContext();
   const [open, setOpen] = useState(false);
+  const getActionTestId = (text) => text ? `nav-action-${text.toLowerCase()}` : undefined;
 
   return (
     <>
@@ -64,6 +65,7 @@ const NavActions = () => {
                   iconOnly={iconOnly}
                   popupContent={popupContent}
                   popupPosition={popupPosition}
+                  dataTestId={getActionTestId(text)}
                 />
               )}
             </Box>
@@ -82,7 +84,7 @@ const NavActions = () => {
                 margin="0"
               />
             }
-            position="bottom right"
+            position={POPUP_POSITIONS.BOTTOM_RIGHT}
             size={SIZES.TINY}
           />
         )}

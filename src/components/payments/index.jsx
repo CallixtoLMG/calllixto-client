@@ -1,6 +1,6 @@
 import { PriceLabel } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
-import { COLORS, CONFIRMATION_WORDS, DATE_FORMATS, FIELD_LABELS, ICONS, PLACEHOLDERS, SIZES, TOOLTIPS } from "@/common/constants";
+import { POPUP_POSITIONS, CONTENT_SIZES, COLORS, CONFIRMATION_WORDS, DATE_FORMATS, FIELD_LABELS, ICONS, PLACEHOLDERS, SIZES, TOOLTIPS } from "@/common/constants";
 import { calculateTotals } from "@/common/utils";
 import { getFormatedDate, getSortedPaymentsByDate } from "@/common/utils/dates";
 import { ModalAddPayment } from "@/components/payments/ModalAddPayment";
@@ -21,7 +21,7 @@ const getPaymentTableHeaders = () => [
         {element.isOverdue && (
           <Popup
             content="Pago posterior a la fecha de vencimiento"
-            position="top center"
+            position={POPUP_POSITIONS.TOP_CENTER}
             size={SIZES.MINI}
             trigger={<Icon name={ICONS.EXCLAMATION_CIRCLE} color={COLORS.RED} size={SIZES.SMALL} />}
           />
@@ -90,7 +90,7 @@ const Payments = ({
             <>
               <Popup
                 trigger={
-                  <Box width="fit-content">
+                  <Box width={CONTENT_SIZES.FIT}>
                     <Button
                       icon={ICONS.ADD}
                       loading={isLoading}
@@ -103,13 +103,14 @@ const Payments = ({
                         setIsModalPaymentOpen(true);
                       }}
                       disabled={isTotalCovered || isLoading}
-                      width="fit-content"
+                      width={CONTENT_SIZES.FIT}
+                      data-testid="budget-add-payment-button"
                     />
                   </Box>
                 }
                 disabled={!isTotalCovered}
                 content="El pago esta completo"
-                position='top center'
+                position={POPUP_POSITIONS.TOP_CENTER}
                 size={SIZES.TINY}
               />
               <ModalAddPayment

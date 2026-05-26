@@ -6,7 +6,7 @@ import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { ModalAction, ModalMultiDelete } from "@/common/components/modals";
 import { Filters, Table } from "@/common/components/table";
-import { COLORS, ENTITIES, FIELD_LABELS, ICONS, PAGES, TOOLTIPS } from "@/common/constants";
+import { CONTENT_SIZES, COLORS, ENTITIES, FIELD_LABELS, ICONS, PAGES, TOOLTIPS } from "@/common/constants";
 import { createFilter } from "@/common/utils";
 import { formatCount, pluralize } from "@/common/utils/pluralization";
 import { OnlyPrint } from "@/components/layout";
@@ -158,7 +158,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
             >
               <DropdownControlled
                 minWidth="150px"
-                width="min-content"
+                width={CONTENT_SIZES.MIN}
                 name="state"
                 label={FIELD_LABELS.STATE}
                 options={PRODUCT_STATES_OPTIONS}

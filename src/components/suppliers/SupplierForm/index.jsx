@@ -65,6 +65,7 @@ const SupplierForm = forwardRef(({
               name="name"
               label="Nombre"
               placeholder="Suministro Estrella"
+              dataTestId="supplier-name-field"
               rules={RULES.REQUIRED}
               disabled={!isUpdating && view}
               required={isUpdating || !view}

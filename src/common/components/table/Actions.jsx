@@ -1,3 +1,4 @@
+import { POPUP_POSITIONS } from "@/common/constants";
 import { Button, Popup } from "semantic-ui-react";
 
 const resolveActionProp = (prop, element, index) => {
@@ -25,7 +26,7 @@ const Actions = ({ actions, element, index }) => {
             size="mini"
             content={resolvedTooltip}
             key={`action_${action.id}`}
-            position="top right"
+            position={POPUP_POSITIONS.TOP_RIGHT}
             trigger={
               <Button
                 type="button"

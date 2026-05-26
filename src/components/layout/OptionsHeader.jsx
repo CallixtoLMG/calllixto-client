@@ -1,5 +1,5 @@
 import ModalAction from '@/common/components/modals/ModalAction';
-import { BUTTON_TEXTS, COLORS, ICONS, SIZES } from '@/common/constants';
+import { CONTENT_SIZES, BUTTON_TEXTS, COLORS, ICONS, SIZES } from '@/common/constants';
 import { useRestoreEntity } from '@/hooks';
 import { useState } from 'react';
 import { Icon } from 'semantic-ui-react';
@@ -37,7 +37,7 @@ const OptionsDropdown = ({ entity, queryKey, text }) => {
       <Dropdown
         hideBorder
         bgColor="transparent"
-        width="fit-content"
+        width={CONTENT_SIZES.FIT}
         height="100%"
         padding="2em 0.5em"
         iconMargin="0"

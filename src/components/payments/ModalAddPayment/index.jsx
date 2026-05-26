@@ -105,6 +105,7 @@ export const ModalAddPayment = ({
                   onChange={(e, { value }) => setPayment({ ...payment, method: value })}
                   disabled={isTotalCovered}
                   error={showErrors && !payment.method ? RULES.REQUIRED.required : undefined}
+                  dataTestId="budget-payment-method-dropdown"
                   required
                 />
               </FormField>
@@ -119,6 +120,7 @@ export const ModalAddPayment = ({
                     setExceedAmountError(false);
                   }}
                   disabled={isTotalCovered}
+                  dataTestId="budget-payment-amount-field"
                   error={
                     showErrors && !payment.amount
                       ? RULES.REQUIRED.required
@@ -146,6 +148,7 @@ export const ModalAddPayment = ({
                 }}
                 disabled={isTotalCovered}
                 iconOnly
+                dataTestId="budget-payment-complete-amount-button"
               />
             </FieldsContainer>
             <FieldsContainer>
@@ -155,6 +158,7 @@ export const ModalAddPayment = ({
                 placeholder="Primer pago"
                 onChange={e => setPayment({ ...payment, comments: e.target.value })}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
+                dataTestId="budget-payment-comments-field"
               />
             </FieldsContainer>
             <TotalList readOnly items={totalListItem} />
@@ -180,6 +184,7 @@ export const ModalAddPayment = ({
               disabled={isTotalCovered || isLoading}
               loading={isLoading}
               submit
+              dataTestId="budget-payment-submit-button"
             />
           </ButtonsContainer>
         </Modal.Actions>

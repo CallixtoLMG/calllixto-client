@@ -1,4 +1,4 @@
-import { SIZES } from '@/common/constants';
+import { POPUP_POSITIONS, SIZES } from '@/common/constants';
 import { forwardRef } from 'react';
 import { Icon, Popup } from 'semantic-ui-react';
 import { Button, Flex } from '../custom';
@@ -19,16 +19,19 @@ const IconedButton = forwardRef(({
   onKeyDown,
   padding,
   iconOnly = false,
-  popupPosition = 'top center',
+  popupPosition = POPUP_POSITIONS.TOP_CENTER,
   popupInverted = false,
   popupDisabled = false,
   popupContent,
+  minWidth,
+  dataTestId,
 }, ref) => {
   const buttonElement = (
     <Button
       size={SIZES.SMALL}
       icon
       $iconOnly={iconOnly}
+      $minWidth={minWidth}
       $alignSelf={alignSelf}
       labelPosition={iconOnly ? undefined : 'left'}
       position={position}
@@ -42,6 +45,7 @@ const IconedButton = forwardRef(({
       loading={loading}
       type={submit ? 'submit' : 'button'}
       onKeyDown={onKeyDown}
+      data-testid={dataTestId}
       ref={ref}
     >
       <Icon name={icon} />

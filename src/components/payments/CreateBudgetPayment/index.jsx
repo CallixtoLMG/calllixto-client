@@ -4,7 +4,7 @@ import { FieldsContainer, Flex, FlexColumn, FormField, Icon, OverflowWrapper, Se
 import { DropdownField, PriceField, PriceLabel, TextField } from "@/common/components/form";
 import { DatePicker } from "@/common/components/form/DatePicker";
 import { Table, TotalList } from "@/common/components/table";
-import { COLORS, ENTITIES, FIELD_LABELS, ICONS, RULES, SIZES, TOOLTIPS } from "@/common/constants";
+import { POPUP_POSITIONS, CONTENT_SIZES, COLORS, ENTITIES, FIELD_LABELS, ICONS, RULES, SIZES, TOOLTIPS } from "@/common/constants";
 import { calculateTotals, handleEnterKeyDown, mapToDropdownOptions } from "@/common/utils";
 import { getFormatedDate, getSortedPaymentsByDate } from "@/common/utils/dates";
 import { useEffect, useMemo, useState } from "react";
@@ -29,7 +29,7 @@ const getPaymentTableHeaders = () => [
         {element.isOverdue && (
           <Popup
             content="Pago posterior a la fecha de vencimiento"
-            position="top center"
+            position={POPUP_POSITIONS.TOP_CENTER}
             size={SIZES.MINI}
             trigger={<Icon name={ICONS.EXCLAMATION_CIRCLE} color={COLORS.RED} size={SIZES.SMALL} />}
           />
@@ -189,7 +189,7 @@ const CreateBudgetPayments = ({
                       onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
                     />
                   </FormField>
-                  <FormField $maxWidth="max-content" flex="1">
+                  <FormField $maxWidth={CONTENT_SIZES.MAX} flex="1">
                     <IconedButton
                       height="38px"
                       size={SIZES.SMALL}
@@ -223,7 +223,7 @@ const CreateBudgetPayments = ({
                   }}
                   onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
                 />
-                <FormField $alignSelf="flex-end" $width="fit-content">
+                <FormField $alignSelf="flex-end" $width={CONTENT_SIZES.FIT}>
                   <IconedButton
                     alignSelf="flex-end"
                     size={SIZES.SMALL}

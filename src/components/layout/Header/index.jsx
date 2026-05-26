@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { IconedButton } from "@/common/components/buttons";
 import { KeyboardShortcuts, ModalUpdates } from "@/common/components/modals";
-import { COLORS, DEFAULT_SELECTED_ACCOUNT, ICONS, PAGES, getNavigationItems } from "@/common/constants";
+import { CONTENT_SIZES, COLORS, ICONS, PAGES, getNavigationItems } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks";
 import { RULES, isCallixtoUser } from "@/roles";
 import { getSelectedAccountId, setSelectedAccountId as saveSelectedAccountId } from "@/services/session";
@@ -25,16 +25,20 @@ const Header = () => {
   const pathname = usePathname();
   const { push } = useRouter();
   const { userData, role } = useUserContext();
-  const [selectedAccountId, setSelectedAccountId] = useState(DEFAULT_SELECTED_ACCOUNT);
+  const [selectedAccountId, setSelectedAccountId] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const account = getSelectedAccountId();
+    if (typeof window === "undefined" || !userData?.isAuthorized) return;
+
+    const account = getSelectedAccountId(userData);
+
+    if (isCallixtoUser(role)) {
       saveSelectedAccountId(account);
-      setSelectedAccountId(account);
     }
-  }, []);
+
+    setSelectedAccountId(account);
+  }, [role, userData]);
 
   const navigationItems = useMemo(() => getNavigationItems(role), [role]);
 
@@ -135,7 +139,7 @@ const Header = () => {
                 icon={ICONS.USER}
                 color={COLORS.BLUE}
                 text={userData.name}
-                width="fit-content"
+                width={CONTENT_SIZES.FIT}
 
               />
             }
