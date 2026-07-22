@@ -3,6 +3,12 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-07-22
+
+### Added
+
+- Header: Added a Pandora shortcut for `callixto` and `sadmin` users to open the Excel sanitizer in a new tab.
+
 ## 2026-05-24
 
 ### Changed
