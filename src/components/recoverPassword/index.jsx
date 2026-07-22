@@ -1,5 +1,4 @@
 "use client";
-import { useUserContext } from "@/User";
 import { confirmNewPasswordRequired, confirmReset, recoverPassword } from "@/api/login";
 import { getUserData } from "@/api/userData";
 import { Form } from "@/common/components/custom";
@@ -15,7 +14,6 @@ import { ModButton, ModGrid, ModGridColumn, ModHeader, RedirectLink, Text } from
 
 const RecoverPasswordForm = ({ isFirstLogin = false }) => {
   const { push } = useRouter();
-  const { setUserData } = useUserContext();
   const methods = useForm();
   const { handleSubmit, reset, watch } = methods;
   const [isCodeSent, setIsCodeSent] = useState(isFirstLogin);
@@ -82,7 +80,6 @@ const RecoverPasswordForm = ({ isFirstLogin = false }) => {
     },
     onSuccess: (userData) => {
       if (userData) {
-        setUserData(userData);
         toast.success("Contrasena cambiada con exito.");
         push(PAGES.BUDGETS.BASE);
       } else {
