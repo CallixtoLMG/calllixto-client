@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { IconedButton } from "@/common/components/buttons";
 import { KeyboardShortcuts, ModalUpdates } from "@/common/components/modals";
-import { CONTENT_SIZES, COLORS, ICONS, PAGES, getNavigationItems } from "@/common/constants";
+import { CONTENT_SIZES, COLORS, ICONS, PAGES, PANDORA_URL, getNavigationItems } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks";
 import { RULES, isCallixtoUser } from "@/roles";
 import { getSelectedAccountId, setSelectedAccountId as saveSelectedAccountId } from "@/services/session";
@@ -11,8 +11,8 @@ import { useEffect, useMemo, useState } from "react";
 import { UserMenu } from "..";
 import SidebarNavigation from "./Sidebar";
 import {
-  Brand,
   AccountBadge,
+  Brand,
   HeaderBar,
   HeaderLeft,
   HeaderRight,
@@ -50,6 +50,10 @@ const Header = () => {
 
   const handleLogout = () => {
     push(PAGES.LOGIN.BASE);
+  };
+
+  const handleOpenPandora = () => {
+    window.open(PANDORA_URL, '_blank', 'noopener,noreferrer');
   };
 
   const routesWithoutHeader = [PAGES.LOGIN.BASE, PAGES.RESTORE_PASSWORD.BASE, PAGES.MAINTENANCE.BASE];
@@ -130,6 +134,15 @@ const Header = () => {
             <ModalUpdates />
             <KeyboardShortcuts />
           </RightActions>
+          {RULES.canAccessPandora[role] && (
+            <IconedButton
+              icon={ICONS.FILE_EXCEL}
+              color={COLORS.BLUE}
+              text="Pandora"
+              width={CONTENT_SIZES.FIT}
+              onClick={handleOpenPandora}
+            />
+          )}
           {isCallixtoUser(role) && (
             <AccountBadge>{selectedAccountId}</AccountBadge>
           )}

@@ -130,6 +130,8 @@ export const PAGES = {
   },
 };
 
+export const PANDORA_URL = 'https://pandora-glm.netlify.app/';
+
 const buildEntityChildren = (page, extra = []) => {
   const singularName = page.SINGULAR_NAME ?? page.NAME;
 
@@ -452,7 +454,7 @@ export const ICONS = {
   LIST_ALTERNATE: "list alternate",
   CARET_UP: "caret up",
   CARET_DOWN: "caret down",
-  SIGN_OUT:"sign out"
+  SIGN_OUT: "sign out"
 };
 
 export const ALL = "all";
