@@ -67,7 +67,7 @@ const Settings = () => {
 
   useEffect(() => {
     setActions([]);
-    setInfo(INFO.HELP.SECTIONS[ENTITIES.SETTINGS]);
+    setInfo(INFO.HELP.SECTIONS[ENTITIES.SETTINGS].LIST);
     setLabels([{ name: PAGES.SETTINGS.NAME }]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setActions, setLabels]);

@@ -16,7 +16,7 @@ import { Dropdown, Icon, Popup } from 'semantic-ui-react';
 import { IconedButton } from '../buttons';
 import { FiltersContainer, HeaderSegment, MainContainer } from './styles';
 
-const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, hydrated }) => {
+const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, hydrated, showRefetchAction = true }) => {
   const ENTITY_MAPPING = {
     [ENTITIES.CUSTOMERS]: { queryKey: LIST_CUSTOMERS_QUERY_KEY, text: PAGES.CUSTOMERS.NAME },
     [ENTITIES.PRODUCTS]: { queryKey: LIST_PRODUCTS_QUERY_KEY, text: PAGES.PRODUCTS.NAME },
@@ -90,9 +90,8 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
             icon={ICONS.SEARCH}
             submit
             color={isDirty ? COLORS.BLUE : undefined}
-            iconOnly
           />
-          {onRefetch &&
+          {showRefetchAction && onRefetch &&
             <Dropdown width="130px" pointing as={CustomButton} text={BUTTON_TEXTS.UPDATE} icon={ICONS.REFRESH} floating labeled button className='icon'>
               <Dropdown.Menu>
                 <DropdownItem onClick={onRefetch}>

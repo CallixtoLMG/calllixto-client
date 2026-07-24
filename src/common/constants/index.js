@@ -132,6 +132,14 @@ export const PAGES = {
 
 export const PANDORA_URL = 'https://pandora-glm.netlify.app/';
 
+export const PAGE_ACTIONS_INFO_TEXT = "Las acciones disponibles de esta sección, como Crear, Actualizar o Descargar Excel, se encuentran en la barra lateral derecha. Usá el botón de acciones para expandirla o contraerla.";
+
+const PageActionsInfo = () => (
+  <ListItem>
+    {PAGE_ACTIONS_INFO_TEXT}
+  </ListItem>
+);
+
 const buildEntityChildren = (page, extra = []) => {
   const singularName = page.SINGULAR_NAME ?? page.NAME;
 
@@ -252,6 +260,16 @@ export const getNavigationItems = (role) => {
       icon: ICONS.COG,
       children: SETTINGS_NAV_ITEMS,
       badge: PAGES.SETTINGS.BADGE,
+    },
+    ROLES.canAccessPandora[role] && {
+      id: "pandora-divider",
+      type: "divider",
+    },
+    ROLES.canAccessPandora[role] && {
+      id: "pandora",
+      label: "Ir a Pandora",
+      href: PANDORA_URL,
+      external: true,
     },
   ];
 
@@ -454,7 +472,10 @@ export const ICONS = {
   LIST_ALTERNATE: "list alternate",
   CARET_UP: "caret up",
   CARET_DOWN: "caret down",
-  SIGN_OUT: "sign out"
+  SIGN_OUT: "sign out",
+  SYNC_ALTERNATE: "sync alternate",
+  BOLT: "bolt",
+  CLOUD_DOWNLOAD: "cloud download"
 };
 
 export const ALL = "all";
@@ -529,9 +550,7 @@ export const INFO = {
                 <ListItem>
                   Listado de clientes según los filtros activos.
                 </ListItem>
-                <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar excel</Accent>, que permite exportar los elementos filtrados a un archivo.
-                </ListItem>
+                <PageActionsInfo />
                 <ListItem>
                   Para crear un cliente, presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
@@ -584,9 +603,7 @@ export const INFO = {
                 <ListItem>
                   Listado de proveedores según los filtros activos.
                 </ListItem>
-                <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar excel</Accent>, que permite exportar los elementos filtrados a un archivo.
-                </ListItem>
+                <PageActionsInfo />
                 <ListItem>
                   Para crear un proveedor, presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
@@ -648,9 +665,7 @@ export const INFO = {
                 <ListItem>
                   Listado de marcas según los filtros activos.
                 </ListItem>
-                <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar excel</Accent>, que permite exportar los datos visibles.
-                </ListItem>
+                <PageActionsInfo />
                 <ListItem>
                   Para crear una marca, presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
@@ -703,9 +718,7 @@ export const INFO = {
                 <ListItem>
                   Listado de productos según los filtros activos.
                 </ListItem>
-                <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar excel</Accent>, que permite exportar los datos visibles.
-                </ListItem>
+                <PageActionsInfo />
                 <ListItem>
                   Para crear un producto, presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
@@ -779,9 +792,7 @@ export const INFO = {
                 <ListItem>
                   En ventas confirmadas, pasando el cursor sobre el <Accent>ID</Accent>, se podrá visualizar quién y cuándo se confirmó la venta. Si la venta está pagada en su totalidad, aparecerá el icono <span><Icon name={ICONS.DOLLAR} color={COLORS.GREEN} /></span>.
                 </ListItem>
-                <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar excel</Accent>, que permite exportar los elementos filtrados a un archivo.
-                </ListItem>
+                <PageActionsInfo />
                 <ListItem>
                   Para crear una venta, presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
@@ -840,6 +851,30 @@ export const INFO = {
           </>
         ),
       },
+      [ENTITIES.BUDGETS_HISTORY]: {
+        LIST: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.CLIPBOARD} color={COLORS.BLUE} /> <strong>Historial de ventas</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                <ListItem>
+                  Consultá ventas dentro de un período determinado. Podés elegir un rango predefinido o ingresar manualmente las fechas Desde y Hasta, y luego ejecutar la búsqueda.
+                </ListItem>
+                <ListItem>
+                  Después de cargar los resultados, podés filtrarlos por Estado, Id, Cliente o Vendedor.
+                </ListItem>
+                <PageActionsInfo />
+                <ListItem>
+                  La acción <Accent>Actualizar</Accent> vuelve a ejecutar la consulta actual sin limpiar las fechas ni los filtros aplicados.
+                </ListItem>
+                <ListItem>
+                  <Accent>Descargar Excel</Accent> exporta todas las ventas filtradas y ordenadas, no solamente las filas visibles en la página actual.
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+      },
       [ENTITIES.EXPENSE]: {
         LIST: (
           <>
@@ -849,9 +884,7 @@ export const INFO = {
                 <ListItem>
                   Listado de gastos según los filtros activos.
                 </ListItem>
-                <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar excel</Accent>, que permite exportar los elementos filtrados a un archivo.
-                </ListItem>
+                <PageActionsInfo />
                 <ListItem>
                   Para crear un gasto, presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
@@ -904,9 +937,7 @@ export const INFO = {
                 <ListItem>
                   Listado de cajas según los filtros activos.
                 </ListItem>
-                <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar excel</Accent>, que permite exportar los elementos filtrados a un archivo.
-                </ListItem>
+                <PageActionsInfo />
                 <ListItem>
                   Para crear una caja, presioná el botón <Accent>Abrir</Accent>.
                 </ListItem>
@@ -953,9 +984,7 @@ export const INFO = {
                 <ListItem>
                   Listado de usuarios según los filtros activos.
                 </ListItem>
-                <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar excel</Accent>, que permite exportar los elementos filtrados a un archivo.
-                </ListItem>
+                <PageActionsInfo />
                 <ListItem>
                   Para crear un usuario, presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
@@ -1009,8 +1038,9 @@ export const INFO = {
                   En la pantalla principal se muestran las distintas pestañas con aspectos configurables. En cada una de ellas encontrarás elementos desplegables donde podrás definir parámetros específicos de cada sección.
                 </ListItem>
                 <ListItem>
-                  Las etiquetas y categorías sirven para catalogar elementos. Para crear una etiqueta o categoría, ingresa un nombre, selecciona un color y agrega una descripción opcional. Luego, haz clic en el botón <Accent>Agregar</Accent>. Cuando hayas terminado, debajo de la tabla se encuentra el botón <Accent>Actualizar</Accent> para guardar los cambios.
+                  Las etiquetas y categorías sirven para catalogar elementos. Para crear una etiqueta o categoría, ingresa un nombre, selecciona un color y agrega una descripción opcional. Luego, haz clic en el botón <Accent>Agregar</Accent>. Cuando hayas terminado, usá el botón <Accent>Actualizar</Accent> para guardar los cambios.
                 </ListItem>
+                <PageActionsInfo />
                 <ListItem>
                   Los productos bloqueados son una lista de IDs que no podrán ser agregados o creados. Para más información, pasa el mouse por encima del icono <Icon name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />.
                 </ListItem>

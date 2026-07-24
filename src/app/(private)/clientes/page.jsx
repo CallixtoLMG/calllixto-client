@@ -4,7 +4,7 @@ import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel, getFormatedPhone } from "@/common/utils";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { CUSTOMER_STATES } from "@/components/customers/customers.constants";
-import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useBreadcrumContext } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
@@ -12,7 +12,6 @@ import { useCallback, useEffect, useMemo } from "react";
 const Customers = () => {
   const { data, isLoading, isRefetching, refetch } = useListCustomers();
   const { setLabels } = useBreadcrumContext();
-  const { setActions } = useNavActionsContext();
   const { push } = useRouter();
 
   useEffect(() => {
@@ -37,23 +36,21 @@ const Customers = () => {
     downloadExcel([headers, ...mappedCustomers], "Lista de Clientes");
   }, []);
 
-  useEffect(() => {
-    const actions = [
+  const sideActions = useMemo(() => [
       {
         id: 1,
         icon: ICONS.ADD,
         color: COLORS.GREEN,
         onClick: () => { push(PAGES.CUSTOMERS.CREATE) },
         text: 'Crear',
+        collapsedTooltip: 'Crear cliente',
       }
-    ];
-    setActions(actions);
-  }, [push, setActions, loading]);
+    ], [push]);
 
   useKeyboardShortcuts(() => push(PAGES.CUSTOMERS.CREATE), SHORTKEYS.ENTER);
 
   return (
-    <CustomersPage onRefetch={refetch} isLoading={loading} customers={loading ? [] : customers} onDownloadExcel={handleDownloadExcel} />
+    <CustomersPage onRefetch={refetch} isLoading={loading} customers={loading ? [] : customers} onDownloadExcel={handleDownloadExcel} sideActions={sideActions} />
   );
 };
 

@@ -5,7 +5,7 @@ import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel } from "@/common/utils";
 import BrandsPage from "@/components/brands/BrandsPage";
 import { BRAND_STATES } from "@/components/brands/brands.constants";
-import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useBreadcrumContext } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
@@ -15,7 +15,6 @@ const Brands = () => {
   const { data, isLoading, isRefetching, refetch } = useListBrands();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
-  const { setActions } = useNavActionsContext();
   const { push } = useRouter();
 
   useEffect(() => {
@@ -40,7 +39,7 @@ const Brands = () => {
     downloadExcel([headers, ...mappedBrands], "Lista de Marcas");
   }, []);
 
-  useEffect(() => {
+  const sideActions = useMemo(() => {
     const actions = [];
 
     if (RULES.canCreate[role]) {
@@ -49,12 +48,13 @@ const Brands = () => {
         icon: ICONS.ADD,
         color: COLORS.GREEN,
         onClick: () => { push(PAGES.BRANDS.CREATE) },
-        text: 'Crear'
+        text: 'Crear',
+        collapsedTooltip: 'Crear marca',
       })
     }
 
-    setActions(actions);
-  }, [push, role, setActions, loading, ]);
+    return actions;
+  }, [push, role]);
 
   useKeyboardShortcuts(() => push(PAGES.BRANDS.CREATE), SHORTKEYS.ENTER);
 
@@ -64,6 +64,7 @@ const Brands = () => {
       isLoading={loading}
       brands={loading ? [] : brands}
       onDownloadExcel={handleDownloadExcel}
+      sideActions={sideActions}
     />
   );
 };

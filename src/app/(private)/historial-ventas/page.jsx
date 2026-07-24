@@ -2,16 +2,20 @@
 import { useListBudgetsHistory } from "@/api/budgets";
 import { useGetSetting } from "@/api/settings";
 import { useListUsers } from "@/api/users";
-import { ENTITIES, PAGES } from "@/common/constants";
+import { BUTTON_TEXTS, COLORS, CONTENT_SIZES, ENTITIES, ICONS, INFO, PAGES } from "@/common/constants";
 import BudgetsHistoryFilter from "@/components/budgets/BudgetsHistoryFilters";
-import BudgetsPage from "@/components/budgets/BudgetsPage";
+import BudgetsPage, { downloadBudgetsExcel } from "@/components/budgets/BudgetsPage";
 import { BASE_BUDGETS_HISTORY_RANGES, BUDGETS_HISTORY_FILTERS_KEY, BUDGET_STATES, DATE_RANGE_KEY, buildCustomHistoryRanges } from "@/components/budgets/budgets.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import useFilterParams from "@/hooks/useFilterParams";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+const BUDGETS_HISTORY_INFO = INFO.HELP.SECTIONS[ENTITIES.BUDGETS_HISTORY].LIST;
 
 const BudgetsHistory = () => {
   const [hydrated, setHydrated] = useState(false);
+  const [filteredBudgets, setFilteredBudgets] = useState([]);
+  const filteredBudgetsRef = useRef([]);
   useEffect(() => setHydrated(true), []);
 
   const {
@@ -25,7 +29,7 @@ const BudgetsHistory = () => {
     },
   });
 
-  const { data: budgetsData, isLoading: isLoadingBudgets, isRefetching } = useListBudgetsHistory({
+  const { data: budgetsData, isLoading: isLoadingBudgets, isRefetching, refetch: refetchBudgetsHistory } = useListBudgetsHistory({
     startDate: dateRange.startDate,
     endDate: dateRange.endDate,
   });
@@ -65,18 +69,78 @@ const BudgetsHistory = () => {
   })), [users]);
 
   useEffect(() => {
+    filteredBudgetsRef.current = filteredBudgets;
+  }, [filteredBudgets]);
+
+  useEffect(() => {
     setLabels([{ name: "Historial de ventas" }]);
   }, [setLabels]);
 
-  useEffect(() => {
-    setActions([]);
-    setInfo(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const hasAppliedDateRange = Boolean(dateRange.startDate && dateRange.endDate);
+  const handleUpdateHistory = useCallback(() => {
+    if (!hasAppliedDateRange || loading) return;
+
+    refetchBudgetsHistory();
+  }, [hasAppliedDateRange, loading, refetchBudgetsHistory]);
+
+  const handleDownloadHistoryExcel = useCallback(() => {
+    downloadBudgetsExcel(filteredBudgetsRef.current);
   }, []);
 
-  const handleSearch = (newRange) => {
+  const handleFilteredBudgetsChange = useCallback((nextFilteredBudgets) => {
+    setFilteredBudgets((currentFilteredBudgets) => {
+      const hasSameBudgets =
+        currentFilteredBudgets.length === nextFilteredBudgets.length &&
+        currentFilteredBudgets.every((budget, index) => budget === nextFilteredBudgets[index]);
+
+      return hasSameBudgets ? currentFilteredBudgets : nextFilteredBudgets;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (hasAppliedDateRange) return;
+
+    setFilteredBudgets((currentFilteredBudgets) => (
+      currentFilteredBudgets.length ? [] : currentFilteredBudgets
+    ));
+  }, [hasAppliedDateRange]);
+
+  const historyActions = useMemo(() => [
+    {
+      id: "update-history",
+      icon: ICONS.REFRESH,
+      color: COLORS.BLUE,
+      text: BUTTON_TEXTS.UPDATE,
+      collapsedTooltip: "Actualizar historial de ventas",
+      onClick: handleUpdateHistory,
+      disabled: !hasAppliedDateRange || loading,
+      loading,
+    },
+    {
+      id: "download-excel",
+      icon: ICONS.FILE_EXCEL,
+      color: COLORS.BLUE,
+      text: "Descargar excel",
+      collapsedTooltip: "Descargar historial de ventas en Excel",
+      onClick: handleDownloadHistoryExcel,
+      width: CONTENT_SIZES.FIT,
+      disabled: !hasAppliedDateRange || loading || !filteredBudgets.length,
+    },
+  ], [filteredBudgets.length, handleDownloadHistoryExcel, handleUpdateHistory, hasAppliedDateRange, loading]);
+
+  useEffect(() => {
+    setActions(historyActions);
+    setInfo(BUDGETS_HISTORY_INFO);
+  }, [historyActions, setActions, setInfo]);
+
+  useEffect(() => () => {
+    setActions([]);
+    setInfo(null);
+  }, [setActions, setInfo]);
+
+  const handleSearch = useCallback((newRange) => {
     setDateRange(newRange);
-  };
+  }, [setDateRange]);
 
   if (!hydrated) return null;
 
@@ -94,6 +158,9 @@ const BudgetsHistory = () => {
           budgets={loading ? [] : budgets}
           filterKey={BUDGETS_HISTORY_FILTERS_KEY}
           usersOptions={usersOptions}
+          onRefetch={refetchBudgetsHistory}
+          useSideActions
+          onFilteredBudgetsChange={handleFilteredBudgetsChange}
         />
       )}
     </>

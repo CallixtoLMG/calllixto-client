@@ -23,6 +23,7 @@ export const BatchImportStock = ({
   mode,
   supplierId,
   products = [],
+  triggerClassName,
 }) => {
   const isDiscount = mode === DISCOUNT_STOCK;
   const methods = useForm();
@@ -380,6 +381,7 @@ export const BatchImportStock = ({
         open={openModal}
         onClose={handleCloseModal}
         onOpen={() => setOpenModal(true)}
+        triggerClassName={triggerClassName}
         onBeforeOpenFile={handleBeforeOpenFile}
         onFileRead={handleFileRead}
         onFileError={() => toast.error("Error al leer el archivo")}

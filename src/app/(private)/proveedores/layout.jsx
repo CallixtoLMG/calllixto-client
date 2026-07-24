@@ -5,7 +5,7 @@ import 'semantic-ui-css/semantic.min.css';
 export default function RootLayout({ children }) {
   return (
     <MainContainer>
-      <SubContainer>
+      <SubContainer $embeddedInWorkspace>
         {children}
       </SubContainer>
     </MainContainer>

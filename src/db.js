@@ -28,6 +28,10 @@ export async function bulkAddStorageItems({ entity, values }) {
   await db[entity].bulkAdd(values);
 };
 
+export async function bulkPutStorageItems({ entity, values }) {
+  await db[entity].bulkPut(values);
+};
+
 export function getStorageItem({ entity, id }) {
   return db[entity].get(id);
 };

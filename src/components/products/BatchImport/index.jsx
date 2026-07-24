@@ -29,6 +29,7 @@ export const BatchImport = ({
   importedRowsCount,
   openBeforeRead = false,
   accept = ".xlsx,.xls,.xlsm",
+  triggerClassName,
 }) => {
   const handleOpenFile = async () => {
     await onBeforeOpenFile?.();
@@ -79,16 +80,19 @@ export const BatchImport = ({
         onChange={handleFileUpload}
       />
       <Button
+        className={triggerClassName}
         height={CONTENT_SIZES.FIT}
         width={CONTENT_SIZES.FIT}
         $paddingLeft="0"
-        as={BatchImportIcon}
+        as={triggerClassName ? undefined : BatchImportIcon}
         onClick={handleOpenFile}
         type="button"
         $iconOnly
       >
         <Icon name={importSettings.icon} color={importSettings.color} />
-        {importSettings.button || importSettings.title}
+        {triggerClassName
+          ? <span>{importSettings.button || importSettings.title}</span>
+          : importSettings.button || importSettings.title}
       </Button>
       <ModalBatchImport
         open={open}

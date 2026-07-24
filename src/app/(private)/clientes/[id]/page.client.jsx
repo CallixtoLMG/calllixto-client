@@ -179,6 +179,7 @@ const CustomerPageClient = ({ customer }) => {
           color: COLORS.GREY,
           onClick: handleClick(isItemInactive(customer.state) ? ACTIVE : INACTIVE),
           text: isItemInactive(customer.state) ? "Activar" : "Desactivar",
+          collapsedTooltip: isItemInactive(customer.state) ? "Activar cliente" : "Desactivar cliente",
           loading: (activeAction === ACTIVE || activeAction === INACTIVE),
           disabled: !!activeAction || isEditPending,
           iconOnly: true
@@ -190,6 +191,7 @@ const CustomerPageClient = ({ customer }) => {
           onClick: handleClick(DELETE),
           text: "Eliminar",
           tooltip: customer.hasBudgets ? "No se puede eliminar este cliente, existen presupuestos asociados." : false,
+          collapsedTooltip: customer.hasBudgets ? "No se puede eliminar este cliente, existen presupuestos asociados." : "Eliminar cliente",
           basic: true,
           loading: activeAction === DELETE,
           disabled: customer.hasBudgets || !!activeAction || isEditPending,

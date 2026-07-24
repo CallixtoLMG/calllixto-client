@@ -15,6 +15,7 @@ import {
   NavItemRow,
   NavItemToggle,
   NavLabel,
+  NavDivider,
   NavSection,
   SidebarBody,
   SidebarContainer,
@@ -53,6 +54,11 @@ const SidebarNavigation = ({ open, onClose, items = [], pathname }) => {
     handleClose();
   };
 
+  const handleExternalClick = (event, href) => {
+    event.preventDefault();
+    window.open(href, "_blank", "noopener,noreferrer");
+  };
+
   const isItemActive = (href) =>
     pathname === href || pathname.startsWith(`${href}/`);
 
@@ -87,6 +93,10 @@ const SidebarNavigation = ({ open, onClose, items = [], pathname }) => {
       <SidebarBody>
         <NavSection>
           {items.map((item) => {
+            if (item.type === "divider") {
+              return <NavDivider key={item.id} />;
+            }
+
             const hasChildren = !!item.children?.length;
             const expanded = !!openGroups[item.id];
             const active = hasChildren
@@ -132,6 +142,23 @@ const SidebarNavigation = ({ open, onClose, items = [], pathname }) => {
                 </div>
               );
             }
+
+            if (item.external) {
+              return (
+                <NavItemButton
+                  key={item.id}
+                  href={item.href}
+                  $active={false}
+                  onClick={(event) => handleExternalClick(event, item.href)}
+                >
+                  <NavItemContent>
+                    <NavLabel>{item.label}</NavLabel>
+                  </NavItemContent>
+                  {item.badge && <Badge>{item.badge}</Badge>}
+                </NavItemButton>
+              );
+            }
+
             return (
               <NavItemButton
                 key={item.id}

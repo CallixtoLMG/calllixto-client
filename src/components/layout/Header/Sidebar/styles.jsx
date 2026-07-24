@@ -139,6 +139,12 @@ export const NavLabel = styled.span`
   font-weight: 600;
 `;
 
+export const NavDivider = styled.div`
+  height: 1px;
+  margin: 10px 18px;
+  background: #e5e7eb;
+`;
+
 export const Chevron = styled.span`
   font-size: 14px;
   transition: transform 0.3s ease;

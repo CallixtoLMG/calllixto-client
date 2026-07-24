@@ -4,7 +4,7 @@ import { useCancelBudget, useConfirmBudget } from "@/api/budgets";
 import { useGetPayments } from "@/api/payments";
 import { useGetSetting } from "@/api/settings";
 import { IconedButton } from "@/common/components/buttons";
-import { DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Menu, Message, MessageHeader } from "@/common/components/custom";
+import { Flex, Message, MessageHeader } from "@/common/components/custom";
 import ModalCancel from "@/common/components/modals/ModalCancel";
 import { CONTENT_SIZES, COLORS, ENTITIES, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
@@ -22,7 +22,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import toast from "react-hot-toast";
-import { Dropdown } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 
 const BudgetPageClient = ({ budget }) => {
@@ -138,6 +137,17 @@ const BudgetPageClient = ({ budget }) => {
       ];
 
       const hasValidSendOptions = sendButtons.some(button => button.subOptions.length > 0);
+      const sendItems = sendButtons.flatMap(({ text: channelText, subOptions }) =>
+        subOptions.map(({ key, href, text, iconName, color }) => ({
+          id: key,
+          href,
+          target: "_blank",
+          text: `${channelText}: ${text}`,
+          collapsedTooltip: `Enviar venta por ${channelText} a ${text}`,
+          icon: iconName,
+          color,
+        }))
+      );
 
       const actions = [
         !isBudgetDraft(budget.state) &&
@@ -147,44 +157,16 @@ const BudgetPageClient = ({ budget }) => {
           color: COLORS.BLUE,
           onClick: () => setIsModalPDFOpen(true),
           text: 'Imprimir venta',
+          collapsedTooltip: 'Descargar PDF de la venta',
           iconOnly:true,
         },
         hasValidSendOptions && {
           id: 2,
-          button: (
-            <Menu>
-              <DropdownOption
-                $menu={true}
-                pointing
-                text='Enviar'
-                icon={ICONS.SEND}
-                labeled
-                button
-                className='icon blue'
-                $paddingLeft="45px"
-                >
-                <Dropdown.Menu direction="left" >
-                  {sendButtons.map(({ text, iconName, subOptions }) => (
-                    <Flex key={iconName}>
-                      {subOptions.length > 0 && (
-                        <DropdownOption $reverse direction="left" text={text} pointing="left" className="link item">
-                          <DropdownMenu margin="0 10px 0 0" icon={iconName}>
-                            {subOptions.map(({ key, href, text, iconName, color }) => (
-                              <Flex key={key}>
-                                <DropdownItem  key={key} as='a' href={href} target="_blank">
-                                  <Icon name={iconName} color={color} /> {text}
-                                </DropdownItem>
-                              </Flex>
-                            ))}
-                          </DropdownMenu>
-                        </DropdownOption>
-                      )}
-                    </Flex>
-                  ))}
-                </Dropdown.Menu>
-              </DropdownOption>
-            </Menu>
-          )
+          icon: ICONS.SEND,
+          color: COLORS.BLUE,
+          text: 'Enviar',
+          collapsedTooltip: 'Enviar venta',
+          items: sendItems,
         },
         {
           id: 3,
@@ -192,6 +174,7 @@ const BudgetPageClient = ({ budget }) => {
           color: COLORS.GREEN,
           onClick: () => { push(PAGES.BUDGETS.CLONE(budget.id)) },
           text: 'Clonar venta',
+          collapsedTooltip: 'Clonar venta',
           iconOnly:true,
         },
         budget.state === BUDGET_STATES.CONFIRMED.id && {
@@ -200,6 +183,7 @@ const BudgetPageClient = ({ budget }) => {
           color: COLORS.RED,
           onClick: () => setIsModalCancelOpen(true),
           text: 'Anular venta',
+          collapsedTooltip: 'Anular venta',
           basic: true,
           iconOnly:true,
         },

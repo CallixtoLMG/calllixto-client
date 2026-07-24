@@ -2,12 +2,12 @@
 import { useUserContext } from "@/User";
 import { useDeleteBySupplierId, useProductsBySupplierId } from "@/api/products";
 import { useDeleteSupplier, useEditSupplier, useSetSupplierState } from "@/api/suppliers";
-import { Button, DropdownItem, FieldsContainer, FormField, Icon, Message, MessageHeader, } from "@/common/components/custom";
+import { FieldsContainer, FormField, Icon, Message, MessageHeader, } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { POPUP_POSITIONS, CONTENT_SIZES, ACTIVE, COLORS, ICONS, INACTIVE, PAGES, PLACEHOLDERS, SIZES } from "@/common/constants";
+import { POPUP_POSITIONS, ACTIVE, COLORS, ICONS, INACTIVE, PAGES, PLACEHOLDERS } from "@/common/constants";
 import { downloadExcel, isItemInactive } from "@/common/utils";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext, } from "@/components/layout";
 import { BatchImportStock } from "@/components/products/BatchImportStock";
@@ -22,7 +22,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import { Dropdown, Popup } from "semantic-ui-react";
 
 const SupplierPageClient = ({ supplier }) => {
   const { role } = useUserContext();
@@ -301,6 +300,9 @@ const SupplierPageClient = ({ supplier }) => {
         tooltip: !hasAssociatedProducts
           ? 'No existen productos de este proveedor.'
           : false,
+        collapsedTooltip: !hasAssociatedProducts
+          ? 'No existen productos de este proveedor.'
+          : 'Imprimir códigos de productos',
         iconOnly: true
       },
       {
@@ -310,6 +312,7 @@ const SupplierPageClient = ({ supplier }) => {
           : ICONS.PAUSE_CIRCLE,
         color: COLORS.GREY,
         text: isItemInactive(supplier?.state) ? "Activar" : "Desactivar",
+        collapsedTooltip: isItemInactive(supplier?.state) ? "Activar proveedor" : "Desactivar proveedor",
         onClick: handleClick(isItemInactive(supplier?.state) ? ACTIVE : INACTIVE),
         loading: activeAction === ACTIVE || activeAction === INACTIVE,
         disabled: !!activeAction || isEditPending,
@@ -317,79 +320,73 @@ const SupplierPageClient = ({ supplier }) => {
       },
       {
         id: 3,
-        iconOnly: true,
-        button: (
-          <Popup
-            disabled={!stockExcelTooltip}
-            position={POPUP_POSITIONS.TOP_CENTER}
-            size={SIZES.TINY}
-            content={(
-              <div>
-                <div><strong>Stock/Excel</strong></div>
-                <div>{stockExcelTooltip}</div>
-              </div>
-            )}
-            trigger={(
-              <div>
-                <Dropdown
-                  pointing
-                  as={Button}
-                  text="Stock/Excel"
-                  icon={ICONS.FILE_EXCEL}
-                  width={CONTENT_SIZES.FIT}
-                  floating
-                  labeled
-                  button
-                  className="icon"
-                  disabled={isStockExcelDisabled}
-                >
-                  <Dropdown.Menu>
-                    <DropdownItem
-                      onClick={() => {
-                        if (products?.length) {
-                          setIsExcelLoading(true);
-                          handleDownloadExcel();
-                          setIsExcelLoading(false);
-                        } else {
-                          toast("No hay productos de este proveedor para descargar.", {
-                            icon: (
-                              <Icon
-                                margin="0"
-                                toast
-                                name={ICONS.INFO_CIRCLE}
-                                color={COLORS.BLUE}
-                              />
-                            ),
-                          });
-                        }
-                      }}
-                    >
-                      <Icon name={ICONS.DOWNLOAD} color="blue" />
-                      Descargar productos
-                    </DropdownItem>
-                    <DropdownItem  >
-                      <BatchImportStock
-                        mode={UPLOAD_STOCK}
-                        supplierId={supplier?.id}
-                        products={products}
-                      />
-                    </DropdownItem>
-                    <DropdownItem  >
-                      <BatchImportStock
-                        mode={DISCOUNT_STOCK}
-                        supplierId={supplier?.id}
-                        products={products}
-                      />
-                    </DropdownItem>
-                    <DropdownItem onClick={() => downloadExcel(EXAMPLE_TEMPLATE_DATA_STOCK, "Ejemplo de tabla stock")}>
-                      <Icon name={ICONS.FILE_EXCEL_OUTLINE} />Plantilla stock
-                    </DropdownItem>
-                  </Dropdown.Menu>
-                </Dropdown>
-              </div>
-            )}
-          />
-        ),
+        icon: ICONS.FILE_EXCEL,
+        color: COLORS.BLUE,
+        text: "Stock/Excel",
+        collapsedTooltip: stockExcelTooltip || "Acciones de stock y Excel del proveedor",
+        disabled: isStockExcelDisabled,
+        tooltip: stockExcelTooltip,
+        items: [
+          {
+            id: "download-products",
+            icon: ICONS.DOWNLOAD,
+            color: COLORS.BLUE,
+            text: "Descargar productos",
+            collapsedTooltip: "Descargar productos del proveedor",
+            onClick: () => {
+              if (products?.length) {
+                setIsExcelLoading(true);
+                handleDownloadExcel();
+                setIsExcelLoading(false);
+              } else {
+                toast("No hay productos de este proveedor para descargar.", {
+                  icon: (
+                    <Icon
+                      margin="0"
+                      toast
+                      name={ICONS.INFO_CIRCLE}
+                      color={COLORS.BLUE}
+                    />
+                  ),
+                });
+              }
+            },
+          },
+          {
+            id: "upload-stock",
+            text: "Cargar stock",
+            color: COLORS.GREEN,
+            collapsedTooltip: "Cargar stock del proveedor",
+            button: (
+              <BatchImportStock
+                mode={UPLOAD_STOCK}
+                supplierId={supplier?.id}
+                products={products}
+              />
+            ),
+          },
+          {
+            id: "discount-stock",
+            text: "Descontar stock",
+            color: COLORS.RED,
+            collapsedTooltip: "Descontar stock del proveedor",
+            button: (
+              <BatchImportStock
+                mode={DISCOUNT_STOCK}
+                supplierId={supplier?.id}
+                products={products}
+              />
+            ),
+          },
+          {
+            id: "stock-template",
+            icon: ICONS.FILE_EXCEL_OUTLINE,
+            color: COLORS.BLUE,
+            text: "Plantilla stock",
+            collapsedTooltip: "Descargar plantilla de stock",
+            onClick: () => downloadExcel(EXAMPLE_TEMPLATE_DATA_STOCK, "Ejemplo de tabla stock"),
+          },
+        ],
       },
       {
         id: 4,
@@ -402,6 +399,9 @@ const SupplierPageClient = ({ supplier }) => {
         tooltip: !hasAssociatedProducts
           ? 'No existen productos de este proveedor.'
           : false,
+        collapsedTooltip: !hasAssociatedProducts
+          ? 'No existen productos de este proveedor.'
+          : 'Eliminar productos del proveedor',
         iconOnly: true
       },
       {
@@ -415,6 +415,9 @@ const SupplierPageClient = ({ supplier }) => {
         tooltip: hasAssociatedProducts
           ? 'No se puede eliminar este proveedor, existen productos asociados.'
           : false,
+        collapsedTooltip: hasAssociatedProducts
+          ? 'No se puede eliminar este proveedor, existen productos asociados.'
+          : 'Eliminar proveedor',
         iconOnly: true,
         basic: true,
         popupPosition: POPUP_POSITIONS.BOTTOM_RIGHT

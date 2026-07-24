@@ -1,14 +1,19 @@
 'use client';
 import { useUserContext } from "@/User";
 import { IconedButton } from "@/common/components/buttons";
+import { Icon } from "@/common/components/custom";
 import { KeyboardShortcuts, ModalUpdates } from "@/common/components/modals";
-import { CONTENT_SIZES, COLORS, ICONS, PAGES, PANDORA_URL, getNavigationItems } from "@/common/constants";
+import { StyledModalHeader } from "@/common/components/modals/ModalShortcuts/styles";
+import { CONTENT_SIZES, COLORS, ICONS, PAGES, POPUP_POSITIONS, SIZES, getNavigationItems } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks";
 import { RULES, isCallixtoUser } from "@/roles";
 import { getSelectedAccountId, setSelectedAccountId as saveSelectedAccountId } from "@/services/session";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { Modal, Popup, Transition } from "semantic-ui-react";
+import styled from "styled-components";
 import { UserMenu } from "..";
+import { useNavActionsContext } from "../NavActions";
 import SidebarNavigation from "./Sidebar";
 import {
   AccountBadge,
@@ -20,6 +25,53 @@ import {
   RightActions,
   UserButton
 } from "./styles";
+
+const StyledModal = styled(Modal)`
+  width: 80vw !important;
+  max-height: 90vh !important;
+  overflow: auto;
+`;
+
+const HeaderInfoButton = () => {
+  const { info } = useNavActionsContext();
+  const [open, setOpen] = useState(false);
+
+  if (!info) return null;
+
+  return (
+    <>
+      <Popup
+        content="Información sobre esta sección."
+        trigger={
+          <Icon
+            name={ICONS.INFO_CIRCLE}
+            color={COLORS.BLUE}
+            size={SIZES.LARGE}
+            onClick={() => setOpen(true)}
+            $pointer
+            margin="0"
+          />
+        }
+        position={POPUP_POSITIONS.BOTTOM_RIGHT}
+        size={SIZES.TINY}
+      />
+      <Transition visible={open} animation="scale" duration={500}>
+        <StyledModal open={open} onClose={() => setOpen(false)}>
+          <StyledModalHeader icon={ICONS.INFO_CIRCLE} content="¿Cómo funciona esta sección?" />
+          {info}
+          <Modal.Actions>
+            <IconedButton
+              text="Cerrar"
+              icon={ICONS.REMOVE}
+              color={COLORS.RED}
+              onClick={() => { setOpen(false); }}
+            />
+          </Modal.Actions>
+        </StyledModal>
+      </Transition>
+    </>
+  );
+};
 
 const Header = () => {
   const pathname = usePathname();
@@ -50,10 +102,6 @@ const Header = () => {
 
   const handleLogout = () => {
     push(PAGES.LOGIN.BASE);
-  };
-
-  const handleOpenPandora = () => {
-    window.open(PANDORA_URL, '_blank', 'noopener,noreferrer');
   };
 
   const routesWithoutHeader = [PAGES.LOGIN.BASE, PAGES.RESTORE_PASSWORD.BASE, PAGES.MAINTENANCE.BASE];
@@ -133,16 +181,8 @@ const Header = () => {
           <RightActions>
             <ModalUpdates />
             <KeyboardShortcuts />
+            <HeaderInfoButton />
           </RightActions>
-          {RULES.canAccessPandora[role] && (
-            <IconedButton
-              icon={ICONS.FILE_EXCEL}
-              color={COLORS.BLUE}
-              text="Pandora"
-              width={CONTENT_SIZES.FIT}
-              onClick={handleOpenPandora}
-            />
-          )}
           {isCallixtoUser(role) && (
             <AccountBadge>{selectedAccountId}</AccountBadge>
           )}

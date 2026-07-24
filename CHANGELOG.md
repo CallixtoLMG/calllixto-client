@@ -3,6 +3,17 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-07-24
+
+### Changed
+
+- Navigation: Moved Pandora access from the header to the main sidebar menu for authorized users.
+- Help: Updated contextual information to describe page actions in the right sidebar, including Sales History.
+- Sidebar: Added open/close transitions to action groups using the main menu timing.
+- Sales History: Added the global actions sidebar with Update and Download Excel actions.
+- Sales History: Moved the Excel export out of the table footer while preserving filtered and sorted export data.
+- Tables: Made the pagination page-size selector more compact and aligned.
+
 ## 2026-07-22
 
 ### Added
