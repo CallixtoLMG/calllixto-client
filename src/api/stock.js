@@ -99,7 +99,11 @@ export function useListStockFlowsByBudget({ budgetId, enabled = true } = {}) {
         },
       });
 
-      return data?.stockFlows ?? data ?? [];
+      if (Array.isArray(data)) return data;
+      if (Array.isArray(data?.stockFlows)) return data.stockFlows;
+      if (data?.statusOk && data?.stockFlows == null) return [];
+
+      throw new Error("Respuesta inválida de movimientos de stock por venta.");
     },
     enabled: !!budgetId && enabled,
     staleTime: IN_MS.ONE_HOUR,

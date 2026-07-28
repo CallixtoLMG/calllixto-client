@@ -14,7 +14,7 @@ import * as XLSX from "xlsx";
 import { BatchImport } from "../BatchImport";
 import { ConfirmDownloadModal } from "../ConfirmDownloadModal";
 
-export const BatchImportProducts = ({ isCreating }) => {
+export const BatchImportProducts = ({ isCreating, triggerClassName }) => {
   const { data, isLoading: loadingProducts, refetch: refetchProducts } = useListProducts();
   const products = useMemo(() => data?.products, [data?.products]);
   const methods = useForm();
@@ -418,6 +418,7 @@ export const BatchImportProducts = ({ isCreating }) => {
         open={open}
         onClose={handleModalClose}
         onOpen={() => setOpen(true)}
+        triggerClassName={triggerClassName}
         onBeforeOpenFile={handleBeforeOpenFile}
         onBeforeRead={handleBeforeRead}
         onFileRead={handleFileRead}

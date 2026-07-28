@@ -3,7 +3,7 @@ import { useUserContext } from "@/User";
 import { useListSuppliers } from "@/api/suppliers";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel, getFormatedPhone } from "@/common/utils";
-import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useBreadcrumContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
 import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
 import { useKeyboardShortcuts } from "@/hooks";
@@ -15,7 +15,6 @@ const Suppliers = () => {
   const { data, isLoading, isRefetching, refetch } = useListSuppliers();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
-  const { setActions } = useNavActionsContext();
   const { push } = useRouter();
 
   useEffect(() => {
@@ -41,7 +40,7 @@ const Suppliers = () => {
     downloadExcel([headers, ...mappedSuppliers], "Lista de Proveedores");
   }, []);
 
-  useEffect(() => {
+  const sideActions = useMemo(() => {
     const actions = [];
     if (RULES.canCreate[role]) {
       actions.push({
@@ -49,11 +48,12 @@ const Suppliers = () => {
         icon: ICONS.ADD,
         color: COLORS.GREEN,
         onClick: () => { push(PAGES.SUPPLIERS.CREATE) },
-        text: 'Crear'
+        text: 'Crear',
+        collapsedTooltip: 'Crear proveedor',
       })
     }
-    setActions(actions);
-  }, [push, role, setActions, loading]);
+    return actions;
+  }, [push, role]);
 
   useKeyboardShortcuts(() => push(PAGES.SUPPLIERS.CREATE), SHORTKEYS.ENTER);
 
@@ -63,6 +63,7 @@ const Suppliers = () => {
       isLoading={loading}
       suppliers={loading ? [] : suppliers}
       onDownloadExcel={handleDownloadExcel}
+      sideActions={sideActions}
     />
   );
 };

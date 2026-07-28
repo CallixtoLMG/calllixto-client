@@ -1,10 +1,9 @@
 "use client"
 import { useUserContext } from "@/User";
 import { useListProducts } from "@/api/products";
-import { Button, DropdownItem, Icon } from "@/common/components/custom";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel } from "@/common/utils";
-import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useBreadcrumContext } from "@/components/layout";
 import { BatchImportProducts } from "@/components/products/BatchImportProducts";
 import ProductsPage from "@/components/products/ProductsPage";
 import { EXAMPLE_TEMPLATE_DATA, PRODUCT_STATES } from "@/components/products/products.constants";
@@ -13,13 +12,11 @@ import { useKeyboardShortcuts } from "@/hooks";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
-import { Dropdown } from "semantic-ui-react";
 
 const Products = () => {
   const { role } = useUserContext();
   const { data, isLoading, isRefetching, refetch } = useListProducts();
   const { setLabels } = useBreadcrumContext();
-  const { setActions } = useNavActionsContext();
   const { push } = useRouter();
 
   useEffect(() => {
@@ -49,7 +46,7 @@ const Products = () => {
     downloadExcel([headers, ...mappedPRoducts], "Lista de Productos");
   }, []);
 
-  useEffect(() => {
+  const sideActions = useMemo(() => {
     const actions = [];
 
     if (RULES.canCreate[role]) {
@@ -58,40 +55,44 @@ const Products = () => {
         icon: ICONS.ADD,
         color: COLORS.GREEN,
         onClick: () => { push(PAGES.PRODUCTS.CREATE) },
-        text: 'Crear'
+        text: 'Crear',
+        collapsedTooltip: 'Crear producto',
       },
         {
           id: 2,
-          button: (
-            <Dropdown
-              pointing
-              as={Button}
-              text='Excel'
-              icon={ICONS.FILE_EXCEL}
-              floating
-              labeled
-              button
-              className='icon'
-            >
-              <Dropdown.Menu>
-                <DropdownItem>
-                  <BatchImportProducts key="batch-create" isCreating />
-                </DropdownItem>
-                <DropdownItem>
-                  <BatchImportProducts key="batch-update" />
-                </DropdownItem>
-                <DropdownItem onClick={() => downloadExcel(EXAMPLE_TEMPLATE_DATA, "Ejemplo de tabla")}>
-                  <Icon name={ICONS.FILE_EXCEL_OUTLINE} />Plantilla
-                </DropdownItem>
-              </Dropdown.Menu>
-            </Dropdown>
-          )
+          icon: ICONS.FILE_EXCEL,
+          color: COLORS.BLUE,
+          text: 'Excel',
+          collapsedTooltip: 'Acciones de productos con Excel',
+          items: [
+            {
+              id: "batch-create",
+              text: "Crear",
+              color: COLORS.GREEN,
+              collapsedTooltip: "Crear lote de productos",
+              button: <BatchImportProducts key="batch-create" isCreating />,
+            },
+            {
+              id: "batch-update",
+              text: "Actualizar",
+              color: COLORS.BLUE,
+              collapsedTooltip: "Actualizar lote de productos",
+              button: <BatchImportProducts key="batch-update" />,
+            },
+            {
+              id: "template",
+              icon: ICONS.FILE_EXCEL_OUTLINE,
+              color: COLORS.BLUE,
+              text: "Plantilla",
+              collapsedTooltip: "Descargar plantilla de productos",
+              onClick: () => downloadExcel(EXAMPLE_TEMPLATE_DATA, "Ejemplo de tabla"),
+            },
+          ],
         });
     }
 
-    setActions(actions);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [push, role, setActions, loading]);
+    return actions;
+  }, [push, role]);
 
   useKeyboardShortcuts(() => push(PAGES.PRODUCTS.CREATE), SHORTKEYS.ENTER);
 
@@ -102,6 +103,7 @@ const Products = () => {
         isLoading={loading}
         products={loading ? [] : products}
         onDownloadExcel={handleDownloadExcel}
+        sideActions={sideActions}
       />
     </>
   );

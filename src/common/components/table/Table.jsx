@@ -34,6 +34,7 @@ const CustomTable = ({
   setFilters = () => { },
   onFilter = () => true,
   onDownloadExcel,
+  onFilteredElementsChange,
   disableDefaultPageLink = false,
 }) => {
 
@@ -45,6 +46,7 @@ const CustomTable = ({
   const [popupOpenId, setPopupOpenId] = useState(null);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const tableRef = useRef(null);
+  const lastFilteredElementsRef = useRef([]);
   const [sortConfig, setSortConfig] = useState(filters?.sorting ?? { key: mainKey, direction: ASC });
 
   const handleSort = (columnKey) => {
@@ -108,6 +110,20 @@ const CustomTable = ({
   useEffect(() => {
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (!onFilteredElementsChange) return;
+
+    const lastFilteredElements = lastFilteredElementsRef.current;
+    const hasSameElements =
+      lastFilteredElements.length === filteredElements.length &&
+      lastFilteredElements.every((element, index) => element === filteredElements[index]);
+
+    if (hasSameElements) return;
+
+    lastFilteredElementsRef.current = filteredElements;
+    onFilteredElementsChange(filteredElements);
+  }, [filteredElements, onFilteredElementsChange]);
 
   useEffect(() => {
     if (hydrated && !isLoading) {

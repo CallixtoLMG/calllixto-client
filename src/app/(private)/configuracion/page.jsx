@@ -3,7 +3,7 @@ import { useEditSetting, useListSettings } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { Form } from "@/common/components/custom";
 import { UnsavedChangesModal } from "@/common/components/modals";
-import { ALL, BUTTON_TEXTS, ENTITIES, INFO, PAGES, SETTINGS_TAB_MAP, SETTINGS_TAB_REVERSE_MAP, SHORTKEYS } from "@/common/constants";
+import { ALL, BUTTON_TEXTS, COLORS, ENTITIES, ICONS, INFO, PAGES, SETTINGS_TAB_MAP, SETTINGS_TAB_REVERSE_MAP, SHORTKEYS } from "@/common/constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SettingsTabs from "@/components/settings";
 import { ENTITY_MAPPER, GET_SETTING_QUERY_KEY, LIST_SETTINGS_QUERY_KEY, sortSettingsByEntityOrder, SUPPORTED_SETTINGS } from "@/components/settings/settings.constants";
@@ -49,28 +49,52 @@ const Settings = () => {
     entity: ENTITIES.SETTINGS,
     key: LIST_SETTINGS_QUERY_KEY,
   });
+  const restoreSettingsRef = useRef(restoreSettings);
 
-  const handleSettingsRefresh = async () => {
+  const handleSettingsRefresh = useCallback(async () => {
     setIsLoading(true)
-    if (typeof restoreSettings !== "function") {
+    if (typeof restoreSettingsRef.current !== "function") {
       return;
     }
     try {
-      await restoreSettings();
+      await restoreSettingsRef.current();
       toast.success("Configuración actualizada correctamente.");
     } catch (error) {
       console.error("Error al actualizar configuración:", error);
       toast.error("Hubo un error al actualizar la configuración.");
     }
     setIsLoading(false)
-  };
+  }, []);
 
   useEffect(() => {
-    setActions([]);
-    setInfo(INFO.HELP.SECTIONS[ENTITIES.SETTINGS]);
+    restoreSettingsRef.current = restoreSettings;
+  }, [restoreSettings]);
+
+  const settingsActions = useMemo(() => [
+    {
+      id: "settings-update",
+      icon: ICONS.REFRESH,
+      color: COLORS.BLUE,
+      text: BUTTON_TEXTS.UPDATE,
+      collapsedTooltip: "Actualizar configuración",
+      onClick: handleSettingsRefresh,
+      disabled: isLoading,
+      loading: isLoading,
+    },
+  ], [handleSettingsRefresh, isLoading]);
+
+  useEffect(() => {
+    setInfo(INFO.HELP.SECTIONS[ENTITIES.SETTINGS].LIST);
     setLabels([{ name: PAGES.SETTINGS.NAME }]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setActions, setLabels]);
+    return () => {
+      setActions([]);
+      setInfo(null);
+    };
+  }, [setActions, setInfo, setLabels]);
+
+  useEffect(() => {
+    setActions(settingsActions);
+  }, [setActions, settingsActions]);
 
   const { mutate: mutateEdit, isPending } = useMutation({
     mutationFn: (data) => editSetting({
@@ -175,8 +199,6 @@ const Settings = () => {
           <SettingsTabs
             onEntityChange={handleEntityChange}
             settings={settings}
-            onRefresh={handleSettingsRefresh}
-            isLoading={isLoading}
             onBeforeView={onBeforeView}
             activeIndex={activeTabIndex}
             onActiveIndexChange={setActiveTabIndex}

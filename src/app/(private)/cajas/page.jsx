@@ -1,5 +1,4 @@
 "use client";
-import { useUserContext } from "@/User";
 import { useCreateCashBalance, useListCashBalances } from "@/api/cashBalances";
 import { useGetSetting } from "@/api/settings";
 import { ModalOpenCashBalance } from "@/common/components/modals";
@@ -7,7 +6,7 @@ import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel, mapToDropdownOptions } from "@/common/utils";
 import CashBalancesPage from "@/components/cashBalances/CashBalancesPage";
 import { CASH_BALANCE_STATES } from "@/components/cashBalances/cashBalances.constants";
-import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useBreadcrumContext } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -16,9 +15,7 @@ import toast from "react-hot-toast";
 
 const CashBalances = () => {
   const { data, isLoading, isRefetching, refetch } = useListCashBalances();
-  const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
-  const { setActions } = useNavActionsContext();
   const { push } = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { data: paymentMethods } = useGetSetting(ENTITIES.GENERAL);
@@ -78,16 +75,14 @@ const CashBalances = () => {
     downloadExcel([headers, ...mappedCashBalances], "Lista de cajas");
   }, []);
 
-  useEffect(() => {
-    const actions = [{
+  const sideActions = useMemo(() => [{
       id: 1,
       icon: ICONS.ADD,
       color: COLORS.GREEN,
       onClick: () => setIsModalOpen(true),
       text: 'Abrir',
-    }];
-    setActions(actions);
-  }, [push, role, setActions]);
+      collapsedTooltip: 'Abrir caja',
+    }], [setIsModalOpen]);
 
   const handleConfirm = useCallback((data) => {
     const payload = {
@@ -108,6 +103,7 @@ const CashBalances = () => {
         cashBalances={isPending ? [] : cashBalances}
         paymentOptions={paymentMethodOptions}
         onDownloadExcel={handleDownloadExcel}
+        sideActions={sideActions}
       />
       <ModalOpenCashBalance
         open={isModalOpen}

@@ -45,7 +45,7 @@ const DeliveriesPrint = forwardRef(({ budget, history = [] }, ref) => {
           </FlexColumn>
           <FlexColumn $rowGap="10px">
             <Title as="h2">ENTREGAS</Title>
-            <Title as="h5">DOCUMENTO NO VALIDO COMO FACTURA</Title>
+            <Title as="h5">DOCUMENTO NO VÁLIDO COMO FACTURA</Title>
           </FlexColumn>
           <FlexColumn>
             <Title as="h3" $textAlign="right">Entregas del presupuesto</Title>
