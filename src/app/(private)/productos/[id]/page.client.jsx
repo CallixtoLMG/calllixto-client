@@ -331,7 +331,7 @@ const ProductPageClient = ({ product }) => {
         actions.push({
           id: 3,
           icon: isProductInactive(product?.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
-          color: COLORS.GREY,
+          color: COLORS.BLUE,
           onClick: handleClick(isProductInactive(product?.state) ? ACTIVE : INACTIVE),
           text: isProductInactive(product?.state) ? "Activar" : "Desactivar",
           collapsedTooltip: isProductInactive(product?.state) ? "Activar producto" : "Desactivar producto",

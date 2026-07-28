@@ -6,7 +6,7 @@ import { useGetSetting } from "@/api/settings";
 import { IconedButton } from "@/common/components/buttons";
 import { Flex, Message, MessageHeader } from "@/common/components/custom";
 import ModalCancel from "@/common/components/modals/ModalCancel";
-import { CONTENT_SIZES, COLORS, ENTITIES, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
+import { COLORS, CONTENT_SIZES, ENTITIES, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
 import { now } from "@/common/utils/dates";
 import BudgetView from "@/components/budgets/BudgetView";
@@ -15,11 +15,12 @@ import ModalCustomer from "@/components/budgets/ModalCustomer";
 import ModalPDF from "@/components/budgets/ModalPDF";
 import { BUDGET_STATES, PAYMENTS_TAB_INDEX, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending } from "@/components/budgets/budgets.utils";
+import { savePublicBudgetSnapshot } from "@/components/budgets/publicBudget.mock";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useBudgetTotals, useLazyTabs } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import toast from "react-hot-toast";
 import { v4 as uuid } from 'uuid';
@@ -107,6 +108,56 @@ const BudgetPageClient = ({ budget }) => {
     }
   }, [setLabels, budget]);
 
+  const handleCopyPublicLink = useCallback(async () => {
+    const budgetSnapshot = {
+      ...budget,
+      customer: customerData,
+      paymentsMade: paymentsMade ?? budget?.paymentsMade ?? [],
+      products: methods.getValues("products") ?? budget?.products ?? [],
+    };
+
+    const result = savePublicBudgetSnapshot({
+      budget: budgetSnapshot,
+      account: userData?.selectedAccount ?? userData?.account,
+      selectedContact,
+      defaultsPDF: budgetSettings?.defaultsPDF,
+      totals: {
+        subtotal,
+        subtotalAfterDiscount,
+        total,
+      },
+    });
+
+    if (!result.ok) {
+      toast.error("No se pudo generar el enlace público.");
+      return;
+    }
+
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error("Clipboard no disponible");
+      }
+
+      await navigator.clipboard.writeText(result.url);
+      toast.success("enlace público copiado.");
+    } catch (error) {
+      console.error("Error copiando enlace público:", error);
+      toast.error("No se pudo copiar el enlace público.");
+    }
+  }, [
+    budget,
+    budgetSettings?.defaultsPDF,
+    customerData,
+    methods,
+    paymentsMade,
+    selectedContact,
+    subtotal,
+    subtotalAfterDiscount,
+    total,
+    userData?.account,
+    userData?.selectedAccount,
+  ]);
+
   useEffect(() => {
     if (budget) {
       const sendButtons = [
@@ -153,15 +204,25 @@ const BudgetPageClient = ({ budget }) => {
         !isBudgetDraft(budget.state) &&
         {
           id: 1,
-          icon: ICONS.FILE_PDF,
+          icon: ICONS.PRINT,
           color: COLORS.BLUE,
           onClick: () => setIsModalPDFOpen(true),
           text: 'Imprimir venta',
           collapsedTooltip: 'Descargar PDF de la venta',
           iconOnly:true,
         },
-        hasValidSendOptions && {
+        !isBudgetDraft(budget.state) &&
+        {
           id: 2,
+          icon: ICONS.CLIPBOARD,
+          color: COLORS.BLUE,
+          onClick: handleCopyPublicLink,
+          text: 'Copiar enlace',
+          collapsedTooltip: 'Copiar enlace público de la venta',
+          iconOnly:true,
+        },
+        hasValidSendOptions && {
+          id: 3,
           icon: ICONS.SEND,
           color: COLORS.BLUE,
           text: 'Enviar',
@@ -169,7 +230,7 @@ const BudgetPageClient = ({ budget }) => {
           items: sendItems,
         },
         {
-          id: 3,
+          id: 4,
           icon: ICONS.COPY,
           color: COLORS.GREEN,
           onClick: () => { push(PAGES.BUDGETS.CLONE(budget.id)) },
@@ -178,7 +239,7 @@ const BudgetPageClient = ({ budget }) => {
           iconOnly:true,
         },
         budget.state === BUDGET_STATES.CONFIRMED.id && {
-          id: 4,
+          id: 5,
           icon: ICONS.BAN,
           color: COLORS.RED,
           onClick: () => setIsModalCancelOpen(true),
@@ -191,7 +252,7 @@ const BudgetPageClient = ({ budget }) => {
       setActions(actions);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [budget, push, role, setActions]);
+  }, [budget, handleCopyPublicLink, push, role, setActions]);
 
   const handleConfirm = () => {
     if (!customerHasInfo) {

@@ -95,10 +95,10 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
             <Dropdown width="130px" pointing as={CustomButton} text={BUTTON_TEXTS.UPDATE} icon={ICONS.REFRESH} floating labeled button className='icon'>
               <Dropdown.Menu>
                 <DropdownItem onClick={onRefetch}>
-                  <Icon color={COLORS.BLUE} name={ICONS.DOWNLOAD} />Actualización rápida
+                  <Icon color={COLORS.BLUE} name={ICONS.BOLT} />Actualización rápida
                 </DropdownItem>
                 <DropdownItem onClick={handleHardUpdate}>
-                  <Icon color={COLORS.RED} name={ICONS.DOWNLOAD} />Actualización completa
+                  <Icon color={COLORS.RED} name={ICONS.CLOUD_DOWNLOAD} />Actualización completa
                 </DropdownItem>
               </Dropdown.Menu>
             </Dropdown>

@@ -17,6 +17,7 @@ import {
   NavLabel,
   NavDivider,
   NavSection,
+  NavSectionTitle,
   SidebarBody,
   SidebarContainer,
   SidebarHeader,
@@ -95,6 +96,10 @@ const SidebarNavigation = ({ open, onClose, items = [], pathname }) => {
           {items.map((item) => {
             if (item.type === "divider") {
               return <NavDivider key={item.id} />;
+            }
+
+            if (item.type === "section-title") {
+              return <NavSectionTitle key={item.id}>{item.label}</NavSectionTitle>;
             }
 
             const hasChildren = !!item.children?.length;

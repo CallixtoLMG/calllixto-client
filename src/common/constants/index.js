@@ -9,6 +9,7 @@ import {
   CHANGE_PASSWORD_PAGE,
   LOGIN_PAGE,
   NOT_FOUND_PAGE,
+  PUBLIC_BUDGETS_PAGE,
   RESTORE_PASSWORD_PAGE,
   ROOT_PAGE
 } from "./routes";
@@ -109,6 +110,12 @@ export const PAGES = {
   BUDGETS_HISTORY: {
     BASE: "/historial-ventas",
   },
+  PUBLIC: {
+    BUDGETS: {
+      BASE: PUBLIC_BUDGETS_PAGE,
+      SHOW: (id) => `${PUBLIC_BUDGETS_PAGE}/${id}`,
+    },
+  },
   LOGIN: {
     BASE: LOGIN_PAGE
   },
@@ -129,6 +136,8 @@ export const PAGES = {
     BASE: NOT_FOUND_PAGE
   },
 };
+
+export const SENSITIVE_VALUE = "*****";
 
 export const PANDORA_URL = 'https://pandora-glm.netlify.app/';
 
@@ -266,8 +275,13 @@ export const getNavigationItems = (role) => {
       type: "divider",
     },
     ROLES.canAccessPandora[role] && {
+      id: "external-links-title",
+      type: "section-title",
+      label: "Enlaces externos",
+    },
+    ROLES.canAccessPandora[role] && {
       id: "pandora",
-      label: "Ir a Pandora",
+      label: "Pandora",
       href: PANDORA_URL,
       external: true,
     },

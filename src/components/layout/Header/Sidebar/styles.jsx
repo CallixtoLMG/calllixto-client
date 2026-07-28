@@ -141,8 +141,20 @@ export const NavLabel = styled.span`
 
 export const NavDivider = styled.div`
   height: 1px;
-  margin: 10px 18px;
+  margin: 10px 18px 8px;
   background: #e5e7eb;
+`;
+
+export const NavSectionTitle = styled.div`
+  min-height: 28px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 `;
 
 export const Chevron = styled.span`

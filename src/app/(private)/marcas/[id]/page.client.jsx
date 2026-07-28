@@ -183,7 +183,7 @@ const BrandPageClient = ({ brand }) => {
         {
           id: 1,
           icon: isItemInactive(brand?.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
-          color: COLORS.GREY,
+          color: COLORS.BLUE,
           text: isItemInactive(brand?.state) ? "Activar" : "Desactivar",
           collapsedTooltip: isItemInactive(brand?.state) ? "Activar marca" : "Desactivar marca",
           onClick: handleClick(isItemInactive(brand?.state) ? ACTIVE : INACTIVE),

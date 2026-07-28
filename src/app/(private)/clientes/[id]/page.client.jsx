@@ -176,7 +176,7 @@ const CustomerPageClient = ({ customer }) => {
         {
           id: 1,
           icon: isItemInactive(customer.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
-          color: COLORS.GREY,
+          color: COLORS.BLUE,
           onClick: handleClick(isItemInactive(customer.state) ? ACTIVE : INACTIVE),
           text: isItemInactive(customer.state) ? "Activar" : "Desactivar",
           collapsedTooltip: isItemInactive(customer.state) ? "Activar cliente" : "Desactivar cliente",

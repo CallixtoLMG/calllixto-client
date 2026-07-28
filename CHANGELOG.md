@@ -3,6 +3,23 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-07-28
+
+### Added
+
+- Sales: Added a mocked public budget link action from sale detail, with local snapshot storage and an unauthenticated public budget view.
+- Settings: Moved the global Update action into the shared page actions sidebar.
+
+### Changed
+
+- Public budgets: Masked customer personal data and hid payment details in the public budget view.
+- Sidebar: Updated page actions to the lighter white-item variant with colored icons, subtle borders, and consistent subactions.
+- Navigation: Added an "Enlaces externos" section label above the Pandora link in the main sidebar.
+- Actions: Unified quick and full update icons across migrated action sidebars.
+- Help: Unified contextual messages to point page actions to the right sidebar.
+- Sidebar: Added smooth open/close transitions to action groups.
+- Tables: Made the pagination page-size selector more compact and aligned.
+
 ## 2026-07-24
 
 ### Changed

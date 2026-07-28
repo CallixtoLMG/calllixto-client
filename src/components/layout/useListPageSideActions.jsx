@@ -92,14 +92,14 @@ const useListPageSideActions = ({
         items: [
           {
             id: "quick-update",
-            icon: ICONS.DOWNLOAD,
+            icon: ICONS.BOLT,
             color: COLORS.BLUE,
             text: "Actualización rápida",
             onClick: handleQuickUpdate,
           },
           {
             id: "hard-update",
-            icon: ICONS.DOWNLOAD,
+            icon: ICONS.CLOUD_DOWNLOAD,
             color: COLORS.BLUE,
             text: "Actualización completa",
             onClick: () => setShowUpdateModal(true),

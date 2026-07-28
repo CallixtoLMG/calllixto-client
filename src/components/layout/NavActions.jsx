@@ -48,7 +48,7 @@ const SIDEBAR_COLOR_HEX = {
 
 const getSidebarColor = (color = COLORS.BLUE) => SIDEBAR_COLOR_HEX[color] || SIDEBAR_COLOR_HEX[COLORS.BLUE];
 const getSidebarBasicBackground = (color = COLORS.BLUE, hover = false) => {
-  const alpha = hover ? "1f" : "12";
+  const alpha = hover ? "1a" : "10";
   return `${getSidebarColor(color)}${alpha}`;
 };
 
@@ -65,21 +65,27 @@ const SidebarActionButton = styled(Button)`
     width: 100% !important;
     min-width: 35px !important;
     height: 36px !important;
-    display: flex !important;
+    display: ${({ $isOpen }) => ($isOpen ? "grid" : "flex")} !important;
+    grid-template-columns: ${({ $isOpen }) => ($isOpen ? "34px minmax(0, 1fr) 16px" : "none")};
     align-items: center !important;
-    justify-content: ${({ $isOpen }) => ($isOpen ? "flex-start" : "center")} !important;
-    gap: ${({ $isOpen }) => ($isOpen ? "8px" : "0")} !important;
-    padding: ${({ $isOpen }) => ($isOpen ? "0 10px !important" : "0 !important")};
+    justify-content: ${({ $isOpen }) => ($isOpen ? "stretch" : "center")} !important;
+    gap: 0 !important;
+    padding: 0 !important;
     margin: 0 !important;
     border-radius: 4px !important;
     text-align: left !important;
-    box-shadow: ${({ basic }) => (basic ? "none" : "0 1px 2px 0 rgba(34, 36, 38, .15)")} !important;
-    border: ${({ basic, $sidebarColor }) => (basic ? `1px solid ${getSidebarColor($sidebarColor)} !important` : undefined)};
-    background-color: ${({ basic, $sidebarColor }) => (basic ? `${getSidebarBasicBackground($sidebarColor)} !important` : undefined)};
+    box-shadow: 0 1px 2px 0 rgba(34, 36, 38, .08) !important;
+    border: 1px solid ${({ $sidebarColor, $isGroupOpen }) => `${getSidebarColor($sidebarColor)}${$isGroupOpen ? "52" : "26"}`} !important;
+    background-color: ${({ $isGroupOpen, $sidebarColor }) => ($isGroupOpen ? `${getSidebarBasicBackground($sidebarColor)} !important` : "#fff !important")};
+    color: ${({ $sidebarColor }) => getSidebarColor($sidebarColor)} !important;
+    overflow: hidden;
+    cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")} !important;
+    opacity: ${({ disabled }) => (disabled ? ".58" : "1")} !important;
 
     &:hover,
     &:focus {
-      background-color: ${({ basic, $sidebarColor }) => (basic ? `${getSidebarBasicBackground($sidebarColor, true)} !important` : undefined)};
+      background-color: ${({ $sidebarColor }) => `${getSidebarBasicBackground($sidebarColor, true)} !important`};
+      border-color: ${({ $sidebarColor }) => `${getSidebarColor($sidebarColor)}52 !important`};
     }
 
     i.icon {
@@ -97,16 +103,19 @@ const SidebarActionText = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: #263238;
+  padding: 0 9px;
 `;
 
 const SidebarActionIconSlot = styled.span`
-  width: ${({ $child }) => ($child ? "28px" : "16px")};
-  min-width: ${({ $child }) => ($child ? "28px" : "16px")};
+  width: 100%;
+  min-width: ${({ $child, $isOpen }) => ($isOpen ? ($child ? "32px" : "34px") : "35px")};
   height: 100%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
+  color: ${({ $sidebarColor }) => getSidebarColor($sidebarColor)};
 
   i.icon {
     display: block !important;
@@ -116,12 +125,14 @@ const SidebarActionIconSlot = styled.span`
     line-height: 16px !important;
     margin: 0 !important;
     text-align: center !important;
+    color: ${({ $sidebarColor }) => getSidebarColor($sidebarColor)} !important;
   }
 `;
 
 const SidebarChevron = styled(Icon)`
   &&&& {
-    color: white !important;
+    color: ${({ $sidebarColor }) => getSidebarColor($sidebarColor)} !important;
+    margin: 0 8px 0 0 !important;
   }
 `;
 
@@ -154,28 +165,28 @@ const SidebarChildButton = styled(SidebarActionButton)`
   &&&&&& {
     height: 32px !important;
     display: grid !important;
-    grid-template-columns: 28px minmax(0, 1fr);
+    grid-template-columns: 32px minmax(0, 1fr);
     align-items: center !important;
     justify-content: stretch !important;
     gap: 0 !important;
-    padding: 0 10px !important;
+    padding: 0 !important;
     font-size: 12.5px !important;
-    color: ${({ disabled }) => (disabled ? "rgba(255, 255, 255, .72)" : "white")} !important;
-    background-color: ${({ $sidebarColor, disabled }) => (disabled ? "#e0e1e2" : getSidebarColor($sidebarColor))} !important;
-    background-image: linear-gradient(rgba(255, 255, 255, .14), rgba(255, 255, 255, .14)) !important;
+    color: ${({ $sidebarColor }) => getSidebarColor($sidebarColor)} !important;
+    background-color: #fff !important;
+    background-image: none !important;
     cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")} !important;
     box-sizing: border-box !important;
-    transition: background-image 120ms ease;
 
     &:hover,
     &:focus {
-      color: ${({ disabled }) => (disabled ? "rgba(255, 255, 255, .72)" : "white")} !important;
-      background-image: linear-gradient(rgba(255, 255, 255, .2), rgba(255, 255, 255, .2)) !important;
+      color: ${({ $sidebarColor }) => getSidebarColor($sidebarColor)} !important;
+      background-color: ${({ $sidebarColor }) => `${getSidebarBasicBackground($sidebarColor, true)} !important`};
+      border-color: ${({ $sidebarColor }) => `${getSidebarColor($sidebarColor)}52 !important`};
     }
 
     i.icon {
       justify-self: center;
-      color: white !important;
+      color: ${({ $sidebarColor }) => getSidebarColor($sidebarColor)} !important;
       width: 16px;
       min-width: 16px;
       margin: 0 !important;
@@ -196,39 +207,57 @@ const SidebarCustomAction = styled.div`
     width: 100% !important;
     min-width: 35px !important;
     height: ${({ $child }) => ($child ? "32px" : "36px")} !important;
-    display: ${({ $child }) => ($child ? "grid" : "flex")} !important;
-    grid-template-columns: ${({ $child }) => ($child ? "28px minmax(0, 1fr)" : "none")};
+    display: ${({ $isOpen }) => ($isOpen ? "grid" : "flex")} !important;
+    grid-template-columns: ${({ $child, $isOpen }) => ($isOpen ? `${$child ? "32px" : "34px"} minmax(0, 1fr)` : "none")};
     align-items: center !important;
-    justify-content: ${({ $child, $isOpen }) => ($child ? "stretch" : ($isOpen ? "flex-start" : "center"))} !important;
-    gap: ${({ $child, $isOpen }) => ($child ? "0" : ($isOpen ? "8px" : "0"))} !important;
-    padding: ${({ $isOpen }) => ($isOpen ? "0 10px !important" : "0 !important")};
+    justify-content: ${({ $isOpen }) => ($isOpen ? "stretch" : "center")} !important;
+    gap: 0 !important;
+    padding: 0 !important;
     margin: 0 !important;
     border-radius: 4px !important;
-    border: 0 !important;
-    color: ${({ $disabled }) => ($disabled ? "rgba(255, 255, 255, .72)" : "white")} !important;
-    background-color: ${({ $sidebarColor, $disabled }) => ($disabled ? "#e0e1e2" : getSidebarColor($sidebarColor))} !important;
-    background-image: linear-gradient(rgba(255, 255, 255, .14), rgba(255, 255, 255, .14)) !important;
-    box-shadow: ${({ $child }) => ($child ? "0 1px 2px 0 rgba(34, 36, 38, .15)" : "none")} !important;
+    border: 1px solid ${({ $sidebarColor }) => getSidebarColor($sidebarColor)}26 !important;
+    color: #263238 !important;
+    background-color: #fff !important;
+    background-image: none !important;
+    box-shadow: 0 1px 2px 0 rgba(34, 36, 38, .08) !important;
     cursor: ${({ $disabled }) => ($disabled ? "not-allowed" : "pointer")} !important;
+    opacity: ${({ $disabled }) => ($disabled ? ".58" : "1")} !important;
     font-size: ${({ $child }) => ($child ? "12.5px" : "13.5px")} !important;
     text-align: left !important;
     box-sizing: border-box !important;
-    transition: background-image 120ms ease;
+
+    &:hover,
+    &:focus {
+      background-color: ${({ $sidebarColor }) => `${getSidebarBasicBackground($sidebarColor, true)} !important`};
+      border-color: ${({ $sidebarColor }) => `${getSidebarColor($sidebarColor)}52 !important`};
+    }
 
     i.icon {
       justify-self: center;
-      width: 16px;
-      min-width: 16px;
-      color: white !important;
+      width: ${({ $child, $isOpen }) => ($isOpen ? ($child ? "32px" : "34px") : "35px")} !important;
+      min-width: ${({ $child, $isOpen }) => ($isOpen ? ($child ? "32px" : "34px") : "35px")} !important;
+      height: 100% !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      background-color: transparent !important;
+      color: ${({ $sidebarColor }) => `${getSidebarColor($sidebarColor)} !important`};
       margin: 0 !important;
+
+      &::before {
+        width: 16px;
+        min-width: 16px;
+      }
     }
 
     > span {
+      display: ${({ $isOpen }) => ($isOpen ? "block" : "none")};
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       line-height: 1.2;
+      padding: 0 9px;
     }
   }
 `;
@@ -330,17 +359,19 @@ const NavActions = ({ orientation, variant = NAV_ACTION_VARIANTS.HORIZONTAL, isO
         disabled={action.disabled}
         loading={action.loading}
         $isOpen={isSidebarOpen}
+        $isGroupOpen={hasItems && openActionId === action.id}
         $sidebarColor={sidebarColor}
         data-testid={getActionTestId(label)}
       >
         {action.icon && (
-          <SidebarActionIconSlot $child={child}>
-            <Icon name={action.icon} color={action.basic ? action.color : undefined} />
+          <SidebarActionIconSlot $child={child} $isOpen={isSidebarOpen} $sidebarColor={sidebarColor}>
+            <Icon name={action.icon} />
           </SidebarActionIconSlot>
         )}
         {isSidebarOpen && label && <SidebarActionText>{label}</SidebarActionText>}
         {isSidebarOpen && hasItems && (
           <SidebarChevron
+            $sidebarColor={sidebarColor}
             name={openActionId === action.id ? ICONS.CARET_UP : ICONS.CARET_DOWN}
           />
         )}

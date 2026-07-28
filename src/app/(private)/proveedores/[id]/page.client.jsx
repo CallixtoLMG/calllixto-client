@@ -7,7 +7,7 @@ import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { POPUP_POSITIONS, ACTIVE, COLORS, ICONS, INACTIVE, PAGES, PLACEHOLDERS } from "@/common/constants";
+import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, PLACEHOLDERS, POPUP_POSITIONS } from "@/common/constants";
 import { downloadExcel, isItemInactive } from "@/common/utils";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext, } from "@/components/layout";
 import { BatchImportStock } from "@/components/products/BatchImportStock";
@@ -310,7 +310,7 @@ const SupplierPageClient = ({ supplier }) => {
         icon: isItemInactive(supplier?.state)
           ? ICONS.PLAY_CIRCLE
           : ICONS.PAUSE_CIRCLE,
-        color: COLORS.GREY,
+        color: COLORS.BLUE,
         text: isItemInactive(supplier?.state) ? "Activar" : "Desactivar",
         collapsedTooltip: isItemInactive(supplier?.state) ? "Activar proveedor" : "Desactivar proveedor",
         onClick: handleClick(isItemInactive(supplier?.state) ? ACTIVE : INACTIVE),
