@@ -4,9 +4,9 @@ import { useCancelBudget, useConfirmBudget } from "@/api/budgets";
 import { useGetPayments } from "@/api/payments";
 import { useGetSetting } from "@/api/settings";
 import { IconedButton } from "@/common/components/buttons";
-import { DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Menu, Message, MessageHeader } from "@/common/components/custom";
+import { Flex, Message, MessageHeader } from "@/common/components/custom";
 import ModalCancel from "@/common/components/modals/ModalCancel";
-import { CONTENT_SIZES, COLORS, ENTITIES, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
+import { COLORS, CONTENT_SIZES, ENTITIES, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
 import { now } from "@/common/utils/dates";
 import BudgetView from "@/components/budgets/BudgetView";
@@ -17,12 +17,12 @@ import { BUDGET_STATES, PAYMENTS_TAB_INDEX, PICK_UP_IN_STORE } from "@/component
 import { isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending } from "@/components/budgets/budgets.utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useBudgetTotals, useLazyTabs } from "@/hooks";
+import { getSelectedAccountId } from "@/services/session";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import toast from "react-hot-toast";
-import { Dropdown } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 
 const BudgetPageClient = ({ budget }) => {
@@ -53,6 +53,12 @@ const BudgetPageClient = ({ budget }) => {
   const customerHasInfo = useMemo(() => !!customerData?.addresses?.length && !!customerData?.phoneNumbers?.length, [customerData]);
   const confirmBudget = useConfirmBudget();
   const cancelBudget = useCancelBudget();
+  const accountId = useMemo(() => getSelectedAccountId(userData), [userData]);
+  const publicHash = budget?.publicHash;
+  const canCopyPublicLink = Boolean(accountId && publicHash);
+  const publicLinkTooltip = canCopyPublicLink
+    ? "Copiar enlace p\u00fablico de la venta"
+    : "Disponible s\u00f3lo para presupuestos nuevos con enlace p\u00fablico";
 
   useEffect(() => {
     resetActions();
@@ -108,6 +114,25 @@ const BudgetPageClient = ({ budget }) => {
     }
   }, [setLabels, budget]);
 
+  const handleCopyPublicLink = useCallback(async () => {
+    if (!accountId || !publicHash) {
+      toast.error(publicLinkTooltip);
+      return;
+    }
+
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error("Clipboard no disponible");
+      }
+
+      await navigator.clipboard.writeText(`${window.location.origin}${PAGES.PUBLIC.BUDGETS.SHOW(accountId, publicHash)}`);
+      toast.success("enlace público copiado.");
+    } catch (error) {
+      console.error("Error copiando enlace público:", error);
+      toast.error("No se pudo copiar el enlace público.");
+    }
+  }, [accountId, publicHash, publicLinkTooltip]);
+
   useEffect(() => {
     if (budget) {
       const sendButtons = [
@@ -138,68 +163,65 @@ const BudgetPageClient = ({ budget }) => {
       ];
 
       const hasValidSendOptions = sendButtons.some(button => button.subOptions.length > 0);
+      const sendItems = sendButtons.flatMap(({ text: channelText, subOptions }) =>
+        subOptions.map(({ key, href, text, iconName, color }) => ({
+          id: key,
+          href,
+          target: "_blank",
+          text: `${channelText}: ${text}`,
+          collapsedTooltip: `Enviar venta por ${channelText} a ${text}`,
+          icon: iconName,
+          color,
+        }))
+      );
 
       const actions = [
         !isBudgetDraft(budget.state) &&
         {
           id: 1,
-          icon: ICONS.FILE_PDF,
+          icon: ICONS.PRINT,
           color: COLORS.BLUE,
           onClick: () => setIsModalPDFOpen(true),
           text: 'Imprimir venta',
+          collapsedTooltip: 'Descargar PDF de la venta',
+          iconOnly:true,
+        },
+        !isBudgetDraft(budget.state) &&
+        {
+          id: 2,
+          icon: ICONS.CLIPBOARD,
+          color: COLORS.BLUE,
+          onClick: handleCopyPublicLink,
+          text: 'Copiar enlace',
+          tooltip: publicLinkTooltip,
+          collapsedTooltip: publicLinkTooltip,
+          disabled: !canCopyPublicLink,
           iconOnly:true,
         },
         hasValidSendOptions && {
-          id: 2,
-          button: (
-            <Menu>
-              <DropdownOption
-                $menu={true}
-                pointing
-                text='Enviar'
-                icon={ICONS.SEND}
-                labeled
-                button
-                className='icon blue'
-                $paddingLeft="45px"
-                >
-                <Dropdown.Menu direction="left" >
-                  {sendButtons.map(({ text, iconName, subOptions }) => (
-                    <Flex key={iconName}>
-                      {subOptions.length > 0 && (
-                        <DropdownOption $reverse direction="left" text={text} pointing="left" className="link item">
-                          <DropdownMenu margin="0 10px 0 0" icon={iconName}>
-                            {subOptions.map(({ key, href, text, iconName, color }) => (
-                              <Flex key={key}>
-                                <DropdownItem  key={key} as='a' href={href} target="_blank">
-                                  <Icon name={iconName} color={color} /> {text}
-                                </DropdownItem>
-                              </Flex>
-                            ))}
-                          </DropdownMenu>
-                        </DropdownOption>
-                      )}
-                    </Flex>
-                  ))}
-                </Dropdown.Menu>
-              </DropdownOption>
-            </Menu>
-          )
+          id: 3,
+          icon: ICONS.SEND,
+          color: COLORS.BLUE,
+          text: 'Enviar',
+          collapsedTooltip: 'Enviar venta',
+          items: sendItems,
         },
         {
-          id: 3,
+          id: 4,
           icon: ICONS.COPY,
           color: COLORS.GREEN,
           onClick: () => { push(PAGES.BUDGETS.CLONE(budget.id)) },
           text: 'Clonar venta',
+          collapsedTooltip: 'Clonar venta',
           iconOnly:true,
         },
         budget.state === BUDGET_STATES.CONFIRMED.id && {
-          id: 4,
+          id: 5,
           icon: ICONS.BAN,
           color: COLORS.RED,
           onClick: () => setIsModalCancelOpen(true),
           text: 'Anular venta',
+          collapsedTooltip: 'Anular venta',
           basic: true,
           iconOnly:true,
         },
@@ -207,7 +229,7 @@ const BudgetPageClient = ({ budget }) => {
       setActions(actions);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [budget, push, role, setActions]);
+  }, [budget, canCopyPublicLink, handleCopyPublicLink, publicLinkTooltip, push, role, setActions]);
 
   const handleConfirm = () => {
     if (!customerHasInfo) {

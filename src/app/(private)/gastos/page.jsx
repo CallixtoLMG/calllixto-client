@@ -5,7 +5,7 @@ import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel } from "@/common/utils";
 import ExpensesPage from "@/components/expenses/ExpensesPage";
 import { EXPENSE_STATES } from "@/components/expenses/expenses.constants";
-import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useBreadcrumContext } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
@@ -15,7 +15,6 @@ const Expenses = () => {
   const { data, isLoading, isRefetching, refetch } = useListExpenses();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
-  const { setActions } = useNavActionsContext();
   const { push } = useRouter();
 
   useEffect(() => {
@@ -43,18 +42,16 @@ const Expenses = () => {
     downloadExcel([headers, ...mappedExpenses], "Lista de Gastos");
   }, []);
 
-  useEffect(() => {
-    const actions = RULES.canCreate[role] ? [
+  const sideActions = useMemo(() => RULES.canCreate[role] ? [
       {
         id: 1,
         icon: ICONS.ADD,
         color: COLORS.GREEN,
         onClick: () => { push(PAGES.EXPENSES.CREATE) },
-        text: 'Crear'
+        text: 'Crear',
+        collapsedTooltip: 'Crear gasto',
       }
-    ] : [];
-    setActions(actions);
-  }, [push, role, setActions, loading]);
+    ] : [], [push, role]);
 
   useKeyboardShortcuts(() => push(PAGES.EXPENSES.CREATE), SHORTKEYS.ENTER);
 
@@ -65,6 +62,7 @@ const Expenses = () => {
       expenses={loading ? [] : expenses}
       role={role}
       onDownloadExcel={handleDownloadExcel}
+      sideActions={sideActions}
     />
   );
 };

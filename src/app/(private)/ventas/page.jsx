@@ -6,16 +6,16 @@ import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { formatLastCount } from "@/common/utils/pluralization";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { BUDGET_STATES, DEFAULT_DATE_RANGE_VALUE } from "@/components/budgets/budgets.constants";
-import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useBreadcrumContext } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 const Budgets = () => {
   const { data: usersData, isLoading: isLoadingUsers } = useListUsers();
   const { setLabels } = useBreadcrumContext();
-  const { setActions } = useNavActionsContext();
   const { push } = useRouter();
+  const pushRef = useRef(push);
   const { data: budgetsSettings, refetch: refetchSettings, isFetching: isFetchingSettings, } = useGetSetting(ENTITIES.BUDGET);
   const rangeValue = Number(budgetsSettings?.defaultPageDateRange?.value) || DEFAULT_DATE_RANGE_VALUE;
   const { data: budgetsData, isLoading: isLoadingBudgets, isRefetching, refetch } = useListBudgets({
@@ -67,25 +67,37 @@ const Budgets = () => {
   })), [users]);
 
   useEffect(() => {
-    const actions = [
+    pushRef.current = push;
+  }, [push]);
+
+  const handleCreate = useCallback(() => {
+    pushRef.current(PAGES.BUDGETS.CREATE);
+  }, []);
+
+  const handleHistory = useCallback(() => {
+    pushRef.current(PAGES.BUDGETS_HISTORY.BASE);
+  }, []);
+
+  const sideActions = useMemo(() => (
+    [
       {
         id: 1,
         icon: ICONS.ADD,
         color: COLORS.GREEN,
-        onClick: () => { push(PAGES.BUDGETS.CREATE) },
-        text: 'Crear'
+        onClick: handleCreate,
+        text: 'Crear',
+        collapsedTooltip: 'Crear venta',
       },
       {
         id: 2,
         icon: ICONS.SEARCH,
         color: COLORS.BLUE,
-        onClick: () => { push(PAGES.BUDGETS_HISTORY.BASE) },
-        text: 'Historial'
+        onClick: handleHistory,
+        text: 'Historial',
+        collapsedTooltip: 'Ir al historial de ventas',
       },
-    ];
-    setActions(actions);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [push, setActions, loading]);
+    ]
+  ), [handleCreate, handleHistory]);
 
   useKeyboardShortcuts(() => push(PAGES.BUDGETS.CREATE), SHORTKEYS.ENTER);
 
@@ -95,6 +107,7 @@ const Budgets = () => {
       isLoading={loading}
       budgets={loading ? [] : budgets}
       usersOptions={usersOptions}
+      sideActions={sideActions}
     />
   )
 };

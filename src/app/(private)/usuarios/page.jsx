@@ -4,7 +4,7 @@ import { useListUsers } from "@/api/users";
 import { COLORS, DATE_FORMATS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel, getFormatedPhone } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
-import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useBreadcrumContext } from "@/components/layout";
 import UsersPage from "@/components/users/UserPage";
 import { USERS_ROLE_OPTIONS, USER_STATES } from "@/components/users/users.constants";
 import { useKeyboardShortcuts } from "@/hooks";
@@ -16,7 +16,6 @@ const Users = () => {
   const { data, isLoading, isRefetching, refetch } = useListUsers();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
-  const { setActions } = useNavActionsContext();
   const { push } = useRouter();
   
   useEffect(() => {
@@ -48,18 +47,16 @@ const Users = () => {
     downloadExcel([headers, ...mappedUsers], "Lista de Usuarios");
   }, []);
 
-  useEffect(() => {
-    const actions = RULES.canManageUsers[role] ? [
+  const sideActions = useMemo(() => RULES.canManageUsers[role] ? [
       {
         id: 1,
         icon: ICONS.ADD,
         color: COLORS.GREEN,
         onClick: () => { push(PAGES.USERS.CREATE) },
-        text: 'Crear'
+        text: 'Crear',
+        collapsedTooltip: 'Crear usuario',
       }
-    ] : [];
-    setActions(actions);
-  }, [push, role, setActions, loading]);
+    ] : [], [push, role]);
 
   useKeyboardShortcuts([
     {
@@ -76,6 +73,7 @@ const Users = () => {
       users={loading ? [] : users}
       role={role}
       onDownloadExcel={handleDownloadExcel}
+      sideActions={sideActions}
     />
   );
 };

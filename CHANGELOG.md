@@ -3,6 +3,48 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-08-03
+
+### Changed
+
+- Public budgets: Replaced the localStorage mock with the real public backend endpoint using `accountId` and `budget.publicHash`.
+- Sales: Enabled public link generation for newly created budgets with `publicEnabled: true` and disabled link copying for older budgets without a public hash.
+- Public budgets: Updated the public loading state to use the standard Callixto loader.
+
+## 2026-07-28
+
+### Added
+
+- Sales: Added a mocked public budget link action from sale detail, with local snapshot storage and an unauthenticated public budget view.
+- Settings: Moved the global Update action into the shared page actions sidebar.
+
+### Changed
+
+- Public budgets: Masked customer personal data and hid payment details in the public budget view.
+- Sidebar: Updated page actions to the lighter white-item variant with colored icons, subtle borders, and consistent subactions.
+- Navigation: Added an "Enlaces externos" section label above the Pandora link in the main sidebar.
+- Actions: Unified quick and full update icons across migrated action sidebars.
+- Help: Unified contextual messages to point page actions to the right sidebar.
+- Sidebar: Added smooth open/close transitions to action groups.
+- Tables: Made the pagination page-size selector more compact and aligned.
+
+## 2026-07-24
+
+### Changed
+
+- Navigation: Moved Pandora access from the header to the main sidebar menu for authorized users.
+- Help: Updated contextual information to describe page actions in the right sidebar, including Sales History.
+- Sidebar: Added open/close transitions to action groups using the main menu timing.
+- Sales History: Added the global actions sidebar with Update and Download Excel actions.
+- Sales History: Moved the Excel export out of the table footer while preserving filtered and sorted export data.
+- Tables: Made the pagination page-size selector more compact and aligned.
+
+## 2026-07-22
+
+### Added
+
+- Header: Added a Pandora shortcut for `callixto` and `sadmin` users to open the Excel sanitizer in a new tab.
+
 ## 2026-05-24
 
 ### Changed

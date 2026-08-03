@@ -70,6 +70,7 @@ const ExpensePageClient = ({ expense }) => {
         color: COLORS.GREEN,
         onClick: () => push(PAGES.EXPENSES.CLONE(expense.id)),
         text: 'Clonar',
+        collapsedTooltip: 'Clonar gasto',
       });
     }
 
@@ -83,6 +84,7 @@ const ExpensePageClient = ({ expense }) => {
         basic: true,
         onClick: handleAnular,
         text: "Anular",
+        collapsedTooltip: "Anular gasto",
         width: CONTENT_SIZES.FIT,
       });
     }

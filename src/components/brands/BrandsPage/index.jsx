@@ -2,12 +2,14 @@ import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
 import { CONTENT_SIZES, ENTITIES, FIELD_LABELS, PAGES } from "@/common/constants";
 import { createFilter } from "@/common/utils";
+import { useListPageSideActions } from "@/components/layout";
 import { useFilters } from "@/hooks";
+import { useCallback, useMemo } from "react";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
-import { BRANDS_FILTERS_KEY, BRAND_COLUMNS, BRAND_STATES_OPTIONS, EMPTY_FILTERS } from "../brands.constants";
+import { BRANDS_FILTERS_KEY, BRAND_COLUMNS, BRAND_STATES_OPTIONS, EMPTY_FILTERS, LIST_BRANDS_QUERY_KEY } from "../brands.constants";
 
-const BrandsPage = ({ brands = [], isLoading, onRefetch, onDownloadExcel }) => {
+const BrandsPage = ({ brands = [], isLoading, onRefetch, onDownloadExcel, sideActions = [] }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -18,7 +20,18 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch, onDownloadExcel }) => {
     hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: BRANDS_FILTERS_KEY });
 
-  const onFilter = createFilter(filters, { name: {}, id: {}, state: { fullMatch: true } });
+  const onFilter = useMemo(() => createFilter(filters, { name: {}, id: {}, state: { fullMatch: true } }), [filters]);
+  const { useSideActions, handleFilteredElementsChange } = useListPageSideActions({
+    sideActions,
+    onRefetch,
+    onDownloadExcel,
+    entity: ENTITIES.BRANDS,
+    queryKey: LIST_BRANDS_QUERY_KEY,
+    pageName: PAGES.BRANDS.NAME,
+    updateTooltip: "Actualizar marcas",
+    downloadTooltip: "Descargar marcas en Excel",
+  });
+  const handleFilteredBrandsChange = useCallback(handleFilteredElementsChange, [handleFilteredElementsChange]);
 
   return (
     <>
@@ -30,6 +43,7 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch, onDownloadExcel }) => {
             onRestoreFilters={onRestoreFilters}
             appliedCount={appliedCount}
             hydrated={hydrated}
+            showRefetchAction={!useSideActions}
           >
             <DropdownControlled
               minWidth="150px"
@@ -66,7 +80,8 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch, onDownloadExcel }) => {
         paginate
         filters={filters}
         setFilters={setFilters}
-        onDownloadExcel={onDownloadExcel}
+        onDownloadExcel={useSideActions ? undefined : onDownloadExcel}
+        onFilteredElementsChange={useSideActions ? handleFilteredBrandsChange : undefined}
       />
     </>
   );

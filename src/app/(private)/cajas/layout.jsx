@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
 
   return (
     <MainContainer>
-      <SubContainer>
+      <SubContainer $embeddedInWorkspace>
         {children}
       </SubContainer>
     </MainContainer>

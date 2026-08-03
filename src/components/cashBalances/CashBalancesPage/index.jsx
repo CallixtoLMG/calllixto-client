@@ -2,18 +2,20 @@ import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
 import { CONTENT_SIZES, ENTITIES, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
 import { createFilter } from "@/common/utils";
+import { useListPageSideActions } from "@/components/layout";
 import { useFilters } from "@/hooks";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
 import {
   CASH_BALANCES_FILTERS_KEY,
   CASH_BALANCE_STATES_OPTIONS,
   EMPTY_FILTERS,
+  LIST_CASH_BALANCES_QUERY_KEY,
   getCashBalanceColumns
 } from "../cashBalances.constants";
 
-const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOptions, onDownloadExcel }) => {
+const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOptions, onDownloadExcel, sideActions = [] }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -31,7 +33,18 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
     }));
   }, [cashBalances]);
 
-  const onFilter = createFilter(filters, { id: {}, paymentMethods: { isArray: true, skipAll: true }, state: { fullMatch: true } });
+  const onFilter = useMemo(() => createFilter(filters, { id: {}, paymentMethods: { isArray: true, skipAll: true }, state: { fullMatch: true } }), [filters]);
+  const { useSideActions, handleFilteredElementsChange } = useListPageSideActions({
+    sideActions,
+    onRefetch,
+    onDownloadExcel,
+    entity: ENTITIES.CASHBALANCES,
+    queryKey: LIST_CASH_BALANCES_QUERY_KEY,
+    pageName: PAGES.CASH_BALANCES.NAME,
+    updateTooltip: "Actualizar cajas",
+    downloadTooltip: "Descargar cajas en Excel",
+  });
+  const handleFilteredCashBalancesChange = useCallback(handleFilteredElementsChange, [handleFilteredElementsChange]);
 
   const cashBalanceColumns = useMemo(
     () => getCashBalanceColumns(filters.state),
@@ -48,6 +61,7 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
             onRestoreFilters={onRestoreFilters}
             appliedCount={appliedCount}
             hydrated={hydrated}
+            showRefetchAction={!useSideActions}
           >
             <DropdownControlled
               minWidth="150px"
@@ -87,7 +101,8 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
         paginate
         filters={filters}
         setFilters={setFilters}
-        onDownloadExcel={onDownloadExcel}
+        onDownloadExcel={useSideActions ? undefined : onDownloadExcel}
+        onFilteredElementsChange={useSideActions ? handleFilteredCashBalancesChange : undefined}
       />
     </>
   );

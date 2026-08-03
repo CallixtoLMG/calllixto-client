@@ -1,8 +1,40 @@
 import { POPUP_POSITIONS, PAGE_SIZE_OPTIONS } from "@/common/constants";
 import { Popup, Pagination as SPagination } from "semantic-ui-react";
+import styled from "styled-components";
 import { Dropdown } from "../custom";
 import ElementCounter from "./ElementCounter";
 import { PaginationContainer } from "./styles";
+
+const PAGE_SIZE_DROPDOWN_WIDTH = "92px";
+
+const PageSizeDropdown = styled(Dropdown)`
+  &&& {
+    width: ${PAGE_SIZE_DROPDOWN_WIDTH}!important;
+    min-width: ${PAGE_SIZE_DROPDOWN_WIDTH}!important;
+    flex: 0 0 auto;
+  }
+
+  &&&.ui.selection.dropdown {
+    display: flex;
+    align-items: center;
+    padding: 0 2.1em 0 0.9em!important;
+  }
+
+  &&& > .text {
+    width: 100%!important;
+    text-align: left!important;
+  }
+
+  &&& .menu {
+    width: ${PAGE_SIZE_DROPDOWN_WIDTH}!important;
+    min-width: ${PAGE_SIZE_DROPDOWN_WIDTH}!important;
+  }
+
+  &&& .menu > .item {
+    width: 100%;
+    text-align: left;
+  }
+`;
 
 const Pagination = ({
   activePage,
@@ -35,7 +67,7 @@ const Pagination = ({
         size="mini"
         content="Elementos mostrados"
         trigger={(
-          <Dropdown
+          <PageSizeDropdown
             options={PAGE_SIZE_OPTIONS}
             value={pageSize}
             onChange={onPageSizeChange}
@@ -43,8 +75,7 @@ const Pagination = ({
             compact
             $boxShadow
             height="40px"
-            width="110px"
-            $textAlign="center"
+            width={PAGE_SIZE_DROPDOWN_WIDTH}
           />
         )}
         position={POPUP_POSITIONS.LEFT_CENTER}
