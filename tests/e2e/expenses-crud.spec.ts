@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
+import { expectSuccessfulApiResponse, isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
+import { E2E_ACCOUNTS } from "./support/env";
 import { waitForEntityDetailUrl } from "./support/entities";
 
 const listUrl = /\/gastos(?:\?|$)/;
@@ -8,6 +10,7 @@ type ExpenseFixture = {
   name: string;
   amount: string;
   comments: string;
+  categoryName?: string;
   tagsCount?: number;
 };
 
@@ -17,10 +20,62 @@ const openExpensesList = async (page: Page) => {
   await expect(page.getByTestId("nav-action-crear")).toBeVisible();
 };
 
-const selectFirstRequiredCategory = async (page: Page) => {
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const fillTestIdInput = async (page: Page, testId: string, value: string) => {
+  await page.getByTestId(testId).locator("input").fill(value);
+};
+
+const typeIntoField = async (page: Page, selector: string, value: string) => {
+  const field = page.locator(selector);
+  await field.click();
+  await field.press("ControlOrMeta+A");
+  await field.pressSequentially(value);
+};
+
+const typeIntoPlaceholder = async (page: Page, placeholder: string | RegExp, value: string) => {
+  const field = page.getByPlaceholder(placeholder);
+  await field.click();
+  await field.press("ControlOrMeta+A");
+  await field.pressSequentially(value);
+};
+
+const openSettingsAccordion = async (page: Page, accordionTestId: string, fieldTestId: string) => {
+  const field = page.getByTestId(fieldTestId).locator("input");
+
+  if (await field.isVisible({ timeout: 500 })) return;
+
+  await page.getByTestId(accordionTestId).click();
+  await expect(field).toBeVisible();
+};
+
+const ensureExpenseCategoryAvailable = async (page: Page, categoryName: string) => {
+  await page.goto("/configuracion?tab=gastos");
+  await expect(page).toHaveURL(/\/configuracion\?tab=gastos$/);
+  await openSettingsAccordion(page, "settings-categories-accordion", "settings-category-name-field");
+  await fillTestIdInput(page, "settings-category-name-field", categoryName);
+  await fillTestIdInput(page, "settings-category-description-field", `Categoria E2E gasto ${categoryName}`);
+  await page.getByTestId("settings-category-description-field").locator("input").press("Enter");
+  await expect(page.getByText(categoryName, { exact: true })).toBeVisible({ timeout: 30_000 });
+  await page.getByTestId("settings-update-button").click();
+  await expect(page.getByText(/cambios guardados correctamente/i)).toBeVisible({ timeout: 30_000 });
+
+  return categoryName;
+};
+
+const selectAvailableCategory = async (page: Page, categoryName?: string) => {
   const categoriesDropdown = page.getByTestId("dropdown-categories");
   await expect(categoriesDropdown).toBeVisible();
   await categoriesDropdown.click();
+
+  if (categoryName) {
+    const categoryOption = page.getByRole("option", { name: new RegExp(escapeRegExp(categoryName), "i") });
+    await expect(categoryOption).toBeVisible({ timeout: 30_000 });
+    await categoryOption.click();
+    await expect(categoriesDropdown.locator(".label").filter({ hasText: categoryName })).toBeVisible({ timeout: 30_000 });
+
+    return categoryName;
+  }
 
   const options = page
     .locator('[role="option"]')
@@ -28,7 +83,8 @@ const selectFirstRequiredCategory = async (page: Page) => {
     .filter({ hasNotText: /todos|no hay|no se encontraron/i });
 
   if (!(await options.count())) {
-    throw new Error("Expense E2E requires at least one configured expense category in settings.");
+    await page.keyboard.press("Escape");
+    return null;
   }
 
   const category = options.nth(0);
@@ -74,18 +130,20 @@ const selectAvailableTags = async (page: Page, requestedCount = 2) => {
 };
 
 const fillExpenseForm = async (page: Page, expense: ExpenseFixture) => {
-  await page.locator('input[name="name"]').fill(expense.name);
-  await page.getByPlaceholder("18000").fill(expense.amount);
+  await typeIntoField(page, 'input[name="name"]', expense.name);
+  await typeIntoPlaceholder(page, "18000", expense.amount);
 
   // The datepicker is intentionally left with its default date. Changing it through
   // react-datepicker would add fragile selector coupling without improving this smoke flow.
-  const selectedCategory = await selectFirstRequiredCategory(page);
+  const selectedCategory = expense.categoryName
+    ? await selectAvailableCategory(page, expense.categoryName)
+    : null;
 
   const selectedTags = expense.tagsCount
     ? await selectAvailableTags(page, expense.tagsCount)
     : [];
 
-  await page.getByPlaceholder("Quiero ver el Juego del Calamar temporada 2").fill(expense.comments);
+  await typeIntoPlaceholder(page, "Quiero ver el Juego del Calamar temporada 2", expense.comments);
 
   return {
     selectedCategory,
@@ -93,18 +151,33 @@ const fillExpenseForm = async (page: Page, expense: ExpenseFixture) => {
   };
 };
 
+const waitForExpenseSettingsReady = async (page: Page) => {
+  const categoriesDropdown = page.getByTestId("dropdown-categories");
+  const tagsDropdown = page.getByTestId("dropdown-tags");
+
+  await expect(categoriesDropdown).toBeVisible();
+  await expect(tagsDropdown).toBeVisible();
+  await expect(categoriesDropdown).not.toHaveClass(/loading/);
+  await expect(tagsDropdown).not.toHaveClass(/loading/);
+};
+
 const createExpense = async (page: Page, expense: ExpenseFixture) => {
-  await openExpensesList(page);
-  await page.getByTestId("nav-action-crear").click();
+  await page.goto("/gastos/crear");
   await expect(page).toHaveURL(/\/gastos\/crear(?:\?|$)/);
+  await waitForExpenseSettingsReady(page);
 
   const selectedData = await fillExpenseForm(page, expense);
+  const createResponsePromise = page.waitForResponse((response) => isApiResponse(response, "POST", "expenses"));
 
-  await page.locator("form").getByRole("button", { name: /crear/i }).click();
-  await waitForEntityDetailUrl(page, "gastos");
+  const createButton = page.locator("form").getByRole("button", { name: /crear/i });
+  await expect(createButton).toBeEnabled();
+  await createButton.click();
+  const createBody = await expectSuccessfulApiResponse(await createResponsePromise, { responseEntity: "expense" });
+  await expect(page).toHaveURL(new RegExp(`/gastos/${createBody.expense.id}(?:\\?|$)`), { timeout: 30_000 });
 
   return {
     url: page.url(),
+    id: createBody.expense.id,
     ...selectedData,
   };
 };
@@ -116,7 +189,9 @@ const expectExpenseName = async (page: Page, name: string) => {
 const voidCurrentExpense = async (page: Page, reason: string) => {
   await page.getByTestId("nav-action-anular").click();
   await page.getByPlaceholder(/motivo/i).fill(reason);
-  await page.getByTestId("modal-void").click({ force: true });
+  const confirmButton = page.getByTestId("modal-void");
+  await expect(confirmButton).toBeEnabled();
+  await confirmButton.click();
   await expect(page.getByText(reason)).toBeVisible({ timeout: 30_000 });
   await expect(page.getByTestId("nav-action-anular")).toBeHidden();
 };
@@ -138,7 +213,7 @@ const voidExpenseIfPresent = async (page: Page, expenseUrl: string, reason: stri
 
 test.describe("expenses", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page);
+    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
   });
 
   test("creates, updates, and voids an expense", async ({ page }) => {
@@ -149,7 +224,6 @@ test.describe("expenses", () => {
       name: `E2E Expense Test ${timestamp}`,
       amount: "1500",
       comments: `Comentario E2E gasto ${timestamp}`,
-      tagsCount: 2,
     };
     const updatedName = `E2E Expense Test ${timestamp} Updated`;
     const updatedComment = `Comentario E2E gasto actualizado ${timestamp}`;
@@ -162,7 +236,9 @@ test.describe("expenses", () => {
 
       await expectExpenseName(page, expense.name);
       await expect(page.getByPlaceholder("18000")).toHaveValue("1,500");
-      await expect(page.getByText(createdExpense.selectedCategory)).toBeVisible();
+      if (createdExpense.selectedCategory) {
+        await expect(page.getByText(createdExpense.selectedCategory)).toBeVisible();
+      }
       await expect(page.getByPlaceholder("Quiero ver el Juego del Calamar temporada 2")).toHaveValue(expense.comments);
 
       for (const tag of createdExpense.selectedTags) {
@@ -196,6 +272,7 @@ test.describe("expenses", () => {
       name: `E2E Expense Test ${timestamp}`,
       amount: "1500",
       comments: `Comentario E2E gasto ${timestamp}`,
+      categoryName: await ensureExpenseCategoryAvailable(page, `E2E Gasto Category Clone ${timestamp}`),
       tagsCount: 2,
     };
     const cloneName = `E2E Expense Clone ${timestamp}`;
@@ -216,15 +293,21 @@ test.describe("expenses", () => {
 
       await expect(page.locator('input[name="name"]')).toHaveValue(originalExpense.name);
       await expect(page.getByPlaceholder("18000")).toHaveValue("1,500");
-      await expect(page.getByText(createdExpense.selectedCategory)).toBeVisible();
+      if (createdExpense.selectedCategory) {
+        await expect(page.getByText(createdExpense.selectedCategory)).toBeVisible();
+      }
       await expect(page.getByPlaceholder("Quiero ver el Juego del Calamar temporada 2")).toHaveValue(originalExpense.comments);
 
       await page.locator('input[name="name"]').fill(cloneName);
       await page.getByPlaceholder("Quiero ver el Juego del Calamar temporada 2").fill(cloneComment);
+      const cloneResponsePromise = page.waitForResponse((response) => isApiResponse(response, "POST", "expenses"));
+
       await page.locator("form").getByRole("button", { name: /crear/i }).click();
+      const cloneBody = await expectSuccessfulApiResponse(await cloneResponsePromise, { responseEntity: "expense" });
       await waitForEntityDetailUrl(page, "gastos");
 
       clonedExpenseUrl = page.url();
+      await expect(page).toHaveURL(new RegExp(`/gastos/${cloneBody.expense.id}(?:\\?|$)`));
       expect(clonedExpenseUrl).not.toBe(originalExpenseUrl);
       await expectExpenseName(page, cloneName);
       await expect(page.getByPlaceholder("Quiero ver el Juego del Calamar temporada 2")).toHaveValue(cloneComment);

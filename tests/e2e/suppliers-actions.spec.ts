@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { loginAsE2EUser } from "./support/auth";
+import { E2E_ACCOUNTS } from "./support/env";
 import {
   deleteCurrentEntity,
   deleteEntityIfPresent,
@@ -296,7 +297,7 @@ const cleanupCreatedData = async (
 
 test.describe("supplier actions", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page);
+    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
   });
 
   test("deletes all products for a supplier", async ({ page }) => {

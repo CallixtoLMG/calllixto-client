@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
+import { expectSuccessfulApiResponse, isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
+import { E2E_ACCOUNTS } from "./support/env";
 import {
   deleteEntityIfPresent,
   dismissUnsavedChangesIfVisible,
@@ -269,16 +271,27 @@ const openProductFromList = async (page: Page, productName: string) => {
 };
 
 const addStockMovement = async (page: Page, type: "add" | "remove", quantity: string, comment: string) => {
+  const productId = new URL(page.url()).pathname.split("/")[2];
+
   await page.getByTestId(type === "add" ? "stock-add-button" : "stock-remove-button").click();
   await fillTestIdInput(page, "stock-quantity-field", quantity);
   await fillTestIdInput(page, "stock-comments-field", comment);
-  await page.getByTestId("modal-confirm").click();
-  await expect(page.getByText(comment)).toBeVisible({ timeout: 30_000 });
+
+  const responsePromise = page.waitForResponse((response) => isApiResponse(response, "POST", `stock-flows/${productId}`));
+  await Promise.all([
+    responsePromise,
+    page.getByTestId("modal-confirm").click(),
+  ]);
+  await expectSuccessfulApiResponse(await responsePromise, { responseEntity: "stockFlow" });
+
+  const row = page.getByTestId("table-row").filter({ hasText: comment });
+  await expect(row).toBeVisible({ timeout: 30_000 });
+  await expect(row.getByTestId("table-cell-quantity").getByText(quantity, { exact: true })).toBeVisible();
 };
 
 test.describe("products", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page);
+    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
   });
 
   test("creates and updates a product", async ({ page }) => {

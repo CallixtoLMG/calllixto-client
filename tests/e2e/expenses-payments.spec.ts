@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { loginAsE2EUser } from "./support/auth";
+import { E2E_ACCOUNTS } from "./support/env";
 import { waitForEntityDetailUrl } from "./support/entities";
 
 type ExpenseFixture = {
@@ -15,6 +16,35 @@ type PaymentFixture = {
 };
 
 const expensesListUrl = /\/gastos(?:\?|$)/;
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const apiPathEndsWith = (url: string, suffix: string) => new URL(url).pathname.endsWith(suffix);
+const paymentApiPath = (expenseId: string) => `/payments/expense/${expenseId}`;
+
+const expectSuccessfulApiResponse = async (response: Awaited<ReturnType<Page["waitForResponse"]>>) => {
+  expect(response.status()).toBeLessThan(400);
+
+  const body = await response.json();
+  expect(body.statusOk).toBeTruthy();
+
+  return body;
+};
+
+const getPaymentsByApi = async (
+  page: Page,
+  paymentResponseUrl: string,
+  expenseId: string,
+  authorization?: string,
+) => {
+  const url = paymentResponseUrl.replace(/\/payments\/expense\/[^/]+(?:\/[^/]+)?$/, paymentApiPath(expenseId));
+  const response = await page.request.get(url, authorization ? { headers: { authorization } } : undefined);
+
+  expect(response.status()).toBeLessThan(400);
+
+  const body = await response.json();
+  expect(Array.isArray(body.payments)).toBeTruthy();
+
+  return body.payments as PaymentFixture[];
+};
 
 const openExpensesList = async (page: Page) => {
   await page.goto("/gastos");
@@ -22,7 +52,7 @@ const openExpensesList = async (page: Page) => {
   await expect(page.getByTestId("nav-action-crear")).toBeVisible();
 };
 
-const selectFirstRequiredCategory = async (page: Page) => {
+const selectFirstAvailableCategory = async (page: Page) => {
   const categoriesDropdown = page.getByTestId("dropdown-categories");
   await expect(categoriesDropdown).toBeVisible();
   await categoriesDropdown.click();
@@ -33,7 +63,8 @@ const selectFirstRequiredCategory = async (page: Page) => {
     .filter({ hasNotText: /todos|no hay|no se encontraron/i });
 
   if (!(await options.count())) {
-    throw new Error("Expense payments E2E requires at least one configured expense category in settings.");
+    await page.keyboard.press("Escape");
+    return;
   }
 
   await options.nth(0).click();
@@ -46,12 +77,15 @@ const createExpenseForPayments = async (page: Page, expense: ExpenseFixture) => 
 
   await page.locator('input[name="name"]').fill(expense.name);
   await page.getByPlaceholder("18000").fill(expense.amount);
-  await selectFirstRequiredCategory(page);
+  await selectFirstAvailableCategory(page);
   await page.getByPlaceholder("Quiero ver el Juego del Calamar temporada 2").fill(expense.comments);
   await page.locator("form").getByRole("button", { name: /crear/i }).click();
   await waitForEntityDetailUrl(page, "gastos");
 
-  return { url: page.url() };
+  return {
+    id: new URL(page.url()).pathname.split("/")[2],
+    url: page.url(),
+  };
 };
 
 const openExpenseDetail = async (page: Page, expenseUrl: string, name: string) => {
@@ -86,8 +120,18 @@ const selectFirstPaymentMethod = async (page: Page) => {
   return method;
 };
 
+const selectPaymentMethod = async (page: Page, method: string) => {
+  const dropdown = page.getByTestId("budget-payment-method-dropdown");
+  await dropdown.click();
+  await page.getByRole("option", { name: new RegExp(`^${escapeRegExp(method)}$`) }).click();
+
+  return method;
+};
+
 const fillPaymentModal = async (page: Page, payment: PaymentFixture) => {
-  const method = payment.method ?? await selectFirstPaymentMethod(page);
+  const method = payment.method
+    ? await selectPaymentMethod(page, payment.method)
+    : await selectFirstPaymentMethod(page);
 
   await page.getByTestId("budget-payment-amount-field").locator("input").fill(payment.amount);
   await page.getByTestId("budget-payment-comments-field").fill(payment.comments);
@@ -154,7 +198,9 @@ const voidCurrentExpense = async (page: Page, reason: string) => {
 
   await voidButton.click();
   await page.getByPlaceholder(/motivo/i).fill(reason);
-  await page.getByTestId("modal-void").click({ force: true });
+  const confirmButton = page.getByTestId("modal-void");
+  await expect(confirmButton).toBeEnabled();
+  await confirmButton.click();
   await expect(page.getByText(reason)).toBeVisible({ timeout: 30_000 });
 };
 
@@ -171,7 +217,7 @@ const voidExpenseIfPresent = async (page: Page, expenseUrl: string | null, reaso
 
 test.describe("expense payment", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page);
+    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
   });
 
   test("creates, updates, and deletes an expense payment", async ({ page }) => {
@@ -218,6 +264,122 @@ test.describe("expense payment", () => {
       expenseUrl = null;
     } finally {
       await voidExpenseIfPresent(page, expenseUrl, voidReason);
+    }
+  });
+
+  test("clones an expense and manages payments on the clone", async ({ page }) => {
+    const timestamp = Date.now();
+    const originalExpense = {
+      name: `E2E Expense Clone Pay Original ${timestamp}`,
+      amount: "1500",
+      comments: `Comentario E2E original clone pay ${timestamp}`,
+    };
+    const cloneName = `E2E Expense Clone Pay Clone ${timestamp}`;
+    const cloneComment = `Comentario E2E clone pay ${timestamp}`;
+    const originalPayment = {
+      amount: "300",
+      comments: `E2E original payment ${timestamp}`,
+    };
+    const originalVoidReason = `Cleanup E2E original clone pay ${timestamp}`;
+    const cloneVoidReason = `Cleanup E2E clone pay ${timestamp}`;
+    let originalExpenseUrl: string | null = null;
+    let clonedExpenseUrl: string | null = null;
+
+    try {
+      const original = await createExpenseForPayments(page, originalExpense);
+      originalExpenseUrl = original.url;
+
+      await openExpenseDetail(page, original.url, originalExpense.name);
+      await openPaymentsTab(page);
+      const originalPaymentResponsePromise = page.waitForResponse((response) =>
+        response.request().method() === "POST" &&
+        apiPathEndsWith(response.url(), paymentApiPath(original.id)),
+      );
+      const createdOriginalPayment = await addExpensePayment(page, originalPayment);
+      const originalPaymentResponse = await originalPaymentResponsePromise;
+      await expectSuccessfulApiResponse(originalPaymentResponse);
+      await assertPaymentVisible(page, createdOriginalPayment);
+      const clonePayment = {
+        method: createdOriginalPayment.method,
+        amount: "400",
+        comments: `E2E clone payment ${timestamp}`,
+      };
+      const editedClonePayment = {
+        method: createdOriginalPayment.method,
+        amount: "600",
+        comments: `E2E clone payment edited ${timestamp}`,
+      };
+
+      await page.getByText("Gasto", { exact: true }).click();
+      await page.getByTestId("nav-action-clonar").click();
+      await expect(page).toHaveURL(/\/gastos\/crear\?clonar=/);
+      await expect(page.locator('input[name="name"]')).toHaveValue(originalExpense.name);
+      await expect(page.getByPlaceholder("18000")).toHaveValue("1,500");
+      await expect(page.getByPlaceholder("Quiero ver el Juego del Calamar temporada 2")).toHaveValue(originalExpense.comments);
+
+      await page.locator('input[name="name"]').fill(cloneName);
+      await page.getByPlaceholder("Quiero ver el Juego del Calamar temporada 2").fill(cloneComment);
+      const clonePostResponsePromise = page.waitForResponse((response) =>
+        response.request().method() === "POST" && apiPathEndsWith(response.url(), "/expenses"),
+      );
+      await page.locator("form").getByRole("button", { name: /crear/i }).click();
+      const clonePostBody = await expectSuccessfulApiResponse(await clonePostResponsePromise);
+      await waitForEntityDetailUrl(page, "gastos");
+
+      const cloneId = new URL(page.url()).pathname.split("/")[2];
+      clonedExpenseUrl = page.url();
+      expect(cloneId).not.toBe(original.id);
+      expect(clonePostBody.expense.id).toBe(cloneId);
+
+      await expect(page.getByTestId("expense-name-field")).toContainText(cloneName);
+      await openPaymentsTab(page);
+      await assertPaymentNotVisible(page, createdOriginalPayment);
+      await expect(page.getByTestId("budget-add-payment-button")).toBeEnabled();
+      await expect(page.getByText("1.500,00")).toHaveCount(2);
+
+      const clonePaymentPostResponsePromise = page.waitForResponse((response) =>
+        response.request().method() === "POST" &&
+        apiPathEndsWith(response.url(), paymentApiPath(cloneId)),
+      );
+      const createdClonePayment = await addExpensePayment(page, clonePayment);
+      await expectSuccessfulApiResponse(await clonePaymentPostResponsePromise);
+      await assertPaymentVisible(page, createdClonePayment);
+      await expect(page.getByText("1.100,00")).toBeVisible();
+
+      const clonePaymentPutResponsePromise = page.waitForResponse((response) =>
+        response.request().method() === "PUT" &&
+        new URL(response.url()).pathname.includes(`${paymentApiPath(cloneId)}/`),
+      );
+      const editedPayment = await editExpensePayment(page, createdClonePayment, editedClonePayment);
+      await expectSuccessfulApiResponse(await clonePaymentPutResponsePromise);
+      await assertPaymentVisible(page, editedPayment);
+      await assertPaymentNotVisible(page, createdClonePayment);
+      await expect(page.getByText("900,00")).toBeVisible();
+
+      const clonePaymentDeleteResponsePromise = page.waitForResponse((response) =>
+        response.request().method() === "DELETE" &&
+        new URL(response.url()).pathname.includes(`${paymentApiPath(cloneId)}/`),
+      );
+      await deleteExpensePayment(page, editedPayment);
+      await expectSuccessfulApiResponse(await clonePaymentDeleteResponsePromise);
+      await assertPaymentNotVisible(page, editedPayment);
+      await expect(page.getByText("1.500,00")).toHaveCount(2);
+
+      const originalPayments = await getPaymentsByApi(
+        page,
+        originalPaymentResponse.url(),
+        original.id,
+        originalPaymentResponse.request().headers().authorization,
+      );
+      expect(originalPayments.some(payment => payment.comments === createdOriginalPayment.comments)).toBeTruthy();
+      expect(originalPayments.some(payment => payment.comments === editedPayment.comments)).toBeFalsy();
+
+      await voidCurrentExpense(page, cloneVoidReason);
+      clonedExpenseUrl = null;
+      originalExpenseUrl = null;
+    } finally {
+      await voidExpenseIfPresent(page, clonedExpenseUrl, cloneVoidReason);
+      await voidExpenseIfPresent(page, originalExpenseUrl, originalVoidReason);
     }
   });
 });

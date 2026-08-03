@@ -16,7 +16,7 @@ import { useAllowUpdate, useProtectedAction, useUnsavedChanges } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 
@@ -30,7 +30,13 @@ const ExpensePageClient = ({ expense }) => {
   const tabParam = searchParams.get("tab");
   const initialTabIndex = tabParam === "pagos" ? 1 : 0;
   const [activeIndex, setActiveIndex] = useState(initialTabIndex);
-  const { data: payments, refetch: refetchPayments, isLoading: isLoadingPayments, isRefetching } = useGetPayments(ENTITIES.EXPENSE, expense.id);
+  const {
+    data: payments,
+    refetch: refetchPayments,
+    isLoading: isLoadingPayments,
+    isRefetching,
+    isError: isPaymentsError,
+  } = useGetPayments(ENTITIES.EXPENSE, expense.id);
   const cancelExpense = useCancelExpense();
   const editExpense = useEditExpense();
   const editPayment = useEditPayment();
@@ -195,6 +201,18 @@ const ExpensePageClient = ({ expense }) => {
     setIsModalCancelOpen(false);
   };
 
+  const isPaymentsQueryLoading = isLoadingPayments || isRefetching;
+  const hasValidPayments = Array.isArray(payments);
+  const hasPaymentsContractError = !isPaymentsQueryLoading && !isPaymentsError && !hasValidPayments;
+  const paymentsWithOverdue = useMemo(() => {
+    if (!hasValidPayments) return [];
+
+    return payments.map(payment => ({
+      ...payment,
+      isOverdue: isDateAfter(payment.date, expense.expirationDate),
+    }));
+  }, [expense.expirationDate, hasValidPayments, payments]);
+
   const panes = [
     {
       menuItem: "Gasto",
@@ -218,35 +236,44 @@ const ExpensePageClient = ({ expense }) => {
       menuItem: "Pagos",
       render: () => (
         <Tab.Pane>
-          <Loader active={isLoadingPayments || isRefetching}>
-            {!isItemCancelled(expense?.state) && expense.expirationDate && (
-              <FieldsContainer>
-                <FormField flex="1">
-                  <TextField
-                    value={getFormatedDate(expense.expirationDate, DATE_FORMATS.ONLY_DATE)}
-                    label="Fecha de vencimiento"
-                    disabled
-                  />
-                </FormField>
-                <FormField flex="1" />
-                <FormField flex="1" />
-              </FieldsContainer>
+          <Loader active={isPaymentsQueryLoading}>
+            {hasPaymentsContractError || isPaymentsError ? (
+              <Message negative>
+                <MessageHeader>No se pudieron cargar los pagos</MessageHeader>
+                <p>Intentá actualizar la pantalla para volver a cargar la información.</p>
+              </Message>
+            ) : hasValidPayments && (
+              <>
+                {!isItemCancelled(expense?.state) && expense.expirationDate && (
+                  <FieldsContainer>
+                    <FormField flex="1">
+                      <TextField
+                        value={getFormatedDate(expense.expirationDate, DATE_FORMATS.ONLY_DATE)}
+                        label="Fecha de vencimiento"
+                        disabled
+                      />
+                    </FormField>
+                    <FormField flex="1" />
+                    <FormField flex="1" />
+                  </FieldsContainer>
+                )}
+                <Payments
+                  payments={paymentsWithOverdue}
+                  isModalPaymentOpen={isModalPaymentOpen}
+                  setIsModalPaymentOpen={setIsModalPaymentOpen}
+                  showDeleteModal={showDeleteModal}
+                  setShowDeleteModal={setShowDeleteModal}
+                  total={expense.amount}
+                  isLoading={isDeletePending || isCreatePending || isEditPaymentPending}
+                  onAdd={(payment) => mutateCreatePayment(payment)}
+                  onEdit={(payment) => mutateEditPayment(payment)}
+                  onDelete={(payment) => {
+                    mutateDeletePayment(payment.id);
+                  }}
+                  allowUpdates={!isItemCancelled(expense?.state)}
+                />
+              </>
             )}
-            <Payments
-              payments={payments.map(payment => ({ ...payment, isOverdue: isDateAfter(payment.date, expense.expirationDate) })) ?? []}
-              isModalPaymentOpen={isModalPaymentOpen}
-              setIsModalPaymentOpen={setIsModalPaymentOpen}
-              showDeleteModal={showDeleteModal}
-              setShowDeleteModal={setShowDeleteModal}
-              total={expense.amount}
-              isLoading={isDeletePending || isCreatePending || isEditPaymentPending}
-              onAdd={(payment) => mutateCreatePayment(payment)}
-              onEdit={(payment) => mutateEditPayment(payment)}
-              onDelete={(payment) => {
-                mutateDeletePayment(payment.id);
-              }}
-              allowUpdates={!isItemCancelled(expense?.state)}
-            />
           </Loader>
         </Tab.Pane>
       ),

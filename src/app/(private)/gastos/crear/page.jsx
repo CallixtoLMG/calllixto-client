@@ -10,6 +10,16 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
 import { toast } from "react-hot-toast";
 
+const buildClonedExpense = (expense) => ({
+  name: expense?.name ?? "",
+  amount: expense?.amount ?? "",
+  expirationDate: expense?.expirationDate ?? "",
+  comments: expense?.comments ?? "",
+  categories: expense?.categories ?? [],
+  tags: expense?.tags ?? [],
+  paymentsMade: [],
+});
+
 const CreateExpense = () => {
   const { push } = useRouter();
   const searchParams = useSearchParams();
@@ -48,11 +58,7 @@ const CreateExpense = () => {
   const clonedExpense = useMemo(() => {
     if (!expenseToClone) return undefined;
 
-    const { id, createdAt, createdBy, updatedAt, updatedBy, state, ...rest } = expenseToClone;
-    return {
-      ...rest,
-      paymentsMade: [],
-    };
+    return buildClonedExpense(expenseToClone);
   }, [expenseToClone]);
 
   return (

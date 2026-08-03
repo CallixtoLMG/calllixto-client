@@ -12,6 +12,25 @@ import { FormProvider, useForm } from "react-hook-form";
 import { DatePickerControlled } from "../../../common/components/form/DatePicker";
 import { EMPTY_EXPENSE } from "../expenses.constants";
 
+const getClonedInitialValues = (expense) => ({
+  ...EMPTY_EXPENSE,
+  name: expense?.name ?? EMPTY_EXPENSE.name,
+  amount: expense?.amount ?? EMPTY_EXPENSE.amount,
+  expirationDate: expense?.expirationDate ?? EMPTY_EXPENSE.expirationDate,
+  comments: expense?.comments ?? EMPTY_EXPENSE.comments,
+  categories: expense?.categories ?? [],
+  tags: expense?.tags ?? [],
+  paymentsMade: [],
+});
+
+const getInitialValues = (expense) => ({
+  ...EMPTY_EXPENSE,
+  tags: [],
+  categories: [],
+  expirationDate: expense?.expirationDate ? expense?.expirationDate : now(),
+  ...expense,
+});
+
 const ExpenseForm = forwardRef(({
   expense,
   onSubmit,
@@ -21,30 +40,17 @@ const ExpenseForm = forwardRef(({
   isCloning = false,
 },
   ref) => {
-  const getInitialValues = (expense) => ({
-    ...EMPTY_EXPENSE,
-    tags: [],
-    categories: [],
-    expirationDate: expense?.expirationDate ? expense?.expirationDate : now(),
-    ...expense,
-  });
-
   const clonedInitialValues = useMemo(() => {
     if (!isCloning || !expense) return EMPTY_EXPENSE;
 
-    const { id, createdAt, createdBy, updatedAt, updatedBy, state, paymentsMade, ...rest } = expense;
-
-    return {
-      ...EMPTY_EXPENSE,
-      ...rest,
-      paymentsMade: [],
-      categories: rest.categories || [],
-      tags: rest.tags || [],
-    };
+    return getClonedInitialValues(expense);
   }, [expense, isCloning]);
+  const initialValues = useMemo(() => (
+    isCloning ? clonedInitialValues : getInitialValues(expense)
+  ), [clonedInitialValues, expense, isCloning]);
 
   const methods = useForm({
-    defaultValues: isCloning ? clonedInitialValues : getInitialValues(expense),
+    defaultValues: initialValues,
   });
   const { isFetching: isExpensesSettingsFetching, refetch: refetchExprensesSettings } = useGetSetting(ENTITIES.EXPENSE);
   const { options: tagsOptions, optionsMapper: tagsMapper } = useSettingArrayField(ENTITIES.EXPENSE, "tags", expense?.tags || []);
@@ -53,13 +59,13 @@ const ExpenseForm = forwardRef(({
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
     submitForm: () => handleSubmit(handleForm)(),
-    resetForm: () => reset(getInitialValues(expense)),
+    resetForm: () => reset(initialValues),
   }));
 
   useEffect(() => {
-    reset(getInitialValues(expense));
+    reset(initialValues);
     refetchExprensesSettings();
-  }, [expense, refetchExprensesSettings, reset]);
+  }, [initialValues, refetchExprensesSettings, reset]);
 
   const handleReset = useCallback(() => {
     if (isCloning) {
@@ -87,7 +93,7 @@ const ExpenseForm = forwardRef(({
     },
     {
       key: SHORTKEYS.DELETE,
-      action: () => reset(getInitialValues(expense)),
+      action: () => reset(initialValues),
       condition: validateShortcuts.canReset,
     }
   ]);

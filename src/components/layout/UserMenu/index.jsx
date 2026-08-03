@@ -1,11 +1,15 @@
 'use client';
 
 import { useUserContext } from "@/User";
+import { clearTestingTable } from "@/api/testing";
 import { Icon } from "@/common/components/custom";
+import { ModalAction } from "@/common/components/modals";
 import { COLORS, ICONS, PAGES } from "@/common/constants";
 import { isCallixtoUser } from "@/roles";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "react-hot-toast";
 import {
   BackButton,
   AccountItem,
@@ -33,10 +37,13 @@ const UserMenu = ({ trigger, onLogout, onAccountChange, selectedAccount }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [view, setView] = useState("main");
   const [searchTerm, setSearchTerm] = useState("");
+  const [showClearTestingTableModal, setShowClearTestingTableModal] = useState(false);
 
   const accountItems = userData?.accounts?.items;
 
   const accounts = useMemo(() => accountItems ?? [], [accountItems]);
+
+  const canClearTestingTable = isCallixtoUser(role);
 
   const filteredAccounts = useMemo(() => {
     if (!searchTerm.trim()) return accounts;
@@ -77,6 +84,48 @@ const UserMenu = ({ trigger, onLogout, onAccountChange, selectedAccount }) => {
   const handleSelectAccount = (accountId) => {
     onAccountChange(accountId);
     setIsOpen(false);
+  };
+
+  const handleOpenClearTestingTableModal = () => {
+    if (!canClearTestingTable) return;
+
+    setIsOpen(false);
+    setShowClearTestingTableModal(true);
+  };
+
+  const { mutate: mutateClearTestingTable, isPending: isClearTestingTablePending } = useMutation({
+    mutationFn: () => {
+      if (!canClearTestingTable) return null;
+
+      return clearTestingTable();
+    },
+    onSuccess: (response) => {
+      if (!response) return;
+
+      if (response?.statusOk) {
+        toast.success("Los datos de testing fueron eliminados. Tu sesion se cerrara.");
+        setShowClearTestingTableModal(false);
+        onLogout?.();
+        return;
+      }
+
+      toast.error(response?.error?.message || response?.message || "No se pudieron borrar los datos de testing.");
+    },
+    onError: () => {
+      toast.error("No se pudieron borrar los datos de testing.");
+    },
+  });
+
+  const handleClearTestingTableModalChange = (open) => {
+    if (isClearTestingTablePending) return;
+
+    setShowClearTestingTableModal(open);
+  };
+
+  const handleClearTestingTable = () => {
+    if (!canClearTestingTable || isClearTestingTablePending) return;
+
+    mutateClearTestingTable();
   };
 
   const selectedAccountName = useMemo(() => {
@@ -121,6 +170,18 @@ const UserMenu = ({ trigger, onLogout, onAccountChange, selectedAccount }) => {
                     Cambiar contraseña
                   </span>
                 </MenuAction>
+                {canClearTestingTable && (
+                  <MenuAction
+                    type="button"
+                    $danger
+                    onClick={handleOpenClearTestingTableModal}
+                  >
+                    <span>
+                      <Icon $tooltip color={COLORS.RED} name={ICONS.TRASH} />
+                      Borrar datos
+                    </span>
+                  </MenuAction>
+                )}
                 <MenuAction
                   type="button"
                   $danger
@@ -184,6 +245,24 @@ const UserMenu = ({ trigger, onLogout, onAccountChange, selectedAccount }) => {
           </>
         )}
       </MenuCard>
+      <ModalAction
+        title="Borrar datos"
+        titleIcon={ICONS.TRASH}
+        titleIconColor={COLORS.RED}
+        confirmButtonText="Borrar datos"
+        showModal={showClearTestingTableModal}
+        setShowModal={handleClearTestingTableModalChange}
+        onConfirm={handleClearTestingTable}
+        isLoading={isClearTestingTablePending}
+        warning
+        bodyContent={(
+          <>
+            <p>Esta accion eliminara los datos generados en el ambiente de testing.</p>
+            <p>La operacion es irreversible. Cuando finalice correctamente, tu sesion se cerrara y tendras que volver a ingresar.</p>
+            <p>Para continuar, escribi &quot;eliminar&quot;.</p>
+          </>
+        )}
+      />
     </MenuContainer>
   );
 };

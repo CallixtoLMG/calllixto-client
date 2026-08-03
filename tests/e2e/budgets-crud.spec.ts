@@ -1,10 +1,12 @@
 import { expect, test, type Page } from "@playwright/test";
+import { expectSuccessfulApiResponse, isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
+import { E2E_ACCOUNTS } from "./support/env";
 import {
   addAddress,
   addPhone,
   dismissUnsavedChangesIfVisible,
-  waitForEntityDetailAfterSubmit,
+  waitForCurrentRouteChunk,
   waitForEntityDetailUrl,
 } from "./support/entities";
 
@@ -20,13 +22,39 @@ type BudgetFormOptions = {
   surcharge?: string;
 };
 
+const responseEntityByApiPath: Record<string, string> = {
+  customers: "customer",
+  suppliers: "supplier",
+  brands: "brand",
+  products: "product",
+};
+
 const budgetsListUrl = /\/ventas(?:\?|$)/;
 const twoDigitId = (seed: number) => (seed % 1296).toString(36).padStart(2, "0").toUpperCase();
 const twoDigitIdWithAttempt = (seed: number, attempt: number) => twoDigitId(seed + attempt * 97);
 const productLocalId = (seed: number) => (seed % 1_679_616).toString(36).padStart(4, "0").toUpperCase();
 
-const fillTestIdInput = async (page: Page, testId: string, value: string) => {
+const fillTestIdInput = async (page: Page, testId: string, value: string, expectedValue = value) => {
   await page.getByTestId(testId).locator("input").fill(value);
+  await expect(page.getByTestId(testId).locator("input")).toHaveValue(expectedValue);
+};
+
+const submitCreateForm = async (page: Page, apiPath: string, entityPath: string) => {
+  const submitButton = page.locator("form").getByRole("button", { name: /crear/i });
+  await expect(submitButton).toBeEnabled({ timeout: 30_000 });
+
+  const responsePromise = page.waitForResponse((response) => isApiResponse(response, "POST", apiPath));
+
+  await Promise.all([
+    responsePromise,
+    submitButton.click(),
+  ]);
+
+  const response = await responsePromise;
+  await expectSuccessfulApiResponse(response, { responseEntity: responseEntityByApiPath[apiPath] });
+
+  await dismissUnsavedChangesIfVisible(page);
+  await waitForEntityDetailUrl(page, entityPath);
 };
 
 const selectSearchOption = async (page: Page, testId: string, text: string) => {
@@ -55,13 +83,13 @@ const createCustomerForBudgetIfNeeded = async (page: Page, timestamp: number) =>
 
   await page.goto("/clientes/crear");
   await expect(page).toHaveURL(/\/clientes\/crear(?:\?|$)/);
+  await waitForCurrentRouteChunk(page);
 
   await page.locator('input[name="name"]').fill(customer.name);
+  await expect(page.locator('input[name="name"]')).toHaveValue(customer.name);
   await addPhone(page, { ref: "Casa", areaCode: "385", number: "5555555" });
   await addAddress(page, { ref: "Casa", address: customer.address });
-  await page.locator("form").getByRole("button", { name: /crear/i }).click();
-  await dismissUnsavedChangesIfVisible(page);
-  await waitForEntityDetailUrl(page, "clientes");
+  await submitCreateForm(page, "customers", "clientes");
 
   return customer;
 };
@@ -70,16 +98,20 @@ const createSupplier = async (page: Page, timestamp: number, attempt = 0) => {
   const supplier = {
     id: twoDigitIdWithAttempt(timestamp, attempt),
     name: `E2E Budget Supplier ${timestamp}`,
+    comment: `Comentario E2E budget supplier ${timestamp} ${attempt}`,
   };
 
   await page.goto("/proveedores/crear");
   await expect(page).toHaveURL(/\/proveedores\/crear(?:\?|$)/);
+  await waitForCurrentRouteChunk(page);
 
   await page.locator('input[name="id"]').fill(supplier.id);
+  await expect(page.locator('input[name="id"]')).toHaveValue(supplier.id);
   await page.locator('input[name="name"]').fill(supplier.name);
-  await page.locator("form").getByRole("button", { name: /crear/i }).click();
-  await dismissUnsavedChangesIfVisible(page);
-  await waitForEntityDetailAfterSubmit(page, "proveedores");
+  await expect(page.locator('input[name="name"]')).toHaveValue(supplier.name);
+  await page.getByPlaceholder("Siempre demora en los pedidos").fill(supplier.comment);
+  await expect(page.getByPlaceholder("Siempre demora en los pedidos")).toHaveValue(supplier.comment);
+  await submitCreateForm(page, "suppliers", "proveedores");
 
   return supplier;
 };
@@ -88,16 +120,20 @@ const createBrand = async (page: Page, timestamp: number, attempt = 0) => {
   const brand = {
     id: twoDigitIdWithAttempt(timestamp + 37, attempt),
     name: `E2E Budget Brand ${timestamp}`,
+    comment: `Comentario E2E budget brand ${timestamp} ${attempt}`,
   };
 
   await page.goto("/marcas/crear");
   await expect(page).toHaveURL(/\/marcas\/crear(?:\?|$)/);
+  await waitForCurrentRouteChunk(page);
 
   await page.locator('input[name="id"]').fill(brand.id);
+  await expect(page.locator('input[name="id"]')).toHaveValue(brand.id);
   await page.locator('input[name="name"]').fill(brand.name);
-  await page.locator("form").getByRole("button", { name: /crear/i }).click();
-  await dismissUnsavedChangesIfVisible(page);
-  await waitForEntityDetailAfterSubmit(page, "marcas");
+  await expect(page.locator('input[name="name"]')).toHaveValue(brand.name);
+  await page.getByPlaceholder("Una marca macanuda").fill(brand.comment);
+  await expect(page.getByPlaceholder("Una marca macanuda")).toHaveValue(brand.comment);
+  await submitCreateForm(page, "brands", "marcas");
 
   return brand;
 };
@@ -118,16 +154,18 @@ const createProductForBudgetIfNeeded = async (page: Page, timestamp: number) => 
 
       await page.goto("/productos/crear");
       await expect(page).toHaveURL(/\/productos\/crear(?:\?|$)/);
+      await waitForCurrentRouteChunk(page);
 
       await selectSearchOption(page, "product-supplier-search", supplier.name);
       await selectSearchOption(page, "product-brand-search", brand.name);
       await fillTestIdInput(page, "product-id-field", product.localId);
       await page.locator('input[name="name"]').fill(product.name);
-      await fillTestIdInput(page, "product-cost-field", "1000");
-      await fillTestIdInput(page, "product-price-field", "1500");
-      await page.locator("form").getByRole("button", { name: /crear/i }).click();
-      await dismissUnsavedChangesIfVisible(page);
-      await waitForEntityDetailAfterSubmit(page, "productos");
+      await expect(page.locator('input[name="name"]')).toHaveValue(product.name);
+      await fillTestIdInput(page, "product-cost-field", "1000", "1,000");
+      await fillTestIdInput(page, "product-price-field", "1500", "1,500");
+      await page.getByPlaceholder("Realmente son muchas pulgadas").fill(`Producto E2E para presupuesto ${timestamp}`);
+      await expect(page.getByPlaceholder("Realmente son muchas pulgadas")).toHaveValue(`Producto E2E para presupuesto ${timestamp}`);
+      await submitCreateForm(page, "products", "productos");
 
       return product;
     } catch (error) {
@@ -185,6 +223,7 @@ const openCreateBudgetPage = async (page: Page) => {
   await expect(page.getByTestId("nav-action-crear")).toBeVisible({ timeout: 30_000 });
   await page.getByTestId("nav-action-crear").click();
   await expect(page).toHaveURL(/\/ventas\/crear(?:\?|$)/);
+  await waitForCurrentRouteChunk(page);
 };
 
 const createDraftBudget = async (page: Page, dependencies: BudgetDependencies, timestamp: number) => {
@@ -264,16 +303,25 @@ const selectFirstPaymentMethod = async (page: Page) => {
 };
 
 const completeBudgetPayments = async (page: Page, timestamp: number) => {
+  const paymentComment = `Pago E2E presupuesto ${timestamp}`;
+
   await page.getByTestId("budget-detail-tab-payments").click();
   await page.getByTestId("budget-add-payment-button").click();
   await expect(page.locator(".ui.modal").getByText(/^agregar pago$/i)).toBeVisible({ timeout: 30_000 });
 
   await selectFirstPaymentMethod(page);
   await page.getByTestId("budget-payment-complete-amount-button").click();
-  await page.getByTestId("budget-payment-comments-field").fill(`Pago E2E presupuesto ${timestamp}`);
+  await page.getByTestId("budget-payment-comments-field").fill(paymentComment);
   await page.getByTestId("budget-payment-submit-button").click();
 
-  await expect(page.getByText(`Pago E2E presupuesto ${timestamp}`)).toBeVisible({ timeout: 30_000 });
+  const paymentsTable = page
+    .getByRole("table")
+    .filter({ has: page.getByRole("columnheader", { name: "Fecha de Pago" }) })
+    .filter({ has: page.getByRole("columnheader", { name: "Comentarios" }) });
+  const paymentRow = paymentsTable.getByRole("row").filter({ hasText: paymentComment });
+
+  await expect(paymentRow).toHaveCount(1, { timeout: 30_000 });
+  await expect(paymentRow.getByRole("cell", { name: paymentComment })).toBeVisible();
   await expect(page.getByTestId("budget-add-payment-button")).toBeDisabled({ timeout: 30_000 });
 };
 
@@ -292,7 +340,7 @@ const completeBudgetDeliveries = async (page: Page, timestamp: number) => {
 
 test.describe("budgets", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page);
+    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
   });
 
   test("creates a draft budget, moves it to pending, and confirms it", async ({ page }) => {
