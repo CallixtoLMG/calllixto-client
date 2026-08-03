@@ -74,6 +74,16 @@ export const waitForEntityDetailUrl = async (page: Page, entityPath: string) => 
   );
 };
 
+export const waitForExpenseSettingsReady = async (page: Page) => {
+  const categoriesDropdown = page.getByTestId("dropdown-categories");
+  const tagsDropdown = page.getByTestId("dropdown-tags");
+
+  await expect(categoriesDropdown).toBeVisible();
+  await expect(tagsDropdown).toBeVisible();
+  await expect(categoriesDropdown).not.toHaveClass(/loading/);
+  await expect(tagsDropdown).not.toHaveClass(/loading/);
+};
+
 export const isEntityDetailUrl = (page: Page, entityPath: string) => {
   const url = new URL(page.url());
   return url.pathname.startsWith(`/${entityPath}/`) && url.pathname !== `/${entityPath}/crear`;

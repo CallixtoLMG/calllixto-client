@@ -12,8 +12,9 @@ const openCashBalancesList = async (page: Page) => {
 
 const openCashBalanceModal = async (page: Page) => {
   await page.getByTestId("nav-action-abrir").click();
-  await expect(page.getByTestId("open-cash-balance-modal")).toBeVisible();
-  await expect(page.getByText(/abrir caja/i)).toBeVisible();
+  const modal = page.getByTestId("open-cash-balance-modal");
+  await expect(modal).toBeVisible();
+  await expect(modal.getByText(/abrir caja/i)).toBeVisible();
 };
 
 const addAllPaymentMethods = async (page: Page) => {

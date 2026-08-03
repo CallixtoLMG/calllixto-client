@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { expectSuccessfulApiResponse, isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
 import { E2E_ACCOUNTS } from "./support/env";
-import { waitForEntityDetailUrl } from "./support/entities";
+import { waitForEntityDetailUrl, waitForExpenseSettingsReady } from "./support/entities";
 
 const listUrl = /\/gastos(?:\?|$)/;
 
@@ -149,16 +149,6 @@ const fillExpenseForm = async (page: Page, expense: ExpenseFixture) => {
     selectedCategory,
     selectedTags,
   };
-};
-
-const waitForExpenseSettingsReady = async (page: Page) => {
-  const categoriesDropdown = page.getByTestId("dropdown-categories");
-  const tagsDropdown = page.getByTestId("dropdown-tags");
-
-  await expect(categoriesDropdown).toBeVisible();
-  await expect(tagsDropdown).toBeVisible();
-  await expect(categoriesDropdown).not.toHaveClass(/loading/);
-  await expect(tagsDropdown).not.toHaveClass(/loading/);
 };
 
 const createExpense = async (page: Page, expense: ExpenseFixture) => {

@@ -1,5 +1,10 @@
 import { expect, test, type Page } from "@playwright/test";
-import { expectSuccessfulApiResponse, isApiResponse } from "./support/api";
+import {
+  expectSuccessfulApiResponse,
+  getE2EAccountApiUrl,
+  getE2EApiHeaders,
+  isApiResponse,
+} from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
 import { E2E_ACCOUNTS } from "./support/env";
 import {
@@ -15,6 +20,18 @@ const listUrl = /\/marcas(?:\?|$)/;
 
 const twoDigitId = (seed: number) => (seed % 1296).toString(36).padStart(2, "0").toUpperCase();
 const twoDigitIdWithAttempt = (seed: number, attempt: number) => twoDigitId(seed + attempt * 97);
+
+const isBrandIdAvailable = async (page: Page, id: string) => {
+  const response = await page.request.get(getE2EAccountApiUrl(`brands/${id}`), {
+    headers: await getE2EApiHeaders(page),
+  });
+
+  if (response.status() === 404) return true;
+  if (!response.ok()) return false;
+
+  const body = await response.json().catch(() => ({}));
+  return !body.brand;
+};
 
 const openBrandsList = async (page: Page) => {
   await page.goto("/marcas");
@@ -41,6 +58,8 @@ const createBrand = async (page: Page, timestamp: number) => {
 
   for (let attempt = 0; attempt < 16; attempt += 1) {
     const candidateId = twoDigitIdWithAttempt(timestamp, attempt);
+    if (!(await isBrandIdAvailable(page, candidateId))) continue;
+
     await page.locator('input[name="id"]').fill(candidateId);
 
     if (await createButton.isEnabled()) {

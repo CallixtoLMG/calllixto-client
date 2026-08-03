@@ -60,7 +60,9 @@ const exportScenarios: ExportScenario[] = [
 const openListPage = async (page: Page, path: string) => {
   await page.goto(path);
   await expect(page).toHaveURL(new RegExp(`${path}(?:\\?|$)`));
-  await expect(page.getByRole("button", { name: /descargar excel/i }).last()).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId("table-row")).not.toHaveCount(0);
+  const excelAction = await revealExcelDownloadAction(page);
+  await expect(excelAction).toBeEnabled();
 };
 
 const getVisibleTableRowsCount = async (page: Page) => {
@@ -90,9 +92,28 @@ const getExpectedExportRowsCount = async (page: Page) => {
   return getVisibleTableRowsCount(page);
 };
 
+const getPageActionsRail = (page: Page) => page.getByTestId("page-actions-aside");
+const getExcelDownloadAction = (page: Page) =>
+  getPageActionsRail(page).getByTestId("nav-action-descargar excel");
+
+const revealExcelDownloadAction = async (page: Page) => {
+  const directAction = getExcelDownloadAction(page);
+
+  if (await directAction.isVisible().catch(() => false)) {
+    return directAction;
+  }
+
+  await getPageActionsRail(page).getByTestId("nav-action-excel").click();
+  await expect(directAction).toBeVisible();
+
+  return directAction;
+};
+
 const downloadExcel = async (page: Page) => {
+  const excelAction = await revealExcelDownloadAction(page);
+  await expect(excelAction).toBeEnabled();
   const downloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: /descargar excel/i }).last().click();
+  await excelAction.click();
 
   return downloadPromise;
 };
