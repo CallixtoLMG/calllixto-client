@@ -15,9 +15,9 @@ import ModalCustomer from "@/components/budgets/ModalCustomer";
 import ModalPDF from "@/components/budgets/ModalPDF";
 import { BUDGET_STATES, PAYMENTS_TAB_INDEX, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending } from "@/components/budgets/budgets.utils";
-import { savePublicBudgetSnapshot } from "@/components/budgets/publicBudget.mock";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useBudgetTotals, useLazyTabs } from "@/hooks";
+import { getSelectedAccountId } from "@/services/session";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -53,6 +53,12 @@ const BudgetPageClient = ({ budget }) => {
   const customerHasInfo = useMemo(() => !!customerData?.addresses?.length && !!customerData?.phoneNumbers?.length, [customerData]);
   const confirmBudget = useConfirmBudget();
   const cancelBudget = useCancelBudget();
+  const accountId = useMemo(() => getSelectedAccountId(userData), [userData]);
+  const publicHash = budget?.publicHash;
+  const canCopyPublicLink = Boolean(accountId && publicHash);
+  const publicLinkTooltip = canCopyPublicLink
+    ? "Copiar enlace p\u00fablico de la venta"
+    : "Disponible s\u00f3lo para presupuestos nuevos con enlace p\u00fablico";
 
   useEffect(() => {
     resetActions();
@@ -109,27 +115,8 @@ const BudgetPageClient = ({ budget }) => {
   }, [setLabels, budget]);
 
   const handleCopyPublicLink = useCallback(async () => {
-    const budgetSnapshot = {
-      ...budget,
-      customer: customerData,
-      paymentsMade: paymentsMade ?? budget?.paymentsMade ?? [],
-      products: methods.getValues("products") ?? budget?.products ?? [],
-    };
-
-    const result = savePublicBudgetSnapshot({
-      budget: budgetSnapshot,
-      account: userData?.selectedAccount ?? userData?.account,
-      selectedContact,
-      defaultsPDF: budgetSettings?.defaultsPDF,
-      totals: {
-        subtotal,
-        subtotalAfterDiscount,
-        total,
-      },
-    });
-
-    if (!result.ok) {
-      toast.error("No se pudo generar el enlace público.");
+    if (!accountId || !publicHash) {
+      toast.error(publicLinkTooltip);
       return;
     }
 
@@ -138,25 +125,13 @@ const BudgetPageClient = ({ budget }) => {
         throw new Error("Clipboard no disponible");
       }
 
-      await navigator.clipboard.writeText(result.url);
+      await navigator.clipboard.writeText(`${window.location.origin}${PAGES.PUBLIC.BUDGETS.SHOW(accountId, publicHash)}`);
       toast.success("enlace público copiado.");
     } catch (error) {
       console.error("Error copiando enlace público:", error);
       toast.error("No se pudo copiar el enlace público.");
     }
-  }, [
-    budget,
-    budgetSettings?.defaultsPDF,
-    customerData,
-    methods,
-    paymentsMade,
-    selectedContact,
-    subtotal,
-    subtotalAfterDiscount,
-    total,
-    userData?.account,
-    userData?.selectedAccount,
-  ]);
+  }, [accountId, publicHash, publicLinkTooltip]);
 
   useEffect(() => {
     if (budget) {
@@ -218,7 +193,9 @@ const BudgetPageClient = ({ budget }) => {
           color: COLORS.BLUE,
           onClick: handleCopyPublicLink,
           text: 'Copiar enlace',
-          collapsedTooltip: 'Copiar enlace público de la venta',
+          tooltip: publicLinkTooltip,
+          collapsedTooltip: publicLinkTooltip,
+          disabled: !canCopyPublicLink,
           iconOnly:true,
         },
         hasValidSendOptions && {
@@ -252,7 +229,7 @@ const BudgetPageClient = ({ budget }) => {
       setActions(actions);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [budget, handleCopyPublicLink, push, role, setActions]);
+  }, [budget, canCopyPublicLink, handleCopyPublicLink, publicLinkTooltip, push, role, setActions]);
 
   const handleConfirm = () => {
     if (!customerHasInfo) {

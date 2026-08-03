@@ -10,13 +10,18 @@ const PUBLIC_ROUTES_WHEN_AVAILABLE = [
   MAINTENANCE_PAGE.BASE,
 ];
 
-const PUBLIC_ROUTE_PREFIXES_WHEN_AVAILABLE = [
-  PUBLIC_BUDGETS_PAGE,
-];
+const isPublicBudgetRoute = (pathname) => {
+  const prefix = `${PUBLIC_BUDGETS_PAGE}/`;
+
+  if (!pathname.startsWith(prefix)) return false;
+
+  const segments = pathname.slice(prefix.length).split("/");
+  return segments.length === 2 && segments.every(Boolean);
+};
 
 const isPublicRoute = (pathname) =>
   PUBLIC_ROUTES_WHEN_AVAILABLE.includes(pathname) ||
-  PUBLIC_ROUTE_PREFIXES_WHEN_AVAILABLE.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+  isPublicBudgetRoute(pathname);
 
 export function middleware(request) {
   const { pathname } = request.nextUrl;

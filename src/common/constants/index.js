@@ -113,7 +113,7 @@ export const PAGES = {
   PUBLIC: {
     BUDGETS: {
       BASE: PUBLIC_BUDGETS_PAGE,
-      SHOW: (id) => `${PUBLIC_BUDGETS_PAGE}/${id}`,
+      SHOW: (accountId, publicHash) => `${PUBLIC_BUDGETS_PAGE}/${encodeURIComponent(accountId)}/${encodeURIComponent(publicHash)}`,
     },
   },
   LOGIN: {
