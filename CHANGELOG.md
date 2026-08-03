@@ -3,6 +3,14 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-08-03
+
+### Changed
+
+- Public budgets: Replaced the localStorage mock with the real public backend endpoint using `accountId` and `budget.publicHash`.
+- Sales: Enabled public link generation for newly created budgets with `publicEnabled: true` and disabled link copying for older budgets without a public hash.
+- Public budgets: Updated the public loading state to use the standard Callixto loader.
+
 ## 2026-07-28
 
 ### Added
