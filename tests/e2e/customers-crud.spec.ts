@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
+import { expectSuccessfulApiResponse, isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
+import { E2E_ACCOUNTS } from "./support/env";
 import {
   addAddress,
   addEmail,
@@ -67,7 +69,7 @@ const selectAvailableTags = async (page: Page, requestedCount = 2) => {
 
 const createCustomer = async (page: Page, customer: CustomerFixture) => {
   await openCustomersList(page);
-  await page.getByTestId("nav-action-crear").click();
+  await page.goto("/clientes/crear");
   await expect(page).toHaveURL(/\/clientes\/crear(?:\?|$)/);
 
   await page.locator('input[name="name"]').fill(customer.name);
@@ -92,12 +94,17 @@ const createCustomer = async (page: Page, customer: CustomerFixture) => {
     ? await selectAvailableTags(page, customer.tagsCount)
     : [];
 
+  const responsePromise = page.waitForResponse((response) => isApiResponse(response, "POST", "customers"));
+
   await page.locator("form").getByRole("button", { name: /crear/i }).click();
+  const body = await expectSuccessfulApiResponse(await responsePromise, { responseEntity: "customer" });
   await dismissUnsavedChangesIfVisible(page);
   await waitForEntityDetailUrl(page, "clientes");
+  await expect(page).toHaveURL(new RegExp(`/clientes/${body.customer.id}(?:\\?|$)`));
 
   return {
     url: page.url(),
+    id: body.customer.id,
     selectedTags,
   };
 };
@@ -113,7 +120,7 @@ const expectCustomerName = async (page: Page, name: string) => {
 
 test.describe("customers", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page);
+    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
   });
 
   test("creates, updates, and deletes a customer", async ({ page }) => {

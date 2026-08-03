@@ -200,7 +200,8 @@ export const useCancelBudget = () => {
       url: `${PATHS.BUDGETS}/${id}/${CANCEL}`,
       value: cancelData,
       responseEntity: ENTITIES.BUDGET,
-      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY], [GET_BUDGET_QUERY_KEY, id]]
+      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY], [GET_BUDGET_QUERY_KEY, id]],
+      skipStorageUpdate: true,
     });
   };
 

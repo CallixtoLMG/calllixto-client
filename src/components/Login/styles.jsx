@@ -43,6 +43,11 @@ const ModButton = styled.button`
   &:active {
     background-color: #347C7D;
   }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.45;
+  }
 `;
 
 const ModGridColumn = styled(Grid.Column)({

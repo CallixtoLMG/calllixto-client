@@ -1,5 +1,12 @@
 import { expect, test, type Page } from "@playwright/test";
+import {
+  expectSuccessfulApiResponse,
+  getE2EAccountApiUrl,
+  getE2EApiHeaders,
+  isApiResponse,
+} from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
+import { E2E_ACCOUNTS } from "./support/env";
 import {
   deleteCurrentEntity,
   deleteEntityIfPresent,
@@ -11,7 +18,20 @@ import {
 
 const listUrl = /\/marcas(?:\?|$)/;
 
-const twoDigitId = () => Math.floor(Math.random() * 1296).toString(36).padStart(2, "0").toUpperCase();
+const twoDigitId = (seed: number) => (seed % 1296).toString(36).padStart(2, "0").toUpperCase();
+const twoDigitIdWithAttempt = (seed: number, attempt: number) => twoDigitId(seed + attempt * 97);
+
+const isBrandIdAvailable = async (page: Page, id: string) => {
+  const response = await page.request.get(getE2EAccountApiUrl(`brands/${id}`), {
+    headers: await getE2EApiHeaders(page),
+  });
+
+  if (response.status() === 404) return true;
+  if (!response.ok()) return false;
+
+  const body = await response.json().catch(() => ({}));
+  return !body.brand;
+};
 
 const openBrandsList = async (page: Page) => {
   await page.goto("/marcas");
@@ -21,7 +41,7 @@ const openBrandsList = async (page: Page) => {
 
 const createBrand = async (page: Page, timestamp: number) => {
   const brand = {
-    id: twoDigitId(),
+    id: twoDigitId(timestamp),
     name: `E2E Brand Test ${timestamp}`,
     comment: `Comentario E2E brand ${timestamp}`,
   };
@@ -30,12 +50,35 @@ const createBrand = async (page: Page, timestamp: number) => {
   await page.goto("/marcas/crear");
   await expect(page).toHaveURL(/\/marcas\/crear(?:\?|$)/);
 
-  await page.locator('input[name="id"]').fill(brand.id);
   await page.locator('input[name="name"]').fill(brand.name);
   await page.getByPlaceholder("Una marca macanuda").fill(brand.comment);
 
-  await page.locator("form").getByRole("button", { name: /crear/i }).click();
+  const createButton = page.locator("form").getByRole("button", { name: /crear/i });
+  let selectedId: string | null = null;
+
+  for (let attempt = 0; attempt < 16; attempt += 1) {
+    const candidateId = twoDigitIdWithAttempt(timestamp, attempt);
+    if (!(await isBrandIdAvailable(page, candidateId))) continue;
+
+    await page.locator('input[name="id"]').fill(candidateId);
+
+    if (await createButton.isEnabled()) {
+      selectedId = candidateId;
+      break;
+    }
+  }
+
+  expect(selectedId, "Expected an available brand id for the E2E account").toBeTruthy();
+  brand.id = selectedId as string;
+
+  const createResponsePromise = page.waitForResponse((response) => isApiResponse(response, "POST", "brands"));
+  await createButton.click();
+  const createBody = await expectSuccessfulApiResponse(await createResponsePromise, {
+    responseEntity: "brand",
+    expectedId: brand.id,
+  });
   await waitForEntityDetailUrl(page, "marcas");
+  await expect(page).toHaveURL(new RegExp(`/marcas/${createBody.brand.id}(?:\\?|$)`));
 
   return {
     ...brand,
@@ -54,7 +97,7 @@ const expectBrandName = async (page: Page, name: string) => {
 
 test.describe("brands", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page);
+    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
   });
 
   test("creates, updates, and deletes a brand", async ({ page }) => {

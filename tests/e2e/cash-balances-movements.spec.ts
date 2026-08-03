@@ -1,9 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
+import { expectSuccessfulApiResponse, isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
+import { confirmOpenCashBalance } from "./support/cashBalances";
+import { E2E_ACCOUNTS } from "./support/env";
 import {
   addAddress,
   addPhone,
   dismissUnsavedChangesIfVisible,
+  waitForCurrentRouteChunk,
   waitForEntityDetailAfterSubmit,
   waitForEntityDetailUrl,
 } from "./support/entities";
@@ -47,11 +51,9 @@ const openCashBalanceForMovements = async (page: Page, timestamp: number) => {
   await expect(page.locator('input[value="Todos"]')).toBeVisible();
   await page.getByTestId("cash-balance-initial-amount-field").locator("input").fill("1000");
   await page.getByTestId("cash-balance-comments-field").fill(comment);
-  await page.getByTestId("cash-balance-open-confirm").click();
-  await expect(page).toHaveURL(/\/cajas\/[^/?]+$/, { timeout: 30_000 });
-  await expect(page.getByText(/caja creada correctamente/i)).toBeVisible({ timeout: 30_000 });
+  const cashBalance = await confirmOpenCashBalance(page, comment);
 
-  return { url: page.url(), comment };
+  return { ...cashBalance, comment };
 };
 
 const closeCurrentCashBalance = async (page: Page) => {
@@ -70,6 +72,7 @@ const createCustomerForBudget = async (page: Page, timestamp: number) => {
 
   await page.goto("/clientes/crear");
   await expect(page).toHaveURL(/\/clientes\/crear(?:\?|$)/);
+  await waitForCurrentRouteChunk(page);
   await page.locator('input[name="name"]').fill(customer.name);
   await addPhone(page, { ref: "Casa", areaCode: "385", number: "5555555" });
   await addAddress(page, { ref: "Casa", address: customer.address });
@@ -88,6 +91,7 @@ const createSupplier = async (page: Page, timestamp: number, attempt = 0) => {
 
   await page.goto("/proveedores/crear");
   await expect(page).toHaveURL(/\/proveedores\/crear(?:\?|$)/);
+  await waitForCurrentRouteChunk(page);
   await page.locator('input[name="id"]').fill(supplier.id);
   await page.locator('input[name="name"]').fill(supplier.name);
   await page.locator("form").getByRole("button", { name: /crear/i }).click();
@@ -105,6 +109,7 @@ const createBrand = async (page: Page, timestamp: number, attempt = 0) => {
 
   await page.goto("/marcas/crear");
   await expect(page).toHaveURL(/\/marcas\/crear(?:\?|$)/);
+  await waitForCurrentRouteChunk(page);
   await page.locator('input[name="id"]').fill(brand.id);
   await page.locator('input[name="name"]').fill(brand.name);
   await page.locator("form").getByRole("button", { name: /crear/i }).click();
@@ -130,6 +135,7 @@ const createProductForBudget = async (page: Page, timestamp: number) => {
 
       await page.goto("/productos/crear");
       await expect(page).toHaveURL(/\/productos\/crear(?:\?|$)/);
+      await waitForCurrentRouteChunk(page);
       await selectSearchOption(page, "product-supplier-search", supplier.name);
       await selectSearchOption(page, "product-brand-search", brand.name);
       await fillTestIdInput(page, "product-id-field", product.localId);
@@ -163,6 +169,7 @@ const createConfirmedBudgetForCashMovement = async (
 ) => {
   await page.goto("/ventas/crear");
   await expect(page).toHaveURL(/\/ventas\/crear(?:\?|$)/);
+  await waitForCurrentRouteChunk(page);
   await page.getByTestId("budget-state-confirmed-button").click();
   await page.getByRole("button", { name: /enviar a direcci/i }).click();
   await fillTestIdInput(page, "budget-expiration-days-field", "7");
@@ -204,7 +211,7 @@ const addPayment = async (page: Page, payment: PaymentFixture) => {
   await page.getByTestId("budget-payment-amount-field").locator("input").fill(payment.amount);
   await page.getByTestId("budget-payment-comments-field").fill(payment.comments);
   await page.getByTestId("budget-payment-submit-button").click();
-  await expect(page.getByText(payment.comments)).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId("table-row").filter({ hasText: payment.comments })).toBeVisible({ timeout: 30_000 });
 
   return { ...payment, method };
 };
@@ -215,22 +222,36 @@ const payBudgetWithMethod = async (page: Page, payment: PaymentFixture) => {
   return addPayment(page, payment);
 };
 
-const selectFirstRequiredCategory = async (page: Page) => {
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const waitForExpenseOptionalFieldsReady = async (page: Page) => {
+  const categoriesDropdown = page.getByTestId("dropdown-categories");
+  const tagsDropdown = page.getByTestId("dropdown-tags");
+
+  await expect(categoriesDropdown).toBeVisible({ timeout: 30_000 });
+  await expect(tagsDropdown).toBeVisible({ timeout: 30_000 });
+  await expect(categoriesDropdown).not.toHaveAttribute("aria-busy", "true", { timeout: 30_000 });
+  await expect(tagsDropdown).not.toHaveAttribute("aria-busy", "true", { timeout: 30_000 });
+};
+
+const selectExpenseCategoryIfProvided = async (page: Page, categoryName?: string) => {
+  if (!categoryName) return null;
+
   const categoriesDropdown = page.getByTestId("dropdown-categories");
   await expect(categoriesDropdown).toBeVisible({ timeout: 30_000 });
+  await expect(categoriesDropdown).not.toHaveAttribute("aria-busy", "true", { timeout: 30_000 });
   await categoriesDropdown.click();
 
-  const option = page
-    .locator('[role="option"]')
-    .filter({ visible: true })
-    .filter({ hasNotText: /todos|no hay|no se encontraron/i })
-    .first();
+  const option = page.getByRole("option", { name: new RegExp(`^${escapeRegExp(categoryName)}$`, "i") });
 
   await expect(option).toBeVisible({ timeout: 30_000 });
   await option.click();
+  await expect(categoriesDropdown.locator(".label").filter({ hasText: categoryName })).toBeVisible({ timeout: 30_000 });
+
+  return categoryName;
 };
 
-const createExpenseForCashMovement = async (page: Page, timestamp: number) => {
+const createExpenseForCashMovement = async (page: Page, timestamp: number, categoryName?: string) => {
   const expense = {
     name: `E2E Expense Cash Movement ${timestamp}`,
     amount: "200",
@@ -239,20 +260,34 @@ const createExpenseForCashMovement = async (page: Page, timestamp: number) => {
 
   await page.goto("/gastos/crear");
   await expect(page).toHaveURL(/\/gastos\/crear(?:\?|$)/);
+  await waitForCurrentRouteChunk(page);
+  await waitForExpenseOptionalFieldsReady(page);
   await page.locator('input[name="name"]').fill(expense.name);
   await page.getByPlaceholder("18000").fill(expense.amount);
-  await selectFirstRequiredCategory(page);
+  await selectExpenseCategoryIfProvided(page, categoryName);
   await page.getByPlaceholder("Quiero ver el Juego del Calamar temporada 2").fill(expense.comments);
-  await page.locator("form").getByRole("button", { name: /crear/i }).click();
-  await waitForEntityDetailUrl(page, "gastos");
 
-  return { ...expense, url: page.url(), id: new URL(page.url()).pathname.split("/")[2] };
+  const responsePromise = page.waitForResponse((response) =>
+    isApiResponse(response, "POST", "expenses"),
+  );
+
+  await page.locator("form").getByRole("button", { name: /crear/i }).click();
+  const response = await responsePromise;
+  const body = await expectSuccessfulApiResponse(response, { responseEntity: "expense" });
+  const expenseId = body.expense.id;
+
+  await waitForEntityDetailUrl(page, "gastos");
+  await expect(page).toHaveURL(new RegExp(`/gastos/${expenseId}(?:\\?|$)`));
+
+  return { ...expense, url: page.url(), id: expenseId };
 };
 
 const payExpenseWithMethod = async (page: Page, expenseUrl: string, payment: PaymentFixture) => {
   await page.goto(expenseUrl);
   await waitForEntityDetailUrl(page, "gastos");
-  await page.getByText("Pagos", { exact: true }).click();
+  const paymentsTab = page.locator(".ui.tabular.menu .item").filter({ hasText: /^Pagos$/ });
+  await expect(paymentsTab).toBeVisible({ timeout: 30_000 });
+  await paymentsTab.click();
   await expect(page.getByText(/detalle de pagos/i)).toBeVisible({ timeout: 30_000 });
   return addPayment(page, payment);
 };
@@ -260,7 +295,7 @@ const payExpenseWithMethod = async (page: Page, expenseUrl: string, payment: Pay
 const openCashBalanceMovements = async (page: Page, cashBalanceUrl: string) => {
   await page.goto(cashBalanceUrl);
   await expect(page).toHaveURL(/\/cajas\/[^/?]+$/, { timeout: 30_000 });
-  await page.getByText("Movimientos", { exact: true }).click();
+  await page.locator(".ui.menu .item").filter({ hasText: /^Movimientos$/ }).click();
   await expect(page.getByText(/movimientos de caja/i)).toBeVisible({ timeout: 30_000 });
 };
 
@@ -291,7 +326,9 @@ const voidExpenseIfPossible = async (page: Page, expenseUrl: string | null, reas
     if (!(await voidButton.isVisible({ timeout: 5_000 }).catch(() => false))) return;
     await voidButton.click();
     await page.getByPlaceholder(/motivo/i).fill(reason);
-    await page.getByTestId("modal-void").click({ force: true });
+    const confirmButton = page.getByTestId("modal-void");
+    await expect(confirmButton).toBeEnabled();
+    await confirmButton.click();
     await expect(page.getByText(reason)).toBeVisible({ timeout: 30_000 });
   } catch {
     // Best-effort cleanup: keep the original test failure as the useful signal.
@@ -300,10 +337,13 @@ const voidExpenseIfPossible = async (page: Page, expenseUrl: string | null, reas
 
 test.describe("cash balance movements", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page);
+    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
   });
 
-  test("records budget and expense movements in a cash balance", async ({ page }) => {
+  test(
+    "records budget and expense movements in a cash balance",
+    { tag: ["@modules-enabled", "@cash-balances"] },
+    async ({ page }) => {
     test.setTimeout(300_000);
 
     const timestamp = Date.now();
@@ -348,5 +388,6 @@ test.describe("cash balance movements", () => {
 
       await voidExpenseIfPossible(page, expenseUrl, `Cleanup E2E cash movement ${timestamp}`);
     }
-  });
+    },
+  );
 });

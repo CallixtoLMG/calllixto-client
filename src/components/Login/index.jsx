@@ -5,7 +5,7 @@ import { Loader } from "@/components/layout";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Form } from "../../common/components/custom";
@@ -16,7 +16,12 @@ const LoginForm = ({ onSubmit }) => {
   const { push } = useRouter();
   const methods = useForm();
   const { handleSubmit } = methods;
+  const [isMounted, setIsMounted] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const { mutate: login, isPending } = useMutation({
     mutationFn: async (dataLogin) => {
@@ -86,7 +91,7 @@ const LoginForm = ({ onSubmit }) => {
                 rules={RULES.REQUIRED}
                 placeholder="Contraseña"
               />
-              <ModButton $fluid size={SIZES.LARGE}>
+              <ModButton $fluid size={SIZES.LARGE} disabled={!isMounted || isPending || isRedirecting}>
                 Ingresar
               </ModButton>
               <PasswordLink onClick={() => push(PAGES.RESTORE_PASSWORD.BASE)}>

@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
+import { expectSuccessfulApiResponse, getE2EApiJson, isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
+import { E2E_ACCOUNTS } from "./support/env";
 import {
   addAddress,
   addEmail,
@@ -15,7 +17,25 @@ import {
 
 const listUrl = /\/proveedores(?:\?|$)/;
 
-const twoDigitId = () => Math.floor(Math.random() * 1296).toString(36).padStart(2, "0").toUpperCase();
+const twoDigitId = (seed: number) => (seed % 1296).toString(36).padStart(2, "0").toUpperCase();
+const twoDigitIdWithAttempt = (seed: number, attempt: number) => twoDigitId(seed + attempt * 97);
+
+const getAvailableSupplierId = async (page: Page, timestamp: number) => {
+  const body = await getE2EApiJson<{ statusOk?: boolean; suppliers?: { id?: string }[] }>(
+    page,
+    "suppliers?attributes=%5B%22id%22%5D",
+  );
+  expect(body.statusOk, JSON.stringify(body)).toBe(true);
+
+  const usedIds = new Set((body.suppliers ?? []).map((supplier) => supplier.id).filter(Boolean));
+
+  for (let attempt = 0; attempt < 1296; attempt += 1) {
+    const candidateId = twoDigitIdWithAttempt(timestamp, attempt);
+    if (!usedIds.has(candidateId)) return candidateId;
+  }
+
+  throw new Error("No available two-character supplier id for the E2E account");
+};
 
 const openSuppliersList = async (page: Page) => {
   await page.goto("/proveedores");
@@ -25,7 +45,7 @@ const openSuppliersList = async (page: Page) => {
 
 const createSupplier = async (page: Page, timestamp: number) => {
   const supplier = {
-    id: twoDigitId(),
+    id: await getAvailableSupplierId(page, timestamp),
     name: `E2E Supplier Test ${timestamp}`,
     comment: `Comentario E2E supplier ${timestamp}`,
     email1: `e2e.supplier.${timestamp}@test.com`,
@@ -47,8 +67,15 @@ const createSupplier = async (page: Page, timestamp: number) => {
   await addAddress(page, { ref: "Trabajo", address: "Avenida Siempre Viva 742" });
   await page.getByPlaceholder("Siempre demora en los pedidos").fill(supplier.comment);
 
+  const responsePromise = page.waitForResponse((response) => isApiResponse(response, "POST", "suppliers"));
+
   await page.locator("form").getByRole("button", { name: /crear/i }).click();
+  const body = await expectSuccessfulApiResponse(await responsePromise, {
+    responseEntity: "supplier",
+    expectedId: supplier.id,
+  });
   await waitForEntityDetailAfterSubmit(page, "proveedores");
+  await expect(page).toHaveURL(new RegExp(`/proveedores/${body.supplier.id}(?:\\?|$)`));
 
   return {
     ...supplier,
@@ -67,7 +94,7 @@ const expectSupplierName = async (page: Page, name: string) => {
 
 test.describe("suppliers", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page);
+    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
   });
 
   test("creates, updates, and deletes a supplier", async ({ page }) => {

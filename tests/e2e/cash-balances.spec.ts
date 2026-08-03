@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { loginAsE2EUser } from "./support/auth";
+import { confirmOpenCashBalance } from "./support/cashBalances";
+import { E2E_ACCOUNTS } from "./support/env";
 
 const openCashBalancesList = async (page: Page) => {
   await page.goto("/cajas");
@@ -10,8 +12,9 @@ const openCashBalancesList = async (page: Page) => {
 
 const openCashBalanceModal = async (page: Page) => {
   await page.getByTestId("nav-action-abrir").click();
-  await expect(page.getByTestId("open-cash-balance-modal")).toBeVisible();
-  await expect(page.getByText(/abrir caja/i)).toBeVisible();
+  const modal = page.getByTestId("open-cash-balance-modal");
+  await expect(modal).toBeVisible();
+  await expect(modal.getByText(/abrir caja/i)).toBeVisible();
 };
 
 const addAllPaymentMethods = async (page: Page) => {
@@ -28,12 +31,6 @@ const fillOpenCashBalanceModal = async (page: Page, comment: string) => {
   // de billetes. El flujo principal de apertura/cierre no depende de ese detalle.
 };
 
-const confirmOpenCashBalance = async (page: Page) => {
-  await page.getByTestId("cash-balance-open-confirm").click();
-  await expect(page).toHaveURL(/\/cajas\/[^/?]+$/, { timeout: 30_000 });
-  await expect(page.getByText(/caja creada correctamente/i)).toBeVisible({ timeout: 30_000 });
-};
-
 const closeCurrentCashBalance = async (page: Page) => {
   await page.getByTestId("nav-action-cerrar caja").click();
   await expect(page.getByText(/cerrar\s+la caja/i)).toBeVisible();
@@ -44,10 +41,13 @@ const closeCurrentCashBalance = async (page: Page) => {
 
 test.describe("cash balance", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page);
+    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
   });
 
-  test("opens and closes a cash balance", async ({ page }) => {
+  test(
+    "opens and closes a cash balance",
+    { tag: ["@modules-enabled", "@cash-balances"] },
+    async ({ page }) => {
     test.setTimeout(120_000);
 
     const timestamp = Date.now();
@@ -56,11 +56,11 @@ test.describe("cash balance", () => {
     await openCashBalancesList(page);
     await openCashBalanceModal(page);
     await fillOpenCashBalanceModal(page, comment);
-    await confirmOpenCashBalance(page);
+    await confirmOpenCashBalance(page, comment);
 
     await expect(page.getByText(/todos los m.todos de pago/i)).toBeVisible({ timeout: 30_000 });
-    await expect(page.getByTestId("textarea-comments")).toHaveValue(comment);
 
     await closeCurrentCashBalance(page);
-  });
+    },
+  );
 });

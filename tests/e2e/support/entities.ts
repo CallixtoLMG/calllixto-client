@@ -20,8 +20,31 @@ export const fillContactField = async (page: Page, testId: string, value: string
   await page.getByTestId(testId).locator("input").fill(value);
 };
 
+export const waitForCurrentRouteChunk = async (page: Page) => {
+  const route = new URL(page.url()).pathname.replace(/^\/|\/$/g, "");
+
+  await page.waitForFunction(
+    (routePath) =>
+      performance.getEntriesByType("resource").some((entry) =>
+        entry.name.includes(`/_next/static/chunks/app/(private)/${routePath}/page.js`) &&
+        entry.responseEnd > 0,
+      ),
+    route,
+  );
+};
+
+const openContactSection = async (page: Page, section: string, firstFieldTestId: string) => {
+  const trigger = page.getByTestId(`contact-add-${section}`);
+  const firstField = page.getByTestId(firstFieldTestId).locator("input");
+
+  await waitForCurrentRouteChunk(page);
+  await expect(trigger).toBeVisible({ timeout: 30_000 });
+  await trigger.click();
+  await expect(firstField).toBeVisible({ timeout: 30_000 });
+};
+
 export const addPhone = async (page: Page, phone: ContactPhone) => {
-  await page.getByTestId("contact-add-phone").click();
+  await openContactSection(page, "phone", "contact-phone-ref");
   await fillContactField(page, "contact-phone-ref", phone.ref);
   await fillContactField(page, "contact-phone-areaCode", phone.areaCode);
   await fillContactField(page, "contact-phone-number", phone.number);
@@ -29,14 +52,14 @@ export const addPhone = async (page: Page, phone: ContactPhone) => {
 };
 
 export const addEmail = async (page: Page, email: ContactEmail) => {
-  await page.getByTestId("contact-add-email").click();
+  await openContactSection(page, "email", "contact-email-ref");
   await fillContactField(page, "contact-email-ref", email.ref);
   await fillContactField(page, "contact-email-email", email.email);
   await page.getByTestId("contact-confirm-email").click();
 };
 
 export const addAddress = async (page: Page, address: ContactAddress) => {
-  await page.getByTestId("contact-add-address").click();
+  await openContactSection(page, "address", "contact-address-ref");
   await fillContactField(page, "contact-address-ref", address.ref);
   await fillContactField(page, "contact-address-address", address.address);
   await page.getByTestId("contact-confirm-address").click();
@@ -49,6 +72,16 @@ export const waitForEntityDetailUrl = async (page: Page, entityPath: string) => 
     (url) => url.pathname.startsWith(`/${entityPath}/`) && url.pathname !== `/${entityPath}/crear`,
     { timeout: 30_000 },
   );
+};
+
+export const waitForExpenseSettingsReady = async (page: Page) => {
+  const categoriesDropdown = page.getByTestId("dropdown-categories");
+  const tagsDropdown = page.getByTestId("dropdown-tags");
+
+  await expect(categoriesDropdown).toBeVisible();
+  await expect(tagsDropdown).toBeVisible();
+  await expect(categoriesDropdown).not.toHaveClass(/loading/);
+  await expect(tagsDropdown).not.toHaveClass(/loading/);
 };
 
 export const isEntityDetailUrl = (page: Page, entityPath: string) => {
@@ -136,7 +169,8 @@ export const filterByName = async (page: Page, name: string) => {
 
 export const expectEntityDeletedFromActiveList = async (page: Page, name: string) => {
   await filterByName(page, name);
-  await expect(page.getByText(/no se encontraron/i)).toBeVisible();
+  await expect(page.locator('input[name="name"]')).toHaveValue(name);
+  await expect(page.getByTestId("table-row").filter({ hasText: name })).toHaveCount(0, { timeout: 30_000 });
 };
 
 export const selectInactiveFilter = async (page: Page) => {

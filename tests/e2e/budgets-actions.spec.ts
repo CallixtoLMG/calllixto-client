@@ -1,10 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
+import { expectSuccessfulApiResponse, isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
+import { E2E_ACCOUNTS } from "./support/env";
 import {
   addAddress,
   addPhone,
   dismissUnsavedChangesIfVisible,
-  waitForEntityDetailAfterSubmit,
   waitForEntityDetailUrl,
 } from "./support/entities";
 
@@ -16,11 +17,13 @@ type CustomerFixture = {
 type SupplierFixture = {
   id: string;
   name: string;
+  comment: string;
 };
 
 type BrandFixture = {
   id: string;
   name: string;
+  comment: string;
 };
 
 type ProductFixture = {
@@ -35,14 +38,40 @@ type BudgetDependencies = {
   product: ProductFixture;
 };
 
+const responseEntityByApiPath: Record<string, string> = {
+  customers: "customer",
+  suppliers: "supplier",
+  brands: "brand",
+  products: "product",
+};
+
 const budgetsListUrl = /\/ventas(?:\?|$)/;
 const confirmedBudgetUrl = /\/ventas\/(?!crear(?:\?|$))[^/]+(?:\?|$)/;
 const twoDigitId = (seed: number) => (seed % 1296).toString(36).padStart(2, "0").toUpperCase();
 const twoDigitIdWithAttempt = (seed: number, attempt: number) => twoDigitId(seed + attempt * 97);
 const productLocalId = (seed: number) => (seed % 1_679_616).toString(36).padStart(4, "0").toUpperCase();
 
-const fillTestIdInput = async (page: Page, testId: string, value: string) => {
+const fillTestIdInput = async (page: Page, testId: string, value: string, expectedValue = value) => {
   await page.getByTestId(testId).locator("input").fill(value);
+  await expect(page.getByTestId(testId).locator("input")).toHaveValue(expectedValue);
+};
+
+const submitCreateForm = async (page: Page, apiPath: string, entityPath: string) => {
+  const submitButton = page.locator("form").getByRole("button", { name: /crear/i });
+  await expect(submitButton).toBeEnabled({ timeout: 30_000 });
+
+  const responsePromise = page.waitForResponse((response) => isApiResponse(response, "POST", apiPath));
+
+  await Promise.all([
+    responsePromise,
+    submitButton.click(),
+  ]);
+
+  const response = await responsePromise;
+  await expectSuccessfulApiResponse(response, { responseEntity: responseEntityByApiPath[apiPath] });
+
+  await dismissUnsavedChangesIfVisible(page);
+  await waitForEntityDetailUrl(page, entityPath);
 };
 
 const selectSearchOption = async (page: Page, testId: string, text: string) => {
@@ -62,11 +91,10 @@ const createCustomerForBudgetIfNeeded = async (page: Page, timestamp: number): P
   await page.goto("/clientes/crear");
   await expect(page).toHaveURL(/\/clientes\/crear(?:\?|$)/);
   await page.locator('input[name="name"]').fill(customer.name);
+  await expect(page.locator('input[name="name"]')).toHaveValue(customer.name);
   await addPhone(page, { ref: "Casa", areaCode: "385", number: "5555555" });
   await addAddress(page, { ref: "Casa", address: customer.address });
-  await page.locator("form").getByRole("button", { name: /crear/i }).click();
-  await dismissUnsavedChangesIfVisible(page);
-  await waitForEntityDetailUrl(page, "clientes");
+  await submitCreateForm(page, "customers", "clientes");
 
   return customer;
 };
@@ -75,15 +103,18 @@ const createSupplierForBudget = async (page: Page, timestamp: number, attempt: n
   const supplier = {
     id: twoDigitIdWithAttempt(timestamp, attempt),
     name: `E2E Budget Action Supplier ${timestamp} ${attempt}`,
+    comment: `Comentario E2E budget supplier ${timestamp} ${attempt}`,
   };
 
   await page.goto("/proveedores/crear");
   await expect(page).toHaveURL(/\/proveedores\/crear(?:\?|$)/);
   await page.locator('input[name="id"]').fill(supplier.id);
+  await expect(page.locator('input[name="id"]')).toHaveValue(supplier.id);
   await page.locator('input[name="name"]').fill(supplier.name);
-  await page.locator("form").getByRole("button", { name: /crear/i }).click();
-  await dismissUnsavedChangesIfVisible(page);
-  await waitForEntityDetailAfterSubmit(page, "proveedores");
+  await expect(page.locator('input[name="name"]')).toHaveValue(supplier.name);
+  await page.getByPlaceholder("Siempre demora en los pedidos").fill(supplier.comment);
+  await expect(page.getByPlaceholder("Siempre demora en los pedidos")).toHaveValue(supplier.comment);
+  await submitCreateForm(page, "suppliers", "proveedores");
 
   return supplier;
 };
@@ -92,15 +123,18 @@ const createBrandForBudget = async (page: Page, timestamp: number, attempt: numb
   const brand = {
     id: twoDigitIdWithAttempt(timestamp + 37, attempt),
     name: `E2E Budget Action Brand ${timestamp} ${attempt}`,
+    comment: `Comentario E2E budget brand ${timestamp} ${attempt}`,
   };
 
   await page.goto("/marcas/crear");
   await expect(page).toHaveURL(/\/marcas\/crear(?:\?|$)/);
   await page.locator('input[name="id"]').fill(brand.id);
+  await expect(page.locator('input[name="id"]')).toHaveValue(brand.id);
   await page.locator('input[name="name"]').fill(brand.name);
-  await page.locator("form").getByRole("button", { name: /crear/i }).click();
-  await dismissUnsavedChangesIfVisible(page);
-  await waitForEntityDetailAfterSubmit(page, "marcas");
+  await expect(page.locator('input[name="name"]')).toHaveValue(brand.name);
+  await page.getByPlaceholder("Una marca macanuda").fill(brand.comment);
+  await expect(page.getByPlaceholder("Una marca macanuda")).toHaveValue(brand.comment);
+  await submitCreateForm(page, "brands", "marcas");
 
   return brand;
 };
@@ -130,12 +164,11 @@ const createProductForBudget = async (
       await selectSearchOption(page, "product-brand-search", brand.name);
       await fillTestIdInput(page, "product-id-field", localId);
       await page.locator('input[name="name"]').fill(name);
-      await fillTestIdInput(page, "product-cost-field", cost);
-      await fillTestIdInput(page, "product-price-field", price);
+      await fillTestIdInput(page, "product-cost-field", cost, "1,000");
+      await fillTestIdInput(page, "product-price-field", price, "1,500");
       await page.getByPlaceholder("Realmente son muchas pulgadas").fill(`Producto E2E para budget ${timestamp}`);
-      await page.locator("form").getByRole("button", { name: /crear/i }).click();
-      await dismissUnsavedChangesIfVisible(page);
-      await waitForEntityDetailAfterSubmit(page, "productos");
+      await expect(page.getByPlaceholder("Realmente son muchas pulgadas")).toHaveValue(`Producto E2E para budget ${timestamp}`);
+      await submitCreateForm(page, "products", "productos");
 
       return {
         localId,
@@ -216,11 +249,30 @@ const openBudgetDetail = async (page: Page, budgetUrl: string, { reload = false 
 };
 
 const voidCurrentBudget = async (page: Page, reason: string) => {
+  const budgetId = new URL(page.url()).pathname.split("/")[2];
+
   await page.getByTestId("nav-action-anular venta").click();
   await expect(page.getByText(/desea anular el presupuesto/i)).toBeVisible({ timeout: 30_000 });
   await page.getByPlaceholder(/motivo/i).fill(reason);
-  await page.getByTestId("modal-void").click({ force: true });
+  await expect(page.getByPlaceholder(/motivo/i)).toHaveValue(reason);
 
+  const voidButton = page.getByTestId("modal-void");
+  await expect(voidButton).toBeEnabled();
+
+  const cancelResponsePromise = page.waitForResponse((response) =>
+    isApiResponse(response, "PUT", `budgets/${budgetId}/cancel`),
+  );
+
+  await Promise.all([
+    cancelResponsePromise,
+    voidButton.click(),
+  ]);
+
+  const cancelBody = await expectSuccessfulApiResponse(await cancelResponsePromise, { responseEntity: "budget" });
+  expect((cancelBody.budget as { state?: string })?.state, JSON.stringify(cancelBody)).toBe("CANCELLED");
+  expect((cancelBody.budget as { cancelledMsg?: string })?.cancelledMsg, JSON.stringify(cancelBody)).toBe(reason);
+
+  await expect(page.getByText(/desea anular el presupuesto/i)).toBeHidden({ timeout: 30_000 });
   await expect(page.getByText(/motivo de anulaci.n/i)).toBeVisible({ timeout: 30_000 });
   await expect(page.getByText(reason)).toBeVisible();
   await expect(page.getByTestId("nav-action-anular venta")).toBeHidden();
@@ -231,14 +283,14 @@ const updateProductForCloneModal = async (page: Page, product: ProductFixture, t
   await waitForEntityDetailUrl(page, "productos");
   await expect(page.getByTestId("product-name-field")).toContainText(product.name, { timeout: 30_000 });
   await page.getByRole("button", { name: /^actualizar$/i }).first().click();
-  await fillTestIdInput(page, "product-cost-field", "1200");
-  await fillTestIdInput(page, "product-price-field", "1800");
+  await fillTestIdInput(page, "product-cost-field", "1200", "1,200");
+  await fillTestIdInput(page, "product-price-field", "1800", "1,800");
   await page.getByPlaceholder("Realmente son muchas pulgadas").fill(`Producto actualizado para test de clonacion ${timestamp}`);
   const updateResponsePromise = page.waitForResponse((response) =>
-    response.request().method() === "PUT" && response.url().includes(`/products/${product.fullId}`),
+    isApiResponse(response, "PUT", `products/${product.fullId}`),
   );
   await page.locator("form").getByRole("button", { name: /^actualizar$/i }).click();
-  await updateResponsePromise;
+  await expectSuccessfulApiResponse(await updateResponsePromise, { responseEntity: "product", expectedId: product.fullId });
   await expect(page.getByRole("status").getByText(/producto actualizado/i)).toBeVisible({ timeout: 30_000 });
   await expect(page.getByTestId("product-price-field").locator("input")).toHaveValue("1,800");
   await page.reload();
@@ -300,7 +352,7 @@ const confirmClonedBudget = async (page: Page) => {
 
 test.describe("budget actions", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page);
+    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
   });
 
   test("voids a confirmed budget", async ({ page }) => {
@@ -308,8 +360,9 @@ test.describe("budget actions", () => {
 
     const timestamp = Date.now();
     const dependencies = await createBudgetDependencies(page, timestamp);
-    await createConfirmedBudgetWithProduct(page, dependencies, timestamp);
+    const budget = await createConfirmedBudgetWithProduct(page, dependencies, timestamp);
 
+    await openBudgetDetail(page, budget.url, { reload: true });
     await voidCurrentBudget(page, `Motivo E2E anulacion budget ${timestamp}`);
   });
 
