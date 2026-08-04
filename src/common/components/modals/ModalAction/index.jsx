@@ -28,6 +28,7 @@ const ModalAction = ({
   reason = '',
   reasonInputRef,
   size,
+  plainBodyContent = false,
   onStart = () => { }
 }) => {
   const [confirmationText, setConfirmationText] = useState('');
@@ -80,8 +81,8 @@ const ModalAction = ({
       <Modal size={size} closeIcon open={showModal} onClose={() => setShowModal(false)}>
         <Header icon={titleIcon} color={titleIconColor} content={title || ""} />
         {bodyContent && (
-          <ModalContent>
-            <Message negative={warning}>{bodyContent}</Message>
+          <ModalContent $plainBodyContent={plainBodyContent}>
+            {plainBodyContent ? bodyContent : <Message negative={warning}>{bodyContent}</Message>}
           </ModalContent>
         )}
         <Modal.Actions>

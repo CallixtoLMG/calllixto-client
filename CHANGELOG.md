@@ -3,6 +3,16 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-08-04
+
+### Added
+
+- Products: Added a batch recover action for selected deleted products, reusing the existing individual product recovery flow.
+
+### Changed
+
+- Products: Aligned the batch recover confirmation modal visually with the existing batch delete modal.
+
 ## 2026-05-16
 
 ### Added
