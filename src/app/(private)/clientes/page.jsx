@@ -42,8 +42,7 @@ const Customers = () => {
         icon: ICONS.ADD,
         color: COLORS.GREEN,
         onClick: () => { push(PAGES.CUSTOMERS.CREATE) },
-        text: 'Crear',
-        collapsedTooltip: 'Crear cliente',
+        text: 'Crear cliente',
       }
     ], [push]);
 

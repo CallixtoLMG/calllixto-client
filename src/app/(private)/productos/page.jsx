@@ -55,8 +55,7 @@ const Products = () => {
         icon: ICONS.ADD,
         color: COLORS.GREEN,
         onClick: () => { push(PAGES.PRODUCTS.CREATE) },
-        text: 'Crear',
-        collapsedTooltip: 'Crear producto',
+        text: 'Crear producto',
       },
         {
           id: 2,
@@ -67,24 +66,22 @@ const Products = () => {
           items: [
             {
               id: "batch-create",
-              text: "Crear",
+              text: "Crear lote de productos",
               color: COLORS.GREEN,
-              collapsedTooltip: "Crear lote de productos",
               button: <BatchImportProducts key="batch-create" isCreating />,
             },
             {
               id: "batch-update",
-              text: "Actualizar",
+              text: "Actualizar lote de productos",
               color: COLORS.BLUE,
-              collapsedTooltip: "Actualizar lote de productos",
               button: <BatchImportProducts key="batch-update" />,
             },
             {
               id: "template",
               icon: ICONS.FILE_EXCEL_OUTLINE,
               color: COLORS.BLUE,
-              text: "Plantilla",
-              collapsedTooltip: "Descargar plantilla de productos",
+              text: "Descargar plantilla de productos",
+              showTooltipWhenExpanded: true,
               onClick: () => downloadExcel(EXAMPLE_TEMPLATE_DATA, "Ejemplo de tabla"),
             },
           ],

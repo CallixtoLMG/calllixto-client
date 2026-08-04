@@ -48,8 +48,7 @@ const Suppliers = () => {
         icon: ICONS.ADD,
         color: COLORS.GREEN,
         onClick: () => { push(PAGES.SUPPLIERS.CREATE) },
-        text: 'Crear',
-        collapsedTooltip: 'Crear proveedor',
+        text: 'Crear proveedor',
       })
     }
     return actions;

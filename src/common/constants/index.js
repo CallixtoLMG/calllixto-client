@@ -489,7 +489,8 @@ export const ICONS = {
   SIGN_OUT: "sign out",
   SYNC_ALTERNATE: "sync alternate",
   BOLT: "bolt",
-  CLOUD_DOWNLOAD: "cloud download"
+  CLOUD_DOWNLOAD: "cloud download",
+  HISTORY: "history"
 };
 
 export const ALL = "all";

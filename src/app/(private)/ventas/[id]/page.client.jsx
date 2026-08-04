@@ -57,7 +57,7 @@ const BudgetPageClient = ({ budget }) => {
   const publicHash = budget?.publicHash;
   const canCopyPublicLink = Boolean(accountId && publicHash);
   const publicLinkTooltip = canCopyPublicLink
-    ? "Copiar enlace p\u00fablico de la venta"
+    ? undefined
     : "Disponible s\u00f3lo para presupuestos nuevos con enlace p\u00fablico";
 
   useEffect(() => {
@@ -170,6 +170,7 @@ const BudgetPageClient = ({ budget }) => {
           target: "_blank",
           text: `${channelText}: ${text}`,
           collapsedTooltip: `Enviar venta por ${channelText} a ${text}`,
+          showTooltipWhenExpanded: true,
           icon: iconName,
           color,
         }))
@@ -182,8 +183,8 @@ const BudgetPageClient = ({ budget }) => {
           icon: ICONS.PRINT,
           color: COLORS.BLUE,
           onClick: () => setIsModalPDFOpen(true),
-          text: 'Imprimir venta',
-          collapsedTooltip: 'Descargar PDF de la venta',
+          text: 'Descargar PDF de la venta',
+          showTooltipWhenExpanded: true,
           iconOnly:true,
         },
         !isBudgetDraft(budget.state) &&
@@ -192,9 +193,8 @@ const BudgetPageClient = ({ budget }) => {
           icon: ICONS.CLIPBOARD,
           color: COLORS.BLUE,
           onClick: handleCopyPublicLink,
-          text: 'Copiar enlace',
+          text: 'Copiar link público',
           tooltip: publicLinkTooltip,
-          collapsedTooltip: publicLinkTooltip,
           disabled: !canCopyPublicLink,
           iconOnly:true,
         },
@@ -203,7 +203,6 @@ const BudgetPageClient = ({ budget }) => {
           icon: ICONS.SEND,
           color: COLORS.BLUE,
           text: 'Enviar',
-          collapsedTooltip: 'Enviar venta',
           items: sendItems,
         },
         {
@@ -212,7 +211,6 @@ const BudgetPageClient = ({ budget }) => {
           color: COLORS.GREEN,
           onClick: () => { push(PAGES.BUDGETS.CLONE(budget.id)) },
           text: 'Clonar venta',
-          collapsedTooltip: 'Clonar venta',
           iconOnly:true,
         },
         budget.state === BUDGET_STATES.CONFIRMED.id && {
@@ -221,7 +219,6 @@ const BudgetPageClient = ({ budget }) => {
           color: COLORS.RED,
           onClick: () => setIsModalCancelOpen(true),
           text: 'Anular venta',
-          collapsedTooltip: 'Anular venta',
           basic: true,
           iconOnly:true,
         },

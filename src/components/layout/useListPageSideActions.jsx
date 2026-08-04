@@ -20,6 +20,7 @@ const useListPageSideActions = ({
   updateTooltip,
   downloadTooltip,
   downloadParentId,
+  showUpdateTooltipWhenExpanded = false,
 }) => {
   const { setActions } = useNavActionsContext();
   const [filteredElements, setFilteredElements] = useState([]);
@@ -87,8 +88,8 @@ const useListPageSideActions = ({
         id: "update",
         icon: ICONS.REFRESH,
         color: COLORS.BLUE,
-        text: BUTTON_TEXTS.UPDATE,
-        collapsedTooltip: updateTooltip,
+        text: updateTooltip || BUTTON_TEXTS.UPDATE,
+        showTooltipWhenExpanded: showUpdateTooltipWhenExpanded,
         items: [
           {
             id: "quick-update",
@@ -133,10 +134,10 @@ const useListPageSideActions = ({
         icon: ICONS.FILE_EXCEL,
         color: COLORS.BLUE,
         onClick: handleDownloadFilteredElements,
-        text: "Descargar excel",
-        collapsedTooltip: downloadTooltip,
+        text: downloadTooltip || "Descargar Excel",
         width: CONTENT_SIZES.FIT,
         disabled: !filteredElements.length,
+        showTooltipWhenExpanded: true,
       };
 
       if (downloadParentId && actions.some((action) => action.id === downloadParentId)) {
@@ -169,6 +170,7 @@ const useListPageSideActions = ({
     onRefetch,
     pageName,
     showUpdateModal,
+    showUpdateTooltipWhenExpanded,
     sideActions,
     updateTooltip,
     useSideActions,
