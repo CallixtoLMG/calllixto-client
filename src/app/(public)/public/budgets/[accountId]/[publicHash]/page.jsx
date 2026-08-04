@@ -74,6 +74,10 @@ const PublicBudgetPage = ({ params }) => {
   }, [params?.accountId, params?.publicHash]);
 
   const budget = publicBudget?.budget;
+  const account = useMemo(() => ({
+    ...publicBudget?.account,
+    id: publicBudget?.account?.id ?? params?.accountId,
+  }), [params?.accountId, publicBudget?.account]);
   const selectedContact = useMemo(() => ({
     address: budget?.pickUpInStore
       ? PICK_UP_IN_STORE
@@ -112,7 +116,7 @@ const PublicBudgetPage = ({ params }) => {
       <Segment>
         <PDFfile
           budget={budget}
-          account={publicBudget.account}
+          account={account}
           printPdfMode={BUDGET_PDF_FORMAT.CUSTOMER.key}
           subtotal={subtotal}
           subtotalAfterDiscount={subtotalAfterDiscount}

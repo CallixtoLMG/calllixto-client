@@ -85,16 +85,14 @@ const Budgets = () => {
         icon: ICONS.ADD,
         color: COLORS.GREEN,
         onClick: handleCreate,
-        text: 'Crear',
-        collapsedTooltip: 'Crear venta',
+        text: 'Crear venta',
       },
       {
         id: 2,
-        icon: ICONS.SEARCH,
+        icon: ICONS.HISTORY,
         color: COLORS.BLUE,
         onClick: handleHistory,
-        text: 'Historial',
-        collapsedTooltip: 'Ir al historial de ventas',
+        text: 'Historial de ventas',
       },
     ]
   ), [handleCreate, handleHistory]);

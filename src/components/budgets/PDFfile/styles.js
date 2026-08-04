@@ -41,7 +41,8 @@ const Divider = styled.div`
 
 const Image = styled(SImage)`
   &&& {
-    height: 50px!important;
+    width: ${({ width }) => width ? `${width}px` : "auto"}!important;
+    height: ${({ height }) => height ? `${height}px` : "50px"}!important;
   };
 `;
 

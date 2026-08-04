@@ -48,8 +48,7 @@ const Expenses = () => {
         icon: ICONS.ADD,
         color: COLORS.GREEN,
         onClick: () => { push(PAGES.EXPENSES.CREATE) },
-        text: 'Crear',
-        collapsedTooltip: 'Crear gasto',
+        text: 'Crear gasto',
       }
     ] : [], [push, role]);
 

@@ -75,11 +75,11 @@ const Settings = () => {
       id: "settings-update",
       icon: ICONS.REFRESH,
       color: COLORS.BLUE,
-      text: BUTTON_TEXTS.UPDATE,
-      collapsedTooltip: "Actualizar configuración",
+      text: "Actualizar configuración",
       onClick: handleSettingsRefresh,
       disabled: isLoading,
       loading: isLoading,
+      showTooltipWhenExpanded: true,
     },
   ], [handleSettingsRefresh, isLoading]);
 

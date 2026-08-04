@@ -6,8 +6,16 @@ import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordi
 import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
 import { BUDGET_RANGE_DATE_MONTH_OPTIONS, SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useState } from "react";
-import { Accordion, } from "semantic-ui-react";
+import { Controller } from "react-hook-form";
+import { Accordion, Checkbox } from "semantic-ui-react";
+import styled from "styled-components";
 import { HistoryDateRangesControlled } from "./HistoryDateRangesControlled";
+
+const PublicBudgetCheckbox = styled(Checkbox)`
+  &&& label {
+    font-weight: normal !important;
+  }
+`;
 
 const General = () => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
@@ -40,6 +48,22 @@ const General = () => {
                   rules={{
                     required: ERROR_MESSAGES.REQUIRED_FIELD_SHORT,
                   }}
+                />
+                <Controller
+                  name="publicEnabled"
+                  defaultValue={false}
+                  render={({ field: { onChange, value } }) => (
+                    <FlexColumn $rowGap="5px">
+                      <SettingsFieldLabel>
+                        Presupuesto público
+                      </SettingsFieldLabel>
+                      <PublicBudgetCheckbox
+                        checked={!!value}
+                        label="Habilitar"
+                        onChange={(_, data) => onChange(Boolean(data.checked))}
+                      />
+                    </FlexColumn>
+                  )}
                 />
                 <HistoryDateRangesControlled />
               </FlexColumn>

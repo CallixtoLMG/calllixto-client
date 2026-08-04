@@ -293,7 +293,7 @@ const SupplierPageClient = ({ supplier }) => {
         id: 1,
         icon: ICONS.BARCODE,
         color: COLORS.BLUE,
-        text: "Imprimir códigos de barra",
+        text: "Imprimir códigos de productos",
         onClick: handleBarCodePrint,
         loading: activeAction === "print",
         disabled: !!activeAction || isEditPending || !hasAssociatedProducts,
@@ -302,7 +302,7 @@ const SupplierPageClient = ({ supplier }) => {
           : false,
         collapsedTooltip: !hasAssociatedProducts
           ? 'No existen productos de este proveedor.'
-          : 'Imprimir códigos de productos',
+          : undefined,
         iconOnly: true
       },
       {
@@ -311,8 +311,7 @@ const SupplierPageClient = ({ supplier }) => {
           ? ICONS.PLAY_CIRCLE
           : ICONS.PAUSE_CIRCLE,
         color: COLORS.BLUE,
-        text: isItemInactive(supplier?.state) ? "Activar" : "Desactivar",
-        collapsedTooltip: isItemInactive(supplier?.state) ? "Activar proveedor" : "Desactivar proveedor",
+        text: isItemInactive(supplier?.state) ? "Activar proveedor" : "Desactivar proveedor",
         onClick: handleClick(isItemInactive(supplier?.state) ? ACTIVE : INACTIVE),
         loading: activeAction === ACTIVE || activeAction === INACTIVE,
         disabled: !!activeAction || isEditPending,
@@ -331,8 +330,7 @@ const SupplierPageClient = ({ supplier }) => {
             id: "download-products",
             icon: ICONS.DOWNLOAD,
             color: COLORS.BLUE,
-            text: "Descargar productos",
-            collapsedTooltip: "Descargar productos del proveedor",
+            text: "Descargar productos del proveedor",
             onClick: () => {
               if (products?.length) {
                 setIsExcelLoading(true);
@@ -354,9 +352,8 @@ const SupplierPageClient = ({ supplier }) => {
           },
           {
             id: "upload-stock",
-            text: "Cargar stock",
+            text: "Cargar stock del proveedor",
             color: COLORS.GREEN,
-            collapsedTooltip: "Cargar stock del proveedor",
             button: (
               <BatchImportStock
                 mode={UPLOAD_STOCK}
@@ -367,9 +364,8 @@ const SupplierPageClient = ({ supplier }) => {
           },
           {
             id: "discount-stock",
-            text: "Descontar stock",
+            text: "Descontar stock del proveedor",
             color: COLORS.RED,
-            collapsedTooltip: "Descontar stock del proveedor",
             button: (
               <BatchImportStock
                 mode={DISCOUNT_STOCK}
@@ -382,8 +378,7 @@ const SupplierPageClient = ({ supplier }) => {
             id: "stock-template",
             icon: ICONS.FILE_EXCEL_OUTLINE,
             color: COLORS.BLUE,
-            text: "Plantilla stock",
-            collapsedTooltip: "Descargar plantilla de stock",
+            text: "Descargar plantilla de stock",
             onClick: () => downloadExcel(EXAMPLE_TEMPLATE_DATA_STOCK, "Ejemplo de tabla stock"),
           },
         ],
@@ -401,7 +396,7 @@ const SupplierPageClient = ({ supplier }) => {
           : false,
         collapsedTooltip: !hasAssociatedProducts
           ? 'No existen productos de este proveedor.'
-          : 'Eliminar productos del proveedor',
+          : undefined,
         iconOnly: true
       },
       {
@@ -417,7 +412,7 @@ const SupplierPageClient = ({ supplier }) => {
           : false,
         collapsedTooltip: hasAssociatedProducts
           ? 'No se puede eliminar este proveedor, existen productos asociados.'
-          : 'Eliminar proveedor',
+          : undefined,
         iconOnly: true,
         basic: true,
         popupPosition: POPUP_POSITIONS.BOTTOM_RIGHT

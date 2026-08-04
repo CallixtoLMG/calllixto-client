@@ -1,6 +1,6 @@
 import { Box, Button, Flex, Icon } from '@/common/components/custom';
 import { COLORS, ICONS, POPUP_POSITIONS, SIZES } from '@/common/constants';
-import { cloneElement, createContext, isValidElement, useContext, useState } from 'react';
+import { cloneElement, createContext, isValidElement, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Popup } from 'semantic-ui-react';
 import styled from 'styled-components';
 import { IconedButton } from '../../common/components/buttons';
@@ -281,8 +281,31 @@ const SidebarTooltipContent = styled.span`
 
 const getActionLabel = (action) => action.text || action.label || action.tooltip;
 const getActionItems = (action) => action.items || action.children || [];
-const getCollapsedActionTooltip = (action) => action.collapsedTooltip || action.tooltip || action.text || action.label;
+const normalizeTooltipText = (text) => typeof text === "string" ? text.trim() : undefined;
+const isSameTooltipText = (tooltip, label) => {
+  const tooltipText = normalizeTooltipText(tooltip);
+  const labelText = normalizeTooltipText(label);
+
+  return !!tooltipText && !!labelText && tooltipText === labelText;
+};
+const getDisabledActionTooltip = (action, label) => {
+  if (!action.disabled) return undefined;
+
+  const tooltip = action.tooltip || action.collapsedTooltip;
+  if (!tooltip || isSameTooltipText(tooltip, label)) return undefined;
+
+  return tooltip;
+};
+const getCollapsedActionTooltip = (action, label) =>
+  getDisabledActionTooltip(action, label) || action.collapsedTooltip || action.tooltip || action.text || action.label;
+const getForcedExpandedActionTooltip = (action) =>
+  action.tooltip || action.collapsedTooltip || action.text || action.label;
+const getExpandedActionTooltip = (action, label, isLabelTruncated) =>
+  getDisabledActionTooltip(action, label) ||
+  (action.showTooltipWhenExpanded ? getForcedExpandedActionTooltip(action) : undefined) ||
+  (isLabelTruncated ? label : undefined);
 const getActionTestId = (text) => text ? `nav-action-${text.toLowerCase()}` : undefined;
+const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 const renderSidebarTooltip = (content, trigger, child = false) => {
   if (!content) return trigger;
@@ -301,6 +324,81 @@ const renderSidebarTooltip = (content, trigger, child = false) => {
   );
 };
 
+const SidebarActionWithTooltip = ({
+  action,
+  buttonProps,
+  child = false,
+  hasItems,
+  isGroupOpen,
+  isSidebarOpen,
+  label,
+  sidebarColor,
+}) => {
+  const labelRef = useRef(null);
+  const [isLabelTruncated, setIsLabelTruncated] = useState(false);
+  const ActionButton = child ? SidebarChildButton : SidebarActionButton;
+  const tooltipContent = isSidebarOpen
+    ? getExpandedActionTooltip(action, label, isLabelTruncated)
+    : getCollapsedActionTooltip(action, label);
+
+  useIsomorphicLayoutEffect(() => {
+    if (!isSidebarOpen || !label) {
+      setIsLabelTruncated(false);
+      return undefined;
+    }
+
+    const labelElement = labelRef.current;
+    if (!labelElement) return undefined;
+
+    const updateTruncation = () => {
+      setIsLabelTruncated(labelElement.scrollWidth > labelElement.clientWidth);
+    };
+
+    updateTruncation();
+
+    const resizeObserver = typeof ResizeObserver !== "undefined"
+      ? new ResizeObserver(updateTruncation)
+      : null;
+
+    resizeObserver?.observe(labelElement);
+    window.addEventListener("resize", updateTruncation);
+
+    return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", updateTruncation);
+    };
+  }, [isSidebarOpen, label]);
+
+  const button = (
+    <ActionButton
+      {...buttonProps}
+      color={action.color}
+      basic={action.basic}
+      disabled={action.disabled}
+      loading={action.loading}
+      $isOpen={isSidebarOpen}
+      $isGroupOpen={isGroupOpen}
+      $sidebarColor={sidebarColor}
+      data-testid={getActionTestId(label)}
+    >
+      {action.icon && (
+        <SidebarActionIconSlot $child={child} $isOpen={isSidebarOpen} $sidebarColor={sidebarColor}>
+          <Icon name={action.icon} />
+        </SidebarActionIconSlot>
+      )}
+      {isSidebarOpen && label && <SidebarActionText ref={labelRef}>{label}</SidebarActionText>}
+      {isSidebarOpen && hasItems && (
+        <SidebarChevron
+          $sidebarColor={sidebarColor}
+          name={isGroupOpen ? ICONS.CARET_UP : ICONS.CARET_DOWN}
+        />
+      )}
+    </ActionButton>
+  );
+
+  return renderSidebarTooltip(tooltipContent, button, child);
+};
+
 const NavActions = ({ orientation, variant = NAV_ACTION_VARIANTS.HORIZONTAL, isOpen = false, onRequestOpen }) => {
   const { actions } = useNavActionsContext();
   const resolvedVariant = orientation === "vertical" ? NAV_ACTION_VARIANTS.SIDEBAR_EXPANDED : variant;
@@ -310,17 +408,19 @@ const NavActions = ({ orientation, variant = NAV_ACTION_VARIANTS.HORIZONTAL, isO
 
   const renderSidebarButton = (action, child = false, parentColor) => {
     const label = getActionLabel(action);
-    const collapsedTooltip = getCollapsedActionTooltip(action);
     const items = getActionItems(action);
     const hasItems = items.length > 0;
-    const ActionButton = child ? SidebarChildButton : SidebarActionButton;
     const sidebarColor = action.color || parentColor || COLORS.BLUE;
     const customButton = isValidElement(action.button)
       ? cloneElement(action.button, { triggerClassName: SIDEBAR_CUSTOM_TRIGGER_CLASS })
       : action.button;
 
     if (action.button && !hasItems) {
-      return renderSidebarTooltip(collapsedTooltip, (
+      return renderSidebarTooltip(
+        isSidebarOpen
+          ? getExpandedActionTooltip(action, label, false)
+          : getCollapsedActionTooltip(action, label),
+        (
         <SidebarCustomAction
           $child={child}
           $disabled={action.disabled}
@@ -329,7 +429,9 @@ const NavActions = ({ orientation, variant = NAV_ACTION_VARIANTS.HORIZONTAL, isO
         >
           {customButton}
         </SidebarCustomAction>
-      ), child);
+        ),
+        child
+      );
     }
 
     const handleClick = () => {
@@ -351,34 +453,18 @@ const NavActions = ({ orientation, variant = NAV_ACTION_VARIANTS.HORIZONTAL, isO
       ? { as: "a", href: action.href, target: action.target, rel: action.target === "_blank" ? "noreferrer" : undefined }
       : { type: "button", onClick: handleClick };
 
-    const button = (
-      <ActionButton
-        {...buttonProps}
-        color={action.color}
-        basic={action.basic}
-        disabled={action.disabled}
-        loading={action.loading}
-        $isOpen={isSidebarOpen}
-        $isGroupOpen={hasItems && openActionId === action.id}
-        $sidebarColor={sidebarColor}
-        data-testid={getActionTestId(label)}
-      >
-        {action.icon && (
-          <SidebarActionIconSlot $child={child} $isOpen={isSidebarOpen} $sidebarColor={sidebarColor}>
-            <Icon name={action.icon} />
-          </SidebarActionIconSlot>
-        )}
-        {isSidebarOpen && label && <SidebarActionText>{label}</SidebarActionText>}
-        {isSidebarOpen && hasItems && (
-          <SidebarChevron
-            $sidebarColor={sidebarColor}
-            name={openActionId === action.id ? ICONS.CARET_UP : ICONS.CARET_DOWN}
-          />
-        )}
-      </ActionButton>
+    return (
+      <SidebarActionWithTooltip
+        action={action}
+        buttonProps={buttonProps}
+        child={child}
+        hasItems={hasItems}
+        isGroupOpen={hasItems && openActionId === action.id}
+        isSidebarOpen={isSidebarOpen}
+        label={label}
+        sidebarColor={sidebarColor}
+      />
     );
-
-    return renderSidebarTooltip(collapsedTooltip, button, child);
   };
 
   const renderSidebarAction = (action) => {

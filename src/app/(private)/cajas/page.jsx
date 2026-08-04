@@ -80,8 +80,7 @@ const CashBalances = () => {
       icon: ICONS.ADD,
       color: COLORS.GREEN,
       onClick: () => setIsModalOpen(true),
-      text: 'Abrir',
-      collapsedTooltip: 'Abrir caja',
+      text: 'Abrir caja',
     }], [setIsModalOpen]);
 
   const handleConfirm = useCallback((data) => {

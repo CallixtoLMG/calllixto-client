@@ -174,8 +174,7 @@ const BudgetsPage = ({
         id: "update",
         icon: ICONS.SYNC_ALTERNATE,
         color: COLORS.BLUE,
-        text: BUTTON_TEXTS.UPDATE,
-        collapsedTooltip: "Actualizar ventas",
+        text: "Actualizar ventas",
         items: [
           {
             id: "quick-update",
@@ -216,10 +215,10 @@ const BudgetsPage = ({
         id: "download-excel",
         icon: ICONS.FILE_EXCEL,
         onClick: handleDownloadFilteredBudgets,
-        text: "Descargar excel",
-        collapsedTooltip: "Descargar ventas en Excel",
+        text: "Descargar ventas en Excel",
         width: CONTENT_SIZES.FIT,
         disabled: !filteredBudgets.length,
+        showTooltipWhenExpanded: true,
       },
     ];
   }, [filteredBudgets.length, handleConfirmHardUpdate, handleDownloadFilteredBudgets, handleQuickUpdate, isUpdateLoading, shouldRegisterSideActions, showUpdateModal, sideActions]);

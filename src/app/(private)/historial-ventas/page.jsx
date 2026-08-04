@@ -110,8 +110,7 @@ const BudgetsHistory = () => {
       id: "update-history",
       icon: ICONS.REFRESH,
       color: COLORS.BLUE,
-      text: BUTTON_TEXTS.UPDATE,
-      collapsedTooltip: "Actualizar historial de ventas",
+      text: "Actualizar historial de ventas",
       onClick: handleUpdateHistory,
       disabled: !hasAppliedDateRange || loading,
       loading,
@@ -120,11 +119,11 @@ const BudgetsHistory = () => {
       id: "download-excel",
       icon: ICONS.FILE_EXCEL,
       color: COLORS.BLUE,
-      text: "Descargar excel",
-      collapsedTooltip: "Descargar historial de ventas en Excel",
+      text: "Descargar historial de ventas en Excel",
       onClick: handleDownloadHistoryExcel,
       width: CONTENT_SIZES.FIT,
       disabled: !hasAppliedDateRange || loading || !filteredBudgets.length,
+      showTooltipWhenExpanded: true,
     },
   ], [filteredBudgets.length, handleDownloadHistoryExcel, handleUpdateHistory, hasAppliedDateRange, loading]);
 

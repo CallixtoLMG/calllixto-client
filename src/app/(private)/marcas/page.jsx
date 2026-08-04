@@ -48,8 +48,7 @@ const Brands = () => {
         icon: ICONS.ADD,
         color: COLORS.GREEN,
         onClick: () => { push(PAGES.BRANDS.CREATE) },
-        text: 'Crear',
-        collapsedTooltip: 'Crear marca',
+        text: 'Crear marca',
       })
     }
 

@@ -53,8 +53,7 @@ const Users = () => {
         icon: ICONS.ADD,
         color: COLORS.GREEN,
         onClick: () => { push(PAGES.USERS.CREATE) },
-        text: 'Crear',
-        collapsedTooltip: 'Crear usuario',
+        text: 'Crear usuario',
       }
     ] : [], [push, role]);
 

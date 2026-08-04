@@ -76,6 +76,7 @@ export const SUPPORTED_SETTINGS = {
   CUSTOMER: ['tags'],
   GENERAL: ['paymentMethods'],
   EXPENSE: ['tags', 'categories'],
+  // TODO: incluir publicEnabled cuando backend soporte persistirlo en settings.
   BUDGET: ['allowConfirmExpired', 'allowCreateWithIncompleteCustomer', 'defaultPageDateRange', 'defaultsCreate', 'defaultsPDF', 'historyDateRanges'],
 };
 

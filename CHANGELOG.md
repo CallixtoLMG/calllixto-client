@@ -3,6 +3,14 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-08-04
+
+### Changed
+
+- Sidebar actions: Refined expanded and collapsed tooltip behavior, keeping redundant tooltips hidden unless text is truncated, disabled, or explicitly opted in.
+- Sidebar actions: Added explicit expanded tooltip support for Excel downloads, supplier updates, product stock/barcode actions, sale PDF/send actions, and settings updates.
+- Products: Updated the stock action label to describe the resulting state, using "Actualizar a sin stock" or "Actualizar a con stock".
+
 ## 2026-08-03
 
 ### Changed

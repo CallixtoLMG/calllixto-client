@@ -30,6 +30,7 @@ const SuppliersPage = ({ isLoading, suppliers = [], onRefetch, onDownloadExcel, 
     pageName: PAGES.SUPPLIERS.NAME,
     updateTooltip: "Actualizar proveedores",
     downloadTooltip: "Descargar proveedores en Excel",
+    showUpdateTooltipWhenExpanded: true,
   });
   const handleFilteredSuppliersChange = useCallback(handleFilteredElementsChange, [handleFilteredElementsChange]);
 
