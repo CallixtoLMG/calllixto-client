@@ -3,6 +3,7 @@ import { UserProvider } from "@/User";
 import { RouteHistoryProvider } from "@/app/RouteHistoryContext";
 import { BackToListButton, GoBackButton } from "@/common/components/buttons";
 import { COLORS, ICONS, PAGES, POPUP_POSITIONS, SIZES } from "@/common/constants";
+import { AUTH_BACKGROUND_COLOR } from "@/components/auth/constants";
 import { BreadcrumProvider, Breadcrumb, Header, NavActions, NavActionsProvider, useNavActionsContext } from "@/components/layout";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -51,6 +52,7 @@ const PageWorkspace = styled.div`
   padding: ${PILOT_STICKY_TOP}px ${({ $hasActions }) => ($hasActions ? "0" : `${NAVIGATION_HORIZONTAL_PADDING}px`)} 20px ${NAVIGATION_HORIZONTAL_PADDING}px;
   width: 100%;
   min-height: 80vh;
+  background-color: ${({ $fullBleedBackground }) => ($fullBleedBackground ? AUTH_BACKGROUND_COLOR : "transparent")};
 `;
 
 const PageContent = styled.div`
@@ -126,6 +128,7 @@ const PrivateLayoutContent = ({ children }) => {
   const hide = [PAGES.BASE, PAGES.NOT_FOUND.BASE];
   const show = !hide.includes(pathname);
   const hasActions = actions.length > 0;
+  const useFullBleedBackground = pathname === PAGES.CHANGE_PASSWORD.BASE;
 
   useEffect(() => {
     setIsActionsRailOpen(false);
@@ -148,7 +151,7 @@ const PrivateLayoutContent = ({ children }) => {
           <Breadcrumb />
         </BreadcrumbContainer>
       </NavigationContainer>
-      <PageWorkspace $hasActions={hasActions}>
+      <PageWorkspace $hasActions={hasActions} $fullBleedBackground={useFullBleedBackground}>
         <PageContent>
           {children}
         </PageContent>

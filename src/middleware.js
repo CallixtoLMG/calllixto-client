@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { MAINTENANCE_MODE, MAINTENANCE_PAGE } from "./common/constants/maintenance";
-import { CHANGE_PASSWORD_PAGE, LOGIN_PAGE, PUBLIC_BUDGETS_PAGE, RESTORE_PASSWORD_PAGE } from "./common/constants/routes";
+import { LOGIN_PAGE, PUBLIC_BUDGETS_PAGE, RESTORE_PASSWORD_PAGE } from "./common/constants/routes";
 import { SESSION_ENDED_NOTIFICATION_KEY, TOKEN_KEY } from "./common/constants/session";
 
 const PUBLIC_ROUTES_WHEN_AVAILABLE = [
   LOGIN_PAGE,
   RESTORE_PASSWORD_PAGE,
-  CHANGE_PASSWORD_PAGE,
   MAINTENANCE_PAGE.BASE,
 ];
 
