@@ -1,5 +1,5 @@
 import { useUserContext } from "@/User";
-import { useBatchDeleteProducts, useDeleteProduct, useEditProduct } from "@/api/products";
+import { useBatchDeleteProducts, useDeleteProduct, useEditProduct, useRecoverProduct } from "@/api/products";
 import { IconedButton } from "@/common/components/buttons";
 import { Flex } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
@@ -26,8 +26,10 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
   const deleteProduct = useDeleteProduct();
   const batchDeleteProducts = useBatchDeleteProducts();
   const editProduct = useEditProduct();
+  const recoverProduct = useRecoverProduct();
   const [showModal, setShowModal] = useState(false);
   const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
+  const [showConfirmRecoverModal, setShowConfirmRecoverModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedProducts, setSelectedProducts] = useState({});
 
@@ -100,6 +102,13 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
     setSelectedProducts(newSelectedProducts);
   };
 
+  const selectedProductsList = useMemo(() => Object.values(selectedProducts), [selectedProducts]);
+  const selectedProductsCount = selectedProductsList.length;
+  const allSelectedProductsAreDeleted = useMemo(() => (
+    !!selectedProductsCount &&
+    selectedProductsList.every(product => product.state === PRODUCT_STATES.DELETED.id)
+  ), [selectedProductsCount, selectedProductsList]);
+
   const { mutate: deleteSelectedProducts, isPending: deleteIsPending } = useMutation({
     mutationFn: async () => {
       const ids = Object.keys(selectedProducts);
@@ -116,16 +125,84 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
     }
   });
 
+  const { mutate: recoverSelectedProducts, isPending: recoverIsPending } = useMutation({
+    mutationFn: async () => {
+      const productsToRecover = Object.values(selectedProducts);
+
+      if (!productsToRecover.length) {
+        return { recoveredCount: 0, failedCount: 0, invalidSelection: true };
+      }
+
+      const hasInvalidProducts = productsToRecover.some(product => product.state !== PRODUCT_STATES.DELETED.id);
+      if (hasInvalidProducts) {
+        return { recoveredCount: 0, failedCount: productsToRecover.length, invalidSelection: true };
+      }
+
+      let recoveredCount = 0;
+      let failedCount = 0;
+      let errorMessage;
+
+      for (const product of productsToRecover) {
+        try {
+          const response = await recoverProduct({ id: product.id });
+          if (response?.statusOk) {
+            recoveredCount++;
+          } else {
+            failedCount++;
+            errorMessage = errorMessage || response?.message || response?.error?.message;
+          }
+        } catch (error) {
+          failedCount++;
+          errorMessage = errorMessage || error?.message;
+        }
+      }
+
+      return { recoveredCount, failedCount, errorMessage };
+    },
+    onSuccess: ({ recoveredCount, failedCount, invalidSelection, errorMessage }) => {
+      if (invalidSelection) {
+        toast.error("La selección ya no es válida para recuperar productos.");
+      } else if (recoveredCount && !failedCount) {
+        toast.success(recoveredCount === 1 ? "Producto recuperado." : `${recoveredCount} productos recuperados.`);
+      } else if (recoveredCount && failedCount) {
+        toast.error(`Se recuperaron ${formatCount(recoveredCount, "product")}. ${formatCount(failedCount, "product")} no pudieron recuperarse.`);
+      } else {
+        toast.error(`No se pudo recuperar ${formatCount(failedCount, "product")}.${errorMessage ? ` ${errorMessage}` : ""}`);
+      }
+    },
+    onError: (error) => {
+      toast.error(`Error al recuperar productos: ${error.message}`);
+    },
+    onSettled: () => {
+      setSelectedProducts({});
+      setShowConfirmRecoverModal(false);
+    }
+  });
+
   const selectionActions = useMemo(() => {
-    const selectedProductsCount = Object.keys(selectedProducts).length;
     const actions = [
       <IconedButton
         key={2}
         text="Descargar códigos"
         icon={ICONS.BARCODE}
         onClick={handlePrint}
+        disabled={deleteIsPending || recoverIsPending}
       />
     ];
+
+    if (allSelectedProductsAreDeleted && RULES.canRemove[role]) {
+      actions.unshift(
+        <IconedButton
+          key={3}
+          text={`Recuperar ${pluralize(selectedProductsCount, "producto", "productos")}`}
+          icon={ICONS.UNDO}
+          color={COLORS.GREEN}
+          onClick={() => setShowConfirmRecoverModal(true)}
+          disabled={deleteIsPending || recoverIsPending}
+          loading={recoverIsPending}
+        />
+      );
+    }
 
     if (RULES.canRemove[role]) {
       actions.unshift(
@@ -135,13 +212,15 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
           icon={ICONS.TRASH}
           color={COLORS.RED}
           onClick={() => setShowConfirmDeleteModal(true)}
+          disabled={deleteIsPending || recoverIsPending}
+          loading={deleteIsPending}
         />
       );
     }
 
     return actions;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [role, selectedProducts]);
+  }, [role, selectedProductsCount, allSelectedProductsAreDeleted, deleteIsPending, recoverIsPending]);
 
   return (
     <>
@@ -186,7 +265,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
           </Form>
         </FormProvider>
         <Table
-          isLoading={isLoading || deleteIsPending}
+          isLoading={isLoading || deleteIsPending || recoverIsPending}
           headers={PRODUCT_COLUMNS}
           elements={products.map(p => ({ ...p, key: p.id }))}
           page={PAGES.PRODUCTS}
@@ -212,13 +291,13 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
         />
       </Flex>
       <OnlyPrint>
-        <PrintBarCodes ref={printRef} products={Object.values(selectedProducts)} />
+        <PrintBarCodes ref={printRef} products={selectedProductsList} />
       </OnlyPrint>
       <ModalMultiDelete
         open={showConfirmDeleteModal}
         onClose={() => setShowConfirmDeleteModal(false)}
         onConfirm={deleteSelectedProducts}
-        elements={Object.values(selectedProducts)}
+        elements={selectedProductsList}
         icon={ICONS.TRASH}
         title={`¿Estás seguro de que desea eliminar${Object.values(selectedProducts).some(
           p => p.state === PRODUCT_STATES.DELETED.id) ?
@@ -227,6 +306,27 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
         }
         isLoading={deleteIsPending}
         headers={PRODUCT_COLUMNS}
+      />
+      <ModalAction
+        showModal={showConfirmRecoverModal}
+        setShowModal={setShowConfirmRecoverModal}
+        title={`Recuperar ${pluralize(selectedProductsCount, "producto", "productos")}`}
+        onConfirm={recoverSelectedProducts}
+        isLoading={recoverIsPending}
+        noConfirmation
+        confirmButtonText="Recuperar"
+        confirmButtonIcon={ICONS.UNDO}
+        titleIcon={ICONS.UNDO}
+        titleIconColor={COLORS.GREEN}
+        plainBodyContent
+        size="large"
+        bodyContent={(
+          <Table
+            headers={PRODUCT_COLUMNS}
+            elements={selectedProductsList}
+            mainKey="id"
+          />
+        )}
       />
     </>
   );

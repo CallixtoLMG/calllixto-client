@@ -9,7 +9,9 @@ const Form = styled.form`
 `;
 
 const ModalContent = styled(Modal.Content)`
-  padding: 5px 0!important;
+  max-height: ${({ $plainBodyContent }) => $plainBodyContent && "70vh"};
+  overflow: ${({ $plainBodyContent }) => $plainBodyContent && "auto"};
+  padding: ${({ $plainBodyContent }) => $plainBodyContent ? "1.5rem!important" : "5px 0!important"};
 `;
 
 const Message = styled(SMessage)`
