@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { expectSuccessfulApiResponse, isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
-import { confirmOpenCashBalance } from "./support/cashBalances";
+import { confirmOpenCashBalance, openCashBalanceModal } from "./support/cashBalances";
 import { E2E_ACCOUNTS } from "./support/env";
 import {
   addAddress,
@@ -42,11 +42,7 @@ const selectSearchOption = async (page: Page, testId: string, text: string) => {
 const openCashBalanceForMovements = async (page: Page, timestamp: number) => {
   const comment = `E2E Cash Balance Movements ${timestamp}`;
 
-  await page.goto("/cajas");
-  await expect(page).toHaveURL(/\/cajas(?:\?|$)/);
-  await expect(page.getByTestId("nav-action-abrir")).toBeVisible({ timeout: 30_000 });
-  await page.getByTestId("nav-action-abrir").click();
-  await expect(page.getByTestId("open-cash-balance-modal")).toBeVisible({ timeout: 30_000 });
+  await openCashBalanceModal(page);
   await page.getByTestId("cash-balance-select-all-payment-methods").click();
   await expect(page.locator('input[value="Todos"]')).toBeVisible();
   await page.getByTestId("cash-balance-initial-amount-field").locator("input").fill("1000");

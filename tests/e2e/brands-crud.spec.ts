@@ -8,13 +8,13 @@ import {
 import { loginAsE2EUser } from "./support/auth";
 import { E2E_ACCOUNTS } from "./support/env";
 import {
-  deleteCurrentEntity,
   deleteEntityIfPresent,
   expectEntityDeletedFromActiveList,
   filterByName,
   selectInactiveFilter,
   waitForEntityDetailUrl,
 } from "./support/entities";
+import { clickPageAction, expectPageActionReady } from "./support/pageActions";
 
 const listUrl = /\/marcas(?:\?|$)/;
 
@@ -36,7 +36,7 @@ const isBrandIdAvailable = async (page: Page, id: string) => {
 const openBrandsList = async (page: Page) => {
   await page.goto("/marcas");
   await expect(page).toHaveURL(listUrl);
-  await expect(page.getByTestId("nav-action-crear")).toBeVisible();
+  await expectPageActionReady(page, "nav-action-crear marca");
 };
 
 const createBrand = async (page: Page, timestamp: number) => {
@@ -47,7 +47,7 @@ const createBrand = async (page: Page, timestamp: number) => {
   };
 
   await openBrandsList(page);
-  await page.goto("/marcas/crear");
+  await clickPageAction(page, "nav-action-crear marca");
   await expect(page).toHaveURL(/\/marcas\/crear(?:\?|$)/);
 
   await page.locator('input[name="name"]').fill(brand.name);
@@ -87,7 +87,9 @@ const createBrand = async (page: Page, timestamp: number) => {
 };
 
 const deleteCurrentBrand = async (page: Page) => {
-  await deleteCurrentEntity(page);
+  await clickPageAction(page, "nav-action-eliminar marca");
+  await page.getByTestId("modal-confirmation-input").locator("input").fill("eliminar");
+  await page.getByTestId("modal-confirm").click();
   await expect(page).toHaveURL(listUrl, { timeout: 30_000 });
 };
 
@@ -140,11 +142,11 @@ test.describe("brands", () => {
       const brand = await createBrand(page, timestamp);
       brandUrl = brand.url;
 
-      await page.getByTestId("nav-action-desactivar").click();
+      await clickPageAction(page, "nav-action-desactivar marca");
       await page.getByPlaceholder(/motivo/i).fill(inactiveReason);
       await page.getByTestId("modal-confirm").click();
       await expect(page.getByText(inactiveReason)).toBeVisible({ timeout: 30_000 });
-      await expect(page.getByTestId("nav-action-activar")).toBeVisible();
+      await expectPageActionReady(page, "nav-action-activar marca");
 
       await openBrandsList(page);
       await selectInactiveFilter(page);
@@ -153,15 +155,15 @@ test.describe("brands", () => {
 
       await page.getByText(brand.name).click();
       await expect(page).toHaveURL(/\/marcas\/[^/]+(?:\?|$)/, { timeout: 30_000 });
-      await page.getByTestId("nav-action-activar").click();
+      await clickPageAction(page, "nav-action-activar marca");
       await page.getByTestId("modal-confirm").click();
-      await expect(page.getByTestId("nav-action-desactivar")).toBeVisible({ timeout: 30_000 });
+      await expectPageActionReady(page, "nav-action-desactivar marca");
 
       await deleteCurrentBrand(page);
       brandUrl = null;
     } finally {
       if (brandUrl) {
-        await deleteEntityIfPresent(page, brandUrl, listUrl);
+        await deleteEntityIfPresent(page, brandUrl, listUrl, "nav-action-eliminar marca");
       }
     }
   });

@@ -6,7 +6,6 @@ import {
   addAddress,
   addEmail,
   addPhone,
-  deleteCurrentEntity,
   deleteEntityIfPresent,
   expectEntityDeletedFromActiveList,
   filterByName,
@@ -14,6 +13,7 @@ import {
   waitForEntityDetailAfterSubmit,
   waitForEntityDetailUrl,
 } from "./support/entities";
+import { clickPageAction, expectPageActionReady } from "./support/pageActions";
 
 const listUrl = /\/proveedores(?:\?|$)/;
 
@@ -40,7 +40,7 @@ const getAvailableSupplierId = async (page: Page, timestamp: number) => {
 const openSuppliersList = async (page: Page) => {
   await page.goto("/proveedores");
   await expect(page).toHaveURL(listUrl);
-  await expect(page.getByTestId("nav-action-crear")).toBeVisible();
+  await expectPageActionReady(page, "nav-action-crear proveedor");
 };
 
 const createSupplier = async (page: Page, timestamp: number) => {
@@ -53,7 +53,7 @@ const createSupplier = async (page: Page, timestamp: number) => {
   };
 
   await openSuppliersList(page);
-  await page.goto("/proveedores/crear");
+  await clickPageAction(page, "nav-action-crear proveedor");
   await expect(page).toHaveURL(/\/proveedores\/crear(?:\?|$)/);
 
   await page.locator('input[name="id"]').fill(supplier.id);
@@ -84,7 +84,9 @@ const createSupplier = async (page: Page, timestamp: number) => {
 };
 
 const deleteCurrentSupplier = async (page: Page) => {
-  await deleteCurrentEntity(page, "nav-action-eliminar proveedor");
+  await clickPageAction(page, "nav-action-eliminar proveedor");
+  await page.getByTestId("modal-confirmation-input").locator("input").fill("eliminar");
+  await page.getByTestId("modal-confirm").click();
   await expect(page).toHaveURL(listUrl, { timeout: 30_000 });
 };
 
@@ -143,11 +145,11 @@ test.describe("suppliers", () => {
       const supplier = await createSupplier(page, timestamp);
       supplierUrl = supplier.url;
 
-      await page.getByTestId("nav-action-desactivar").click();
+      await clickPageAction(page, "nav-action-desactivar proveedor");
       await page.getByPlaceholder(/motivo/i).fill(inactiveReason);
       await page.getByTestId("modal-confirm").click();
       await expect(page.getByText(inactiveReason)).toBeVisible({ timeout: 30_000 });
-      await expect(page.getByTestId("nav-action-activar")).toBeVisible();
+      await expectPageActionReady(page, "nav-action-activar proveedor");
 
       await openSuppliersList(page);
       await selectInactiveFilter(page);
@@ -156,9 +158,9 @@ test.describe("suppliers", () => {
 
       await page.getByText(supplier.name).click();
       await expect(page).toHaveURL(/\/proveedores\/[^/]+(?:\?|$)/, { timeout: 30_000 });
-      await page.getByTestId("nav-action-activar").click();
+      await clickPageAction(page, "nav-action-activar proveedor");
       await page.getByTestId("modal-confirm").click();
-      await expect(page.getByTestId("nav-action-desactivar")).toBeVisible({ timeout: 30_000 });
+      await expectPageActionReady(page, "nav-action-desactivar proveedor");
 
       await deleteCurrentSupplier(page);
       supplierUrl = null;

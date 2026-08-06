@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { expectSuccessfulApiResponse, isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
 import { E2E_ACCOUNTS } from "./support/env";
@@ -30,7 +30,43 @@ type CustomerFixture = {
 const openCustomersList = async (page: Page) => {
   await page.goto("/clientes");
   await expect(page).toHaveURL(/\/clientes(?:\?|$)/);
-  await expect(page.getByTestId("nav-action-crear")).toBeVisible();
+  const createAction = await getCreateCustomerAction(page);
+  await expectActionReady(createAction);
+};
+
+const getPageActionsRail = (page: Page) => page.getByTestId("page-actions-aside");
+
+const expectActionReady = async (action: Locator) => {
+  await expect(action).toBeVisible();
+  await expect(action).toBeEnabled();
+  await action.click({ trial: true });
+};
+
+const expandPageActionsRail = async (page: Page) => {
+  const rail = getPageActionsRail(page);
+  await expect(rail).toBeAttached();
+
+  const railToggle = rail.getByTestId("page-actions-rail-toggle");
+
+  if (await railToggle.getAttribute("aria-expanded") === "false") {
+    await railToggle.click();
+    await expect(railToggle).toHaveAttribute("aria-expanded", "true");
+  }
+
+  return rail;
+};
+
+const getCreateCustomerAction = async (page: Page) => {
+  const rail = await expandPageActionsRail(page);
+  return rail.getByTestId("nav-action-crear cliente");
+};
+
+const openCreateCustomerPage = async (page: Page) => {
+  await openCustomersList(page);
+  const createAction = await getCreateCustomerAction(page);
+  await createAction.click();
+  await expect(page).toHaveURL(/\/clientes\/crear(?:\?|$)/);
+  await expect(page.locator('input[name="name"]')).toBeVisible({ timeout: 30_000 });
 };
 
 const selectAvailableTags = async (page: Page, requestedCount = 2) => {
@@ -68,9 +104,7 @@ const selectAvailableTags = async (page: Page, requestedCount = 2) => {
 };
 
 const createCustomer = async (page: Page, customer: CustomerFixture) => {
-  await openCustomersList(page);
-  await page.goto("/clientes/crear");
-  await expect(page).toHaveURL(/\/clientes\/crear(?:\?|$)/);
+  await openCreateCustomerPage(page);
 
   await page.locator('input[name="name"]').fill(customer.name);
 
@@ -110,7 +144,7 @@ const createCustomer = async (page: Page, customer: CustomerFixture) => {
 };
 
 const deleteCurrentCustomer = async (page: Page) => {
-  await deleteCurrentEntity(page);
+  await deleteCurrentEntity(page, "nav-action-eliminar cliente");
   await expect(page).toHaveURL(/\/clientes(?:\?|$)/, { timeout: 30_000 });
 };
 
@@ -153,7 +187,7 @@ test.describe("customers", () => {
       await expectEntityDeletedFromActiveList(page, updatedCustomerName);
     } finally {
       if (createdCustomerUrl) {
-        await deleteEntityIfPresent(page, createdCustomerUrl, /\/clientes(?:\?|$)/);
+        await deleteEntityIfPresent(page, createdCustomerUrl, /\/clientes(?:\?|$)/, "nav-action-eliminar cliente");
       }
     }
   });
@@ -204,7 +238,7 @@ test.describe("customers", () => {
       createdCustomerUrl = null;
     } finally {
       if (createdCustomerUrl) {
-        await deleteEntityIfPresent(page, createdCustomerUrl, /\/clientes(?:\?|$)/);
+        await deleteEntityIfPresent(page, createdCustomerUrl, /\/clientes(?:\?|$)/, "nav-action-eliminar cliente");
       }
     }
   });
@@ -223,11 +257,11 @@ test.describe("customers", () => {
       });
       createdCustomerUrl = createdCustomer.url;
 
-      await page.getByTestId("nav-action-desactivar").click();
+      await page.getByTestId("nav-action-desactivar cliente").click();
       await page.getByPlaceholder(/motivo/i).fill(inactiveReason);
       await page.getByTestId("modal-confirm").click();
       await expect(page.getByText(inactiveReason)).toBeVisible({ timeout: 30_000 });
-      await expect(page.getByTestId("nav-action-activar")).toBeVisible();
+      await expect(page.getByTestId("nav-action-activar cliente")).toBeVisible();
 
       await openCustomersList(page);
       await selectInactiveFilter(page);
@@ -236,15 +270,15 @@ test.describe("customers", () => {
 
       await page.getByText(customerName).click();
       await expect(page).toHaveURL(/\/clientes\/[^/]+(?:\?|$)/, { timeout: 30_000 });
-      await page.getByTestId("nav-action-activar").click();
+      await page.getByTestId("nav-action-activar cliente").click();
       await page.getByTestId("modal-confirm").click();
-      await expect(page.getByTestId("nav-action-desactivar")).toBeVisible({ timeout: 30_000 });
+      await expect(page.getByTestId("nav-action-desactivar cliente")).toBeVisible({ timeout: 30_000 });
 
       await deleteCurrentCustomer(page);
       createdCustomerUrl = null;
     } finally {
       if (createdCustomerUrl) {
-        await deleteEntityIfPresent(page, createdCustomerUrl, /\/clientes(?:\?|$)/);
+        await deleteEntityIfPresent(page, createdCustomerUrl, /\/clientes(?:\?|$)/, "nav-action-eliminar cliente");
       }
     }
   });

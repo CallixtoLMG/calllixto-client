@@ -35,7 +35,7 @@ const CreateCustomer = () => {
     mutationFn: createCustomer,
     onSuccess: async (response) => {
       if (response.statusOk) {
-        push(PAGES.CUSTOMERS.SHOW(response.customer.id))
+        customerUnsaved.runWithoutPrompt(() => push(PAGES.CUSTOMERS.SHOW(response.customer.id)))
         toast.success('Cliente creado!');
       } else {
         toast.error(`${response?.message} (${response?.error?.message})`);

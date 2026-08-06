@@ -12,174 +12,76 @@ Documentacion corta para correr los tests E2E del frontend.
 Variables esperadas:
 
 ```env
+E2E_STABLE_PORT=3100
 E2E_BASE_URL=http://127.0.0.1:3000
 E2E_USER_EMAIL=
 E2E_USER_PASSWORD=
+E2E_ACCOUNT_MODULES_ENABLED=
+E2E_ACCOUNT_MODULES_DISABLED=
 ```
 
-## Comandos principales
+La configuracion estable carga `.env.local` y luego `.env.e2e`. `.env.e2e` pisa valores locales para Playwright, `next build` y `next start`.
 
-Correr todos los tests:
+## Modalidades
+
+### Estable
+
+Usar para suite completa, CI y validacion antes de merge:
 
 ```bash
 npm run test:e2e
 ```
 
-Correr todos los tests con navegador visible:
+Este comando ejecuta `next build`, luego Playwright levanta `next start` en `127.0.0.1:3100`, espera `/login`, corre los tests y cierra el servidor. No reutiliza servidores existentes.
+
+Con navegador visible:
 
 ```bash
 npm run test:e2e:headed
 ```
 
-Correr todos los tests con la UI de Playwright:
+Por archivo:
 
 ```bash
-npm run test:e2e:ui
+npm run test:e2e -- tests/e2e/products-crud.spec.ts
 ```
 
-## Correr por archivo
-
-Customers:
+Por nombre:
 
 ```bash
-npm run test:e2e:headed -- tests/e2e/customers-crud.spec.ts
+npm run test:e2e -- -g "creates and updates a product"
 ```
 
-Suppliers / Proveedores:
+Varios archivos:
 
 ```bash
-npm run test:e2e:headed -- tests/e2e/suppliers-crud.spec.ts
+npm run test:e2e -- tests/e2e/customers-crud.spec.ts tests/e2e/products-crud.spec.ts
 ```
 
-Supplier actions / Acciones de proveedores:
+### Desarrollo
+
+Usar solo para debugging rapido de specs aislados:
 
 ```bash
-npm run test:e2e:headed -- tests/e2e/suppliers-actions.spec.ts
+npm run test:e2e:dev -- tests/e2e/login.smoke.spec.ts
 ```
 
-Brands / Marcas:
+Esta modalidad usa `next dev` en `E2E_BASE_URL` o `http://127.0.0.1:3000`. No usar para suite completa: una corrida larga sobre `next dev` puede degradar el servidor y producir falsos fallos en cascada.
 
-```bash
-npm run test:e2e:headed -- tests/e2e/brands-crud.spec.ts
+## HTTP 500 en `/login`
+
+El helper de auth valida que `GET /login` responda con status menor que 500. Si aparece:
+
+```text
+Expected /login to render without a server error
+Received: 500
 ```
 
-Expenses / Gastos:
-
-```bash
-npm run test:e2e:headed -- tests/e2e/expenses-crud.spec.ts
-```
-
-Expense payments / Pagos de gastos:
-
-```bash
-npm run test:e2e:headed -- tests/e2e/expenses-payments.spec.ts
-```
-
-Products / Productos:
-
-```bash
-npm run test:e2e:headed -- tests/e2e/products-crud.spec.ts
-```
-
-Product actions / Acciones de productos:
-
-```bash
-npm run test:e2e:headed -- tests/e2e/products-actions.spec.ts
-```
-
-Budgets / Ventas:
-
-```bash
-npm run test:e2e:headed -- tests/e2e/budgets-crud.spec.ts
-```
-
-Budget actions / Acciones de budgets:
-
-```bash
-npm run test:e2e:headed -- tests/e2e/budgets-actions.spec.ts
-```
-
-Settings / Configuracion:
-
-```bash
-npm run test:e2e:headed -- tests/e2e/settings.spec.ts
-```
-
-Cash Balances / Cajas:
-
-```bash
-npm run test:e2e:headed -- tests/e2e/cash-balances.spec.ts
-```
-
-Cash balance movements / Movimientos de caja:
-
-```bash
-npm run test:e2e:headed -- tests/e2e/cash-balances-movements.spec.ts
-```
-
-Excel exports:
-
-```bash
-npm run test:e2e:headed -- tests/e2e/exports-excel.spec.ts
-```
-
-Login real:
-
-```bash
-npm run test:e2e:headed -- tests/e2e/login.spec.ts
-```
-
-Login smoke:
-
-```bash
-npm run test:e2e:headed -- tests/e2e/login.smoke.spec.ts
-```
-
-Correr varios archivos especificos:
-
-```bash
-npm run test:e2e:headed -- tests/e2e/customers-crud.spec.ts tests/e2e/suppliers-crud.spec.ts
-```
-
-## Correr por nombre
-
-Un test individual:
-
-```bash
-npm run test:e2e:headed -- -g "logs in with E2E credentials"
-npm run test:e2e:headed -- -g "creates, updates, and deletes a customer"
-```
-
-Grupos por coincidencia de nombre:
-
-```bash
-npm run test:e2e:headed -- -g "customer"
-npm run test:e2e:headed -- -g "supplier"
-npm run test:e2e:headed -- -g "deletes all products for a supplier"
-npm run test:e2e:headed -- -g "prints supplier product barcodes"
-npm run test:e2e:headed -- -g "brand"
-npm run test:e2e:headed -- -g "expense"
-npm run test:e2e:headed -- -g "expense payment"
-npm run test:e2e:headed -- -g "product"
-npm run test:e2e:headed -- -g "prints product barcode"
-npm run test:e2e:headed -- -g "shows product change history after updates"
-npm run test:e2e:headed -- -g "budget"
-npm run test:e2e:headed -- -g "voids a confirmed budget"
-npm run test:e2e:headed -- -g "clones a confirmed budget"
-npm run test:e2e:headed -- -g "settings"
-npm run test:e2e:headed -- -g "cash balance"
-npm run test:e2e:headed -- -g "cash balance movements"
-npm run test:e2e:headed -- -g "exports"
-npm run test:e2e:headed -- -g "exports customers"
-npm run test:e2e:headed -- -g "exports cash balances"
-npm run test:e2e:headed -- -g "login"
-```
-
-El `--` en comandos npm sirve para pasar argumentos al comando interno del script. Por ejemplo, en `npm run test:e2e:headed -- -g "login"`, el `-g "login"` se envia a Playwright.
+Eso es error de servidor, no fallo de locator. Revisar logs de `next start` o `next dev` antes de tocar specs. En modalidad estable, un 500 de `/login` indica posible problema de render/produccion y debe investigarse con stack del servidor.
 
 ## Que cubre cada archivo
 
-- `login.smoke.spec.ts`: abre la pantalla de login y verifica que carguen elementos basicos visibles.
+- `login.smoke.spec.ts`: abre la pantalla de login y verifica elementos basicos visibles.
 - `login.spec.ts`: hace login real usando variables de entorno y verifica acceso a la app.
 - `customers-crud.spec.ts`: cubre CRUD basico, datos ampliados, y activar/desactivar clientes.
 - `suppliers-crud.spec.ts`: cubre CRUD basico y activar/desactivar proveedores.
@@ -198,9 +100,10 @@ El `--` en comandos npm sirve para pasar argumentos al comando interno del scrip
 
 ## Flujo recomendado
 
-- Durante desarrollo, correr el archivo de la entidad que se esta modificando.
+- Durante desarrollo, correr el archivo de la entidad con `npm run test:e2e -- tests/e2e/archivo.spec.ts`.
+- Para debugging rapido, usar `npm run test:e2e:dev -- tests/e2e/archivo.spec.ts`.
 - Antes de cerrar un sprint o mergear, correr todos los tests con `npm run test:e2e`.
-- Si muchos tests fallan, correr primero `login.smoke.spec.ts` y luego `login.spec.ts` para descartar problemas de login/auth.
+- Si muchos tests fallan, correr primero `npm run test:e2e -- tests/e2e/login.smoke.spec.ts`.
 
 ## Debug local
 

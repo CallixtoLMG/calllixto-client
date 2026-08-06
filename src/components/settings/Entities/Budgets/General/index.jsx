@@ -54,12 +54,12 @@ const General = () => {
                   defaultValue={false}
                   render={({ field: { onChange, value } }) => (
                     <FlexColumn $rowGap="5px">
-                      <SettingsFieldLabel>
+                      <SettingsFieldLabel helpText={SETTINGS_HELP_TEXTS.BUDGET_PUBLIC_ENABLED}>
                         Presupuesto público
                       </SettingsFieldLabel>
                       <PublicBudgetCheckbox
                         checked={!!value}
-                        label="Habilitar"
+                        label={value ? "Habilitado" : "Deshabilitado"}
                         onChange={(_, data) => onChange(Boolean(data.checked))}
                       />
                     </FlexColumn>

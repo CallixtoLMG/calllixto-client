@@ -9,6 +9,7 @@ import {
   waitForEntityDetailAfterSubmit,
   waitForEntityDetailUrl,
 } from "./support/entities";
+import { expectPageActionReady } from "./support/pageActions";
 
 type SupplierFixture = {
   id: string;
@@ -191,7 +192,11 @@ const selectProductState = async (page: Page, stateName: RegExp) => {
 const openProductsList = async (page: Page) => {
   await page.goto("/productos");
   await expect(page).toHaveURL(productsListUrl);
-  await expect(page.getByTestId("nav-action-crear")).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId("dropdown-state")).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('input[name="name"]')).toBeVisible();
+  await expect(page.getByRole("button", { name: /buscar/i })).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: /nombre/i })).toBeVisible();
+  await expectPageActionReady(page, "nav-action-crear producto");
 };
 
 const assertProductsDeleted = async (page: Page, products: ProductFixture[]) => {

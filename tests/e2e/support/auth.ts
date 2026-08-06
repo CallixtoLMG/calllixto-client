@@ -1,4 +1,4 @@
-import { expect, type Page } from "@playwright/test";
+import { expect, type Locator, type Page, type Request } from "@playwright/test";
 import { getE2ECredentials } from "./env";
 
 type LoginAsE2EUserOptions = {
@@ -17,6 +17,40 @@ const getAccountNameMatcher = (accountName: RegExp | string) => {
 
   const displayName = toAccountDisplayName(accountName);
   return new RegExp(`^(?:${escapeRegExp(accountName)}|${escapeRegExp(displayName)})$`, "i");
+};
+
+const isLoginAuthRequest = (request: Request) => {
+  const url = request.url();
+
+  return request.method() === "POST"
+    && (/cognito-idp/i.test(url) || /amazonaws\.com/i.test(url));
+};
+
+type LoginFormControls = {
+  form: Locator;
+  emailInput: Locator;
+  passwordInput: Locator;
+  submitButton: Locator;
+};
+
+export const openLoginPage = async (page: Page): Promise<LoginFormControls> => {
+  const response = await page.goto("/login", { waitUntil: "domcontentloaded" });
+  expect(response?.status(), "Expected /login to render without a server error").toBeLessThan(500);
+  await expect(page).toHaveURL(/\/login(?:\?|$)/);
+
+  const emailInput = page.getByPlaceholder(/correo/i);
+  const form = page.locator("form", { has: emailInput });
+  const passwordInput = form.getByPlaceholder(/contrase/i);
+  const submitButton = form.getByRole("button", { name: /ingresar/i });
+
+  await expect(form).toBeVisible({ timeout: 30_000 });
+  await expect(emailInput).toBeVisible({ timeout: 30_000 });
+  await expect(passwordInput).toBeVisible({ timeout: 30_000 });
+  await expect(submitButton).toHaveCount(1);
+  await expect(submitButton).toBeVisible({ timeout: 30_000 });
+  await expect(submitButton).toBeEnabled({ timeout: 30_000 });
+
+  return { form, emailInput, passwordInput, submitButton };
 };
 
 const selectAccount = async (page: Page, accountName: RegExp | string) => {
@@ -38,16 +72,15 @@ const selectAccount = async (page: Page, accountName: RegExp | string) => {
 export const loginAsE2EUser = async (page: Page, options: LoginAsE2EUserOptions = {}) => {
   const { email, password } = getE2ECredentials();
 
-  await page.goto("/login");
-  const submitButton = page.getByRole("button", { name: /ingresar/i });
-  await expect(submitButton).toBeEnabled();
+  const { emailInput, passwordInput, submitButton } = await openLoginPage(page);
 
-  await page.getByPlaceholder(/correo/i).fill(email);
-  await page.getByPlaceholder(/contrase/i).fill(password);
+  await emailInput.fill(email);
+  await passwordInput.fill(password);
   await expect(submitButton).toBeEnabled();
 
   await Promise.all([
     page.waitForURL(/\/ventas(?:\?|$)/, { timeout: 60_000 }),
+    page.waitForRequest(isLoginAuthRequest, { timeout: 30_000 }),
     submitButton.click(),
   ]);
 

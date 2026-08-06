@@ -1,20 +1,14 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page, type Response } from "@playwright/test";
 import { loginAsE2EUser } from "./support/auth";
-import { confirmOpenCashBalance } from "./support/cashBalances";
+import { confirmOpenCashBalance, openCashBalanceModal } from "./support/cashBalances";
 import { E2E_ACCOUNTS } from "./support/env";
 
-const openCashBalancesList = async (page: Page) => {
-  await page.goto("/cajas");
-  await expect(page).toHaveURL(/\/cajas(?:\?|$)/);
-  await expect(page.getByRole("columnheader", { name: /id/i })).toBeVisible({ timeout: 30_000 });
-  await expect(page.getByTestId("nav-action-abrir")).toBeVisible({ timeout: 30_000 });
+type CloseCashBalanceResponse = {
+  statusOk?: boolean;
 };
 
-const openCashBalanceModal = async (page: Page) => {
-  await page.getByTestId("nav-action-abrir").click();
-  const modal = page.getByTestId("open-cash-balance-modal");
-  await expect(modal).toBeVisible();
-  await expect(modal.getByText(/abrir caja/i)).toBeVisible();
+const isCloseCashBalanceResponse = (response: Response) => {
+  return response.request().method() === "POST" && /\/cash-balances\/[^/]+$/.test(new URL(response.url()).pathname);
 };
 
 const addAllPaymentMethods = async (page: Page) => {
@@ -23,6 +17,7 @@ const addAllPaymentMethods = async (page: Page) => {
 };
 
 const fillOpenCashBalanceModal = async (page: Page, comment: string) => {
+  await expect(page.getByTestId("open-cash-balance-modal").getByText(/abrir caja/i)).toBeVisible();
   await addAllPaymentMethods(page);
   await page.getByTestId("cash-balance-initial-amount-field").locator("input").fill("100");
   await page.getByTestId("cash-balance-comments-field").fill(comment);
@@ -34,7 +29,16 @@ const fillOpenCashBalanceModal = async (page: Page, comment: string) => {
 const closeCurrentCashBalance = async (page: Page) => {
   await page.getByTestId("nav-action-cerrar caja").click();
   await expect(page.getByText(/cerrar\s+la caja/i)).toBeVisible();
-  await page.getByTestId("modal-confirm").click();
+  const [closeResponse] = await Promise.all([
+    page.waitForResponse(isCloseCashBalanceResponse),
+    page.getByTestId("modal-confirm").click(),
+  ]);
+
+  expect(closeResponse.status()).toBeLessThan(400);
+
+  const body = await closeResponse.json() as CloseCashBalanceResponse;
+  expect(body.statusOk, JSON.stringify(body)).toBe(true);
+
   await expect(page.getByText(/caja cerrada/i)).toBeVisible({ timeout: 30_000 });
   await expect(page.getByTestId("nav-action-cerrar caja")).toBeHidden({ timeout: 30_000 });
 };
@@ -53,7 +57,6 @@ test.describe("cash balance", () => {
     const timestamp = Date.now();
     const comment = `Comentario E2E caja ${timestamp}`;
 
-    await openCashBalancesList(page);
     await openCashBalanceModal(page);
     await fillOpenCashBalanceModal(page, comment);
     await confirmOpenCashBalance(page, comment);

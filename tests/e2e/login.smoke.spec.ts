@@ -1,13 +1,14 @@
 import { expect, test } from "@playwright/test";
+import { openLoginPage } from "./support/auth";
 
 test.describe("login smoke", () => {
   test("loads the login page", async ({ page }) => {
-    await page.goto("/login");
+    const { emailInput, submitButton } = await openLoginPage(page);
 
     await expect(page.getByRole("img", { name: /callixto.*logo/i })).toBeVisible();
     await expect(page.getByText(/ingresa a tu cuenta/i)).toBeVisible();
-    await expect(page.getByPlaceholder(/correo/i)).toBeVisible();
-    await expect(page.getByRole("button", { name: /ingresar/i })).toBeVisible();
+    await expect(emailInput).toBeVisible();
+    await expect(submitButton).toBeVisible();
   });
 
   test("opens password recovery from login and requests a reset code", async ({ page }) => {
@@ -27,7 +28,7 @@ test.describe("login smoke", () => {
       });
     });
 
-    await page.goto("/login");
+    await openLoginPage(page);
     await page.getByText(/olvidaste/i).click();
 
     await expect(page).toHaveURL(/\/recuperar-contrasena(?:\?|$)/);

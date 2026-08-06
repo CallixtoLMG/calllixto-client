@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { expectSuccessfulApiResponse, isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
 import { E2E_ACCOUNTS } from "./support/env";
@@ -176,21 +176,56 @@ const expectExpenseName = async (page: Page, name: string) => {
   await expect(page.getByTestId("expense-name-field")).toContainText(name, { timeout: 30_000 });
 };
 
+const getPageActionsRail = (page: Page) => page.getByTestId("page-actions-aside");
+
+const expectActionReady = async (action: Locator) => {
+  await expect(action).toBeVisible();
+  await expect(action).toBeEnabled();
+  await action.click({ trial: true });
+};
+
+const expandPageActionsRail = async (page: Page) => {
+  const rail = getPageActionsRail(page);
+  await expect(rail).toBeAttached();
+
+  const railToggle = rail.getByTestId("page-actions-rail-toggle");
+
+  if (await railToggle.getAttribute("aria-expanded") === "false") {
+    await railToggle.click();
+    await expect(railToggle).toHaveAttribute("aria-expanded", "true");
+  }
+
+  return rail;
+};
+
+const getExpenseDetailAction = async (page: Page, actionTestId: string) => {
+  const rail = await expandPageActionsRail(page);
+  const action = rail.getByTestId(actionTestId);
+  await expectActionReady(action);
+  return action;
+};
+
 const voidCurrentExpense = async (page: Page, reason: string) => {
-  await page.getByTestId("nav-action-anular").click();
+  const expenseId = new URL(page.url()).pathname.split("/").pop();
+  const voidAction = await getExpenseDetailAction(page, "nav-action-anular gasto");
+  await voidAction.click();
   await page.getByPlaceholder(/motivo/i).fill(reason);
   const confirmButton = page.getByTestId("modal-void");
   await expect(confirmButton).toBeEnabled();
+  const voidResponsePromise = page.waitForResponse((response) =>
+    isApiResponse(response, "PUT", `expenses/${expenseId}/cancel`));
   await confirmButton.click();
+  await expectSuccessfulApiResponse(await voidResponsePromise, { responseEntity: "expense", expectedId: expenseId });
   await expect(page.getByText(reason)).toBeVisible({ timeout: 30_000 });
-  await expect(page.getByTestId("nav-action-anular")).toBeHidden();
+  await expect(page.getByTestId("nav-action-anular gasto")).toBeHidden();
 };
 
 const voidExpenseIfPresent = async (page: Page, expenseUrl: string, reason: string) => {
   try {
     await page.goto(expenseUrl);
 
-    const voidButton = page.getByTestId("nav-action-anular");
+    const rail = await expandPageActionsRail(page);
+    const voidButton = rail.getByTestId("nav-action-anular gasto");
     if (!(await voidButton.isVisible({ timeout: 5_000 }).catch(() => false))) {
       return;
     }
@@ -278,7 +313,8 @@ test.describe("expenses", () => {
 
       await expectExpenseName(page, originalExpense.name);
       await expect(page.getByPlaceholder("18000")).toHaveValue("1,500");
-      await page.getByTestId("nav-action-clonar").click();
+      const cloneAction = await getExpenseDetailAction(page, "nav-action-clonar gasto");
+      await cloneAction.click();
       await expect(page).toHaveURL(/\/gastos\/crear\?clonar=/, { timeout: 30_000 });
 
       await expect(page.locator('input[name="name"]')).toHaveValue(originalExpense.name);

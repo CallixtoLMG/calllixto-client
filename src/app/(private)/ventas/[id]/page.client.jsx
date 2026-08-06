@@ -55,10 +55,15 @@ const BudgetPageClient = ({ budget }) => {
   const cancelBudget = useCancelBudget();
   const accountId = useMemo(() => getSelectedAccountId(userData), [userData]);
   const publicHash = budget?.publicHash;
-  const canCopyPublicLink = Boolean(accountId && publicHash);
-  const publicLinkTooltip = canCopyPublicLink
-    ? undefined
-    : "Disponible s\u00f3lo para presupuestos nuevos con enlace p\u00fablico";
+  const isPublicBudgetsEnabled = Boolean(budgetSettings?.publicEnabled);
+  const publicLinkTooltip = !isPublicBudgetsEnabled
+    ? "Los presupuestos públicos están deshabilitados en Configuración"
+    : !publicHash
+      ? "Este presupuesto no tiene un enlace público disponible"
+      : !accountId
+        ? "No se pudo identificar la cuenta actual"
+        : undefined;
+  const canCopyPublicLink = Boolean(isPublicBudgetsEnabled && accountId && publicHash);
 
   useEffect(() => {
     resetActions();
@@ -115,7 +120,7 @@ const BudgetPageClient = ({ budget }) => {
   }, [setLabels, budget]);
 
   const handleCopyPublicLink = useCallback(async () => {
-    if (!accountId || !publicHash) {
+    if (!canCopyPublicLink) {
       toast.error(publicLinkTooltip);
       return;
     }
@@ -131,7 +136,7 @@ const BudgetPageClient = ({ budget }) => {
       console.error("Error copiando enlace público:", error);
       toast.error("No se pudo copiar el enlace público.");
     }
-  }, [accountId, publicHash, publicLinkTooltip]);
+  }, [accountId, canCopyPublicLink, publicHash, publicLinkTooltip]);
 
   useEffect(() => {
     if (budget) {
