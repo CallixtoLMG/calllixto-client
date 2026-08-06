@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { expectSuccessfulApiResponse, isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
 import { E2E_ACCOUNTS } from "./support/env";
@@ -217,13 +217,33 @@ const fillBudgetForm = async (
   await page.getByTestId("textarea-comments").fill(`Comentario E2E presupuesto ${timestamp}`);
 };
 
+const getPageActionsRail = (page: Page) => page.getByTestId("page-actions-aside");
+const expectActionReady = async (action: Locator) => {
+  await expect(action).toBeVisible();
+  await expect(action).toBeEnabled();
+  await action.click({ trial: true });
+};
+
 const openCreateBudgetPage = async (page: Page) => {
   await page.goto("/ventas");
   await expect(page).toHaveURL(budgetsListUrl);
-  await expect(page.getByTestId("nav-action-crear")).toBeVisible({ timeout: 30_000 });
-  await page.getByTestId("nav-action-crear").click();
+  await expect(page.getByTestId("table-row")).not.toHaveCount(0, { timeout: 30_000 });
+  const rail = getPageActionsRail(page);
+  await expect(rail).toBeAttached();
+
+  const railToggle = rail.getByTestId("page-actions-rail-toggle");
+
+  if (await railToggle.getAttribute("aria-expanded") === "false") {
+    await railToggle.click();
+    await expect(railToggle).toHaveAttribute("aria-expanded", "true");
+  }
+
+  const createAction = rail.getByTestId("nav-action-crear venta");
+  await expectActionReady(createAction);
+  await createAction.click();
   await expect(page).toHaveURL(/\/ventas\/crear(?:\?|$)/);
   await waitForCurrentRouteChunk(page);
+  await expect(page.getByTestId("budget-customer-search")).toBeVisible({ timeout: 30_000 });
 };
 
 const createDraftBudget = async (page: Page, dependencies: BudgetDependencies, timestamp: number) => {

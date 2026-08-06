@@ -80,7 +80,7 @@ export const HistoryDateRangesControlled = () => {
             <ListItem key={range.id}>
               <List.Content floated="right">
                 <Icon
-                  pointer="true"
+                  $pointer
                   name={ICONS.TRASH}
                   color={COLORS.RED}
                   onClick={() => remove(index)}

@@ -1,6 +1,7 @@
-import { expect, test, type Page, type Response } from "@playwright/test";
+import { expect, test, type Response } from "@playwright/test";
 import { isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
+import { openCashBalanceModal } from "./support/cashBalances";
 import { E2E_ACCOUNTS } from "./support/env";
 
 type CashBalanceResponseBody = {
@@ -38,19 +39,6 @@ const isModuleAuthorizationErrorBody = (body: CashBalanceResponseBody) => {
   return /ModuleNotAuthorizedError|no tiene permiso|m[oó]dulo|autoriz/i.test(text);
 };
 
-const openCashBalancesList = async (page: Page) => {
-  await page.goto("/cajas");
-  await expect(page).toHaveURL(/\/cajas(?:\?|$)/);
-  const openAction = page.getByTestId("nav-action-abrir");
-  await expect(openAction).toBeVisible();
-  await expect(openAction).toBeEnabled();
-};
-
-const openCashBalanceModal = async (page: Page) => {
-  await page.getByTestId("nav-action-abrir").click();
-  await expect(page.getByTestId("open-cash-balance-modal")).toBeVisible();
-};
-
 test.describe("cash balance authorization", () => {
   test(
     "denies cash-balance creation when the module is disabled",
@@ -62,7 +50,6 @@ test.describe("cash balance authorization", () => {
       await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesDisabled });
       await expect(page.getByText(E2E_ACCOUNTS.modulesDisabled)).toBeVisible();
 
-      await openCashBalancesList(page);
       await openCashBalanceModal(page);
       await page.getByTestId("cash-balance-select-all-payment-methods").click();
       await expect(page.locator('input[value="Todos"]')).toBeVisible();

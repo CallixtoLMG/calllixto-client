@@ -54,7 +54,7 @@ const Products = () => {
         id: 1,
         icon: ICONS.ADD,
         color: COLORS.GREEN,
-        onClick: () => { push(PAGES.PRODUCTS.CREATE) },
+        href: PAGES.PRODUCTS.CREATE,
         text: 'Crear producto',
       },
         {
@@ -89,7 +89,7 @@ const Products = () => {
     }
 
     return actions;
-  }, [push, role]);
+  }, [role]);
 
   useKeyboardShortcuts(() => push(PAGES.PRODUCTS.CREATE), SHORTKEYS.ENTER);
 

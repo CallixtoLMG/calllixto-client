@@ -76,8 +76,7 @@ export const SUPPORTED_SETTINGS = {
   CUSTOMER: ['tags'],
   GENERAL: ['paymentMethods'],
   EXPENSE: ['tags', 'categories'],
-  // TODO: incluir publicEnabled cuando backend soporte persistirlo en settings.
-  BUDGET: ['allowConfirmExpired', 'allowCreateWithIncompleteCustomer', 'defaultPageDateRange', 'defaultsCreate', 'defaultsPDF', 'historyDateRanges'],
+  BUDGET: ['allowConfirmExpired', 'allowCreateWithIncompleteCustomer', 'publicEnabled', 'defaultPageDateRange', 'defaultsCreate', 'defaultsPDF', 'historyDateRanges'],
 };
 
 export const SETTINGS_HELP_TEXTS = {
@@ -86,6 +85,7 @@ export const SETTINGS_HELP_TEXTS = {
   BLACKLIST: "Permite bloquear productos especificos para evitar que se utilicen en determinadas operaciones.",
   CATEGORIES: "Permite organizar gastos o productos en grupos para facilitar el analisis y la gestion.",
   BUDGET_GENERAL: "Permite configurar valores generales para consultar y revisar ventas.",
+  BUDGET_PUBLIC_ENABLED: "Habilita la posibilidad de compartir un presupuesto mediante enlaces públicos.",
   BUDGET_ON_CREATE: "Permite definir valores predeterminados que se completan al crear una venta.",
   BUDGET_ON_PRINT: "Permite configurar como se muestra e imprime el PDF de una venta.",
   BUDGET_DEFAULT_PAGE_DATE_RANGE: "Define el rango de fechas que se muestra por defecto al entrar al listado de ventas.",

@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { loginAsE2EUser } from "./support/auth";
+import { openCashBalanceModal } from "./support/cashBalances";
 import { E2E_ACCOUNTS } from "./support/env";
 
 type SettingItem = {
@@ -118,10 +119,7 @@ const assertProductSettingsAvailable = async (page: Page, label: string, blocked
 };
 
 const assertPaymentMethodAvailable = async (page: Page, method: string) => {
-  await page.goto("/cajas");
-  await expect(page).toHaveURL(/\/cajas(?:\?|$)/);
-  await expect(page.getByTestId("nav-action-abrir")).toBeVisible({ timeout: 30_000 });
-  await page.getByTestId("nav-action-abrir").click();
+  await openCashBalanceModal(page);
   const modal = page.getByTestId("open-cash-balance-modal");
   await expect(modal).toBeVisible({ timeout: 30_000 });
   await expectDropdownOptionAvailable(page, "dropdown-paymentMethods", method, modal);

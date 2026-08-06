@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page, type Response } from "@playwright/test";
 import { loginAsE2EUser } from "./support/auth";
 import { E2E_ACCOUNTS } from "./support/env";
 import {
@@ -29,6 +29,10 @@ type ProductFixture = {
   fullId: string;
 };
 
+type ProductMutationResponse = {
+  statusOk?: boolean;
+};
+
 const productsListUrl = /\/productos(?:\?|$)/;
 const suppliersListUrl = /\/proveedores(?:\?|$)/;
 const brandsListUrl = /\/marcas(?:\?|$)/;
@@ -38,6 +42,28 @@ const productLocalId = (seed: number) => (seed % 1_679_616).toString(36).padStar
 
 const fillTestIdInput = async (page: Page, testId: string, value: string) => {
   await page.getByTestId(testId).locator("input").fill(value);
+};
+
+const isProductMutationResponse = (response: Response, method: string, productId: string, suffix = "") => {
+  return response.request().method() === method
+    && new URL(response.url()).pathname.endsWith(`/products/${productId}${suffix}`);
+};
+
+const expectSuccessfulProductMutation = async (response: Response) => {
+  expect(response.status()).toBeLessThan(400);
+
+  const body = await response.json() as ProductMutationResponse;
+  expect(body.statusOk, JSON.stringify(body)).toBe(true);
+};
+
+const expectStatusMessage = async (page: Page, message: RegExp) => {
+  await expect.poll(
+    async () => page.locator('[role="status"]').evaluateAll(
+      (elements, pattern) => elements.some((element) => new RegExp(pattern, "i").test(element.textContent ?? "")),
+      message.source,
+    ),
+    { timeout: 30_000 },
+  ).toBe(true);
 };
 
 const selectSearchOption = async (page: Page, testId: string, text: string) => {
@@ -112,7 +138,7 @@ const createSupplierAndBrandForActions = async (page: Page, timestamp: number, o
       }
 
       if (brand) {
-        await deleteEntityIfPresent(page, brand.url, brandsListUrl);
+        await deleteEntityIfPresent(page, brand.url, brandsListUrl, "nav-action-eliminar marca");
       }
     }
   }
@@ -161,6 +187,35 @@ const openProductDetail = async (page: Page, product: ProductFixture) => {
   await expect(page.getByTestId("product-name-field")).toContainText(product.name, { timeout: 30_000 });
 };
 
+const getPageActionsRail = (page: Page) => page.getByTestId("page-actions-aside");
+
+const expectActionReady = async (action: Locator) => {
+  await expect(action).toBeVisible({ timeout: 30_000 });
+  await expect(action).toBeEnabled({ timeout: 30_000 });
+  await action.click({ trial: true });
+};
+
+const expandPageActionsRail = async (page: Page) => {
+  const rail = getPageActionsRail(page);
+  await expect(rail).toBeAttached({ timeout: 30_000 });
+
+  const toggle = rail.getByTestId("page-actions-rail-toggle");
+
+  if ((await toggle.getAttribute("aria-expanded")) === "false") {
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  }
+
+  return rail;
+};
+
+const getProductDetailAction = async (page: Page, actionTestId: string) => {
+  const rail = await expandPageActionsRail(page);
+  const action = rail.getByTestId(actionTestId);
+  await expectActionReady(action);
+  return action;
+};
+
 const installPrintSpy = async (page: Page) => {
   await page.addInitScript(() => {
     Object.defineProperty(window, "__printCalled", {
@@ -198,6 +253,7 @@ const assertBarcodePrintFlow = async (page: Page, product: ProductFixture) => {
 
 const updateProductAndSave = async (
   page: Page,
+  productId: string,
   update: {
     name?: string;
     cost?: string;
@@ -223,8 +279,13 @@ const updateProductAndSave = async (
     await page.getByPlaceholder("Realmente son muchas pulgadas").fill(update.comments);
   }
 
-  await page.keyboard.press("Enter");
-  await expect(page.getByText(/producto actualizado/i)).toBeVisible({ timeout: 30_000 });
+  const [updateResponse] = await Promise.all([
+    page.waitForResponse((response) => isProductMutationResponse(response, "PUT", productId)),
+    page.keyboard.press("Enter"),
+  ]);
+
+  await expectSuccessfulProductMutation(updateResponse);
+  await expectStatusMessage(page, /producto actualizado/i);
 
   if (update.name) {
     await expect(page.getByTestId("product-name-field")).toContainText(update.name, { timeout: 30_000 });
@@ -252,12 +313,18 @@ const assertProductHistoryContainsChanges = async (page: Page, values: string[])
   await expect(historyList.getByText(/estado:/i).first()).toBeVisible();
 };
 
-const deactivateProduct = async (page: Page, reason: string) => {
-  await page.getByTestId("nav-action-desactivar").click();
+const deactivateProduct = async (page: Page, productId: string, reason: string) => {
+  const deactivateAction = await getProductDetailAction(page, "nav-action-desactivar producto");
+  await deactivateAction.click();
   await page.getByPlaceholder(/motivo/i).fill(reason);
-  await page.getByTestId("modal-confirm").click();
-  await expect(page.getByText(/producto desactivado/i)).toBeVisible({ timeout: 30_000 });
-  await expect(page.getByTestId("nav-action-activar")).toBeVisible({ timeout: 30_000 });
+  const [deactivateResponse] = await Promise.all([
+    page.waitForResponse((response) => isProductMutationResponse(response, "POST", productId, "/set-state")),
+    page.getByTestId("modal-confirm").click(),
+  ]);
+
+  await expectSuccessfulProductMutation(deactivateResponse);
+  await expectStatusMessage(page, /producto desactivado/i);
+  await getProductDetailAction(page, "nav-action-activar producto");
 };
 
 const deleteProductPermanentlyIfPresent = async (page: Page, product: ProductFixture | null) => {
@@ -266,17 +333,17 @@ const deleteProductPermanentlyIfPresent = async (page: Page, product: ProductFix
   try {
     await page.goto(product.url);
 
-    const recoverButton = page.getByTestId("nav-action-recuperar");
-    const deleteButton = page.getByTestId("nav-action-eliminar");
+    const recoverButton = page.getByTestId("nav-action-recuperar producto");
+    const deleteButton = page.getByTestId("nav-action-eliminar producto");
 
     if (!(await recoverButton.isVisible({ timeout: 5_000 }).catch(() => false))) {
       if (!(await deleteButton.isVisible({ timeout: 5_000 }).catch(() => false))) return;
-      await deleteCurrentEntity(page);
+      await deleteCurrentEntity(page, "nav-action-eliminar producto");
       await expect(recoverButton).toBeVisible({ timeout: 30_000 });
     }
 
     if (await deleteButton.isVisible({ timeout: 5_000 }).catch(() => false)) {
-      await deleteCurrentEntity(page);
+      await deleteCurrentEntity(page, "nav-action-eliminar producto");
       await expect(page).toHaveURL(productsListUrl, { timeout: 30_000 });
     }
   } catch {
@@ -297,7 +364,7 @@ const cleanupCreatedData = async (
   }
 
   if (brand) {
-    await deleteEntityIfPresent(page, brand.url, brandsListUrl);
+    await deleteEntityIfPresent(page, brand.url, brandsListUrl, "nav-action-eliminar marca");
   }
 };
 
@@ -357,11 +424,11 @@ test.describe("product actions", () => {
       );
 
       await openProductDetail(page, product);
-      await updateProductAndSave(page, { name: updatedName });
+      await updateProductAndSave(page, product.fullId, { name: updatedName });
       product.name = updatedName;
 
-      await updateProductAndSave(page, { cost: "1200" });
-      await deactivateProduct(page, inactiveReason);
+      await updateProductAndSave(page, product.fullId, { cost: "1200" });
+      await deactivateProduct(page, product.fullId, inactiveReason);
 
       await page.reload();
       await openProductHistoryTab(page);

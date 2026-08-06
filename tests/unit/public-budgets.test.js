@@ -7,18 +7,24 @@ const root = path.join(__dirname, "..", "..");
 const read = (...segments) => fs.readFileSync(path.join(root, ...segments), "utf8");
 const exists = (...segments) => fs.existsSync(path.join(root, ...segments));
 
-test("budget creation enables public hash generation only on create payload", () => {
+test("budget creation does not send obsolete per-budget publicEnabled flag", () => {
   const budgetsApi = read("src", "api", "budgets.js");
 
-  assert.match(budgetsApi, /value:\s*\{\s*\.\.\.budget,\s*publicEnabled:\s*true,\s*\}/s);
-  assert.doesNotMatch(budgetsApi, /useEditBudget[\s\S]*publicEnabled:\s*true/);
+  assert.match(budgetsApi, /value:\s*budget/);
+  assert.doesNotMatch(budgetsApi, /publicEnabled:\s*true|budget\.publicEnabled/);
 });
 
-test("public budget link uses accountId and budget.publicHash without fallback fields", () => {
+test("public budget link uses settings publicEnabled and budget.publicHash without budget.publicEnabled", () => {
   const budgetDetail = read("src", "app", "(private)", "ventas", "[id]", "page.client.jsx");
   const constants = read("src", "common", "constants", "index.js");
 
   assert.match(budgetDetail, /budget\?\.publicHash/);
+  assert.match(budgetDetail, /isPublicBudgetsEnabled\s*=\s*Boolean\(budgetSettings\?\.publicEnabled\)/);
+  assert.match(budgetDetail, /Boolean\(isPublicBudgetsEnabled && accountId && publicHash\)/);
+  assert.match(budgetDetail, /Los presupuestos públicos están deshabilitados en Configuración/);
+  assert.match(budgetDetail, /Este presupuesto no tiene un enlace público disponible/);
+  assert.match(budgetDetail, /if \(!canCopyPublicLink\)/);
+  assert.doesNotMatch(budgetDetail, /budget\?\.publicEnabled|budget\.publicEnabled/);
   assert.doesNotMatch(budgetDetail, /budget\?\.hash|budget\?\.publicId|budget\?\.publicLink/);
   assert.match(budgetDetail, /disabled:\s*!canCopyPublicLink/);
   assert.match(budgetDetail, /PAGES\.PUBLIC\.BUDGETS\.SHOW\(accountId,\s*publicHash\)/);
@@ -44,4 +50,14 @@ test("public budget page fetches real data, keeps privacy flag, and avoids stora
 
 test("localStorage public budget mock file was removed", () => {
   assert.equal(exists("src", "components", "budgets", "publicBudget.mock.js"), false);
+});
+
+test("cloned budgets do not copy public hash or obsolete publicEnabled", () => {
+  const budgetConstants = read("src", "components", "budgets", "budgets.constants.js");
+  const cloneBlock = budgetConstants.slice(
+    budgetConstants.indexOf("export const createClonedBudget"),
+    budgetConstants.indexOf("export const getHourKey")
+  );
+
+  assert.doesNotMatch(cloneBlock, /publicHash|publicEnabled|\.\.\.budget/);
 });

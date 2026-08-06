@@ -6,7 +6,7 @@ const test = require("node:test");
 const root = path.join(__dirname, "..", "..");
 const read = (...segments) => fs.readFileSync(path.join(root, ...segments), "utf8");
 
-test("settings budget general exposes publicEnabled checkbox locally without sending it", () => {
+test("settings budget general exposes and persists publicEnabled checkbox", () => {
   const generalSettings = read("src", "components", "settings", "Entities", "Budgets", "General", "index.jsx");
   const settingsConstants = read("src", "components", "settings", "settings.constants.js");
 
@@ -14,10 +14,19 @@ test("settings budget general exposes publicEnabled checkbox locally without sen
   assert.match(generalSettings, /defaultValue=\{false\}/);
   assert.match(generalSettings, /checked=\{!!value\}/);
   assert.match(generalSettings, /Presupuesto público/);
-  assert.match(generalSettings, /label="Habilitar"/);
+  assert.match(generalSettings, /helpText=\{SETTINGS_HELP_TEXTS\.BUDGET_PUBLIC_ENABLED\}/);
+  assert.match(generalSettings, /label=\{value \? "Habilitado" : "Deshabilitado"\}/);
   assert.match(generalSettings, /font-weight:\s*normal/);
-  assert.match(settingsConstants, /TODO: incluir publicEnabled cuando backend soporte persistirlo en settings/);
-  assert.doesNotMatch(settingsConstants, /BUDGET:\s*\[[^\]]*publicEnabled/);
+  assert.match(settingsConstants, /BUDGET:\s*\[[^\]]*publicEnabled/);
+  assert.match(settingsConstants, /BUDGET_PUBLIC_ENABLED:\s*"Habilita la posibilidad de compartir un presupuesto mediante enlaces públicos\."/);
+  assert.doesNotMatch(settingsConstants, /TODO: incluir publicEnabled/);
+});
+
+test("settings budget history date ranges delete icon shows pointer cursor", () => {
+  const historyRanges = read("src", "components", "settings", "Entities", "Budgets", "General", "HistoryDateRangesControlled.jsx");
+
+  assert.match(historyRanges, /<Icon[\s\S]*\$pointer[\s\S]*name=\{ICONS\.TRASH\}[\s\S]*onClick=\{\(\) => remove\(index\)\}/);
+  assert.doesNotMatch(historyRanges, /pointer="true"/);
 });
 
 test("sidebar actions use specific labels instead of redundant generic tooltips", () => {

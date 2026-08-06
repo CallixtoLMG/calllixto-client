@@ -4,9 +4,8 @@ import dotenv from "dotenv";
 dotenv.config({ path: ".env.local", quiet: true });
 dotenv.config({ path: ".env.e2e", override: true, quiet: true });
 
-const e2eHost = "127.0.0.1";
-const e2ePort = process.env.E2E_STABLE_PORT || "3100";
-const baseURL = `http://${e2eHost}:${e2ePort}`;
+const devBaseURL = process.env.E2E_DEV_BASE_URL || process.env.E2E_BASE_URL || "http://127.0.0.1:3000";
+const devURL = new URL(devBaseURL);
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -16,7 +15,7 @@ export default defineConfig({
   workers: 1,
   reporter: [["html"], ["list"]],
   use: {
-    baseURL,
+    baseURL: devBaseURL,
     trace: "retain-on-failure",
   },
   projects: [
@@ -26,8 +25,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `npm run start:e2e -- --hostname ${e2eHost} --port ${e2ePort}`,
-    url: `${baseURL}/login`,
+    command: `npm run dev -- --hostname ${devURL.hostname} --port ${devURL.port || "3000"}`,
+    url: `${devBaseURL}/login`,
     reuseExistingServer: false,
     timeout: 120 * 1000,
   },

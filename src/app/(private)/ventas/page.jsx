@@ -9,13 +9,12 @@ import { BUDGET_STATES, DEFAULT_DATE_RANGE_VALUE } from "@/components/budgets/bu
 import { useBreadcrumContext } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 
 const Budgets = () => {
   const { data: usersData, isLoading: isLoadingUsers } = useListUsers();
   const { setLabels } = useBreadcrumContext();
   const { push } = useRouter();
-  const pushRef = useRef(push);
   const { data: budgetsSettings, refetch: refetchSettings, isFetching: isFetchingSettings, } = useGetSetting(ENTITIES.BUDGET);
   const rangeValue = Number(budgetsSettings?.defaultPageDateRange?.value) || DEFAULT_DATE_RANGE_VALUE;
   const { data: budgetsData, isLoading: isLoadingBudgets, isRefetching, refetch } = useListBudgets({
@@ -66,36 +65,24 @@ const Budgets = () => {
     text: `${user.firstName} ${user.lastName}`,
   })), [users]);
 
-  useEffect(() => {
-    pushRef.current = push;
-  }, [push]);
-
-  const handleCreate = useCallback(() => {
-    pushRef.current(PAGES.BUDGETS.CREATE);
-  }, []);
-
-  const handleHistory = useCallback(() => {
-    pushRef.current(PAGES.BUDGETS_HISTORY.BASE);
-  }, []);
-
   const sideActions = useMemo(() => (
     [
       {
         id: 1,
         icon: ICONS.ADD,
         color: COLORS.GREEN,
-        onClick: handleCreate,
+        href: PAGES.BUDGETS.CREATE,
         text: 'Crear venta',
       },
       {
         id: 2,
         icon: ICONS.HISTORY,
         color: COLORS.BLUE,
-        onClick: handleHistory,
+        href: PAGES.BUDGETS_HISTORY.BASE,
         text: 'Historial de ventas',
       },
     ]
-  ), [handleCreate, handleHistory]);
+  ), []);
 
   useKeyboardShortcuts(() => push(PAGES.BUDGETS.CREATE), SHORTKEYS.ENTER);
 

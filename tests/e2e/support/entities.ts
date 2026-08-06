@@ -21,16 +21,8 @@ export const fillContactField = async (page: Page, testId: string, value: string
 };
 
 export const waitForCurrentRouteChunk = async (page: Page) => {
-  const route = new URL(page.url()).pathname.replace(/^\/|\/$/g, "");
-
-  await page.waitForFunction(
-    (routePath) =>
-      performance.getEntriesByType("resource").some((entry) =>
-        entry.name.includes(`/_next/static/chunks/app/(private)/${routePath}/page.js`) &&
-        entry.responseEnd > 0,
-      ),
-    route,
-  );
+  await page.waitForLoadState("domcontentloaded");
+  await page.waitForFunction(() => document.readyState !== "loading");
 };
 
 const openContactSection = async (page: Page, section: string, firstFieldTestId: string) => {
@@ -39,6 +31,8 @@ const openContactSection = async (page: Page, section: string, firstFieldTestId:
 
   await waitForCurrentRouteChunk(page);
   await expect(trigger).toBeVisible({ timeout: 30_000 });
+  await expect(trigger).toBeEnabled();
+  await trigger.click({ trial: true });
   await trigger.click();
   await expect(firstField).toBeVisible({ timeout: 30_000 });
 };
