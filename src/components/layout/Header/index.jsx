@@ -19,7 +19,9 @@ import {
   AccountBadge,
   Brand,
   HeaderBar,
+  HeaderDesktopOnly,
   HeaderLeft,
+  HeaderMobileOnly,
   HeaderRight,
   Overlay,
   RightActions,
@@ -169,12 +171,25 @@ const Header = () => {
     <>
       <HeaderBar>
         <HeaderLeft>
-          <IconedButton
-            onClick={() => setIsSidebarOpen(true)}
-            icon={ICONS.LIST}
-            color={COLORS.BLUE}
-            text="Menú"
-          />
+          <HeaderDesktopOnly>
+            <IconedButton
+              onClick={() => setIsSidebarOpen(true)}
+              icon={ICONS.LIST}
+              color={COLORS.BLUE}
+              text="Menú"
+            />
+          </HeaderDesktopOnly>
+          <HeaderMobileOnly>
+            <IconedButton
+              onClick={() => setIsSidebarOpen(true)}
+              icon={ICONS.LIST}
+              color={COLORS.BLUE}
+              text="Menu"
+              iconOnly
+              popupContent={"Men\u00fa"}
+              popupPosition={POPUP_POSITIONS.BOTTOM_LEFT}
+            />
+          </HeaderMobileOnly>
           <Brand>CallixtoGLM</Brand>
         </HeaderLeft>
         <HeaderRight>
@@ -188,13 +203,25 @@ const Header = () => {
           )}
           <UserMenu
             trigger={
-              <IconedButton
-                icon={ICONS.USER}
-                color={COLORS.BLUE}
-                text={userData.name}
-                width={CONTENT_SIZES.FIT}
-
-              />
+              <>
+                <HeaderDesktopOnly>
+                  <IconedButton
+                    icon={ICONS.USER}
+                    color={COLORS.BLUE}
+                    text={userData.name}
+                    width={CONTENT_SIZES.FIT}
+                  />
+                </HeaderDesktopOnly>
+                <HeaderMobileOnly>
+                  <IconedButton
+                    icon={ICONS.USER}
+                    color={COLORS.BLUE}
+                    text={userData.name}
+                    iconOnly
+                    popupPosition={POPUP_POSITIONS.BOTTOM_RIGHT}
+                  />
+                </HeaderMobileOnly>
+              </>
             }
             onLogout={handleLogout}
             onAccountChange={handleAccountChange}

@@ -1,5 +1,8 @@
 import styled from "styled-components";
 
+const MOBILE_BREAKPOINT = 767;
+const MOBILE_HORIZONTAL_PADDING = 16;
+
 export const HeaderBar = styled.header`
   position: fixed;
   top: 0;
@@ -13,18 +16,37 @@ export const HeaderBar = styled.header`
   justify-content: space-between;
   padding: 0 50px;
   z-index: 800;
+  min-width: 0;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    padding-left: ${MOBILE_HORIZONTAL_PADDING}px;
+    padding-right: ${MOBILE_HORIZONTAL_PADDING}px;
+  }
 `;
 
 export const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
   gap: 14px;
+  min-width: 0;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    flex: 1 1 auto;
+    gap: 8px;
+  }
 `;
 
 export const HeaderRight = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    flex: 0 1 auto;
+    gap: 8px;
+    justify-content: flex-end;
+  }
 `;
 
 export const HamburgerButton = styled.button`
@@ -46,12 +68,23 @@ export const Brand = styled.div`
   font-size: 18px;
   font-weight: 700;
   color: #1f2937;
+  min-width: 0;
+  white-space: nowrap;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    font-size: 16px;
+  }
 `;
 
 export const RightActions = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: 0 0 auto;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    gap: 6px;
+  }
 `;
 
 export const AccountBadge = styled.div`
@@ -63,6 +96,15 @@ export const AccountBadge = styled.div`
   display: flex;
   align-items: center;
   font-size: 13.5px;
+  min-width: 0;
+  white-space: nowrap;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    max-width: 72px;
+    padding: 0 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `;
 
 export const UserButton = styled.button`
@@ -93,5 +135,21 @@ export const Overlay = styled.div`
   inset: 0;
   background: rgba(15, 23, 42, 0.28);
   z-index: 790;
+`;
+
+export const HeaderDesktopOnly = styled.div`
+  display: contents;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    display: none;
+  }
+`;
+
+export const HeaderMobileOnly = styled.div`
+  display: none;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    display: contents;
+  }
 `;
 

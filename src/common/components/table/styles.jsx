@@ -2,6 +2,8 @@ import { Flex } from '@/common/components/custom';
 import { Pagination as SPagination, Segment as SSegment, Table as STable } from "semantic-ui-react";
 import styled from "styled-components";
 
+const MOBILE_BREAKPOINT = 767;
+
 const Cell = styled(STable.Cell)`
   height: 37px!important;
   padding: 2px 7px!important;
@@ -39,8 +41,29 @@ const PaginationContainer = styled(Flex)`
 
 const FiltersContainer = styled(Flex)`
   column-gap: 10px;
+  row-gap: 10px;
   align-items: center;
   flex-direction: row!important;
+  min-width: 0;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: wrap;
+    align-items: stretch;
+
+    > .field {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      flex: 1 1 100% !important;
+    }
+
+    > button {
+      flex: 0 0 auto;
+      align-self: flex-start !important;
+    }
+  }
 `;
 
 const Segment = styled(SSegment)`
@@ -129,6 +152,12 @@ const LinkContent = styled.div`
 
 const MainContainer = styled(Flex)`
   column-gap: 10px;
+  min-width: 0;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    width: 100%;
+    max-width: 100%;
+  }
 `;
 
 const HeaderSegment = styled(SSegment)`
@@ -137,9 +166,38 @@ const HeaderSegment = styled(SSegment)`
   padding: 5px 10px !important;
   margin: 0 !important;
   column-gap: 10px;
+  row-gap: 10px;
   align-content: center;
   justify-content: space-between;
+  min-width: 0;
+  max-width: 100%;
+  overflow: visible;
+  box-sizing: border-box;
 `;
 
-export { ActionsContainer, Cell, Container, FiltersContainer, HeaderCell, HeaderSegment, InnerActionsContainer, LinkCell, LinkContent, LinkOverlay, MainContainer, Pagination, PaginationContainer, Segment, Table, TableHeader, TableRow };
+const FiltersActions = styled(Flex)`
+  min-width: 0;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: 8px;
+
+    .ui.dropdown.button {
+      max-width: 100%;
+    }
+  }
+`;
+
+const ResponsiveHeaderSegment = styled(HeaderSegment)`
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+`;
+
+export { ActionsContainer, Cell, Container, FiltersActions, FiltersContainer, HeaderCell, ResponsiveHeaderSegment as HeaderSegment, InnerActionsContainer, LinkCell, LinkContent, LinkOverlay, MainContainer, Pagination, PaginationContainer, Segment, Table, TableHeader, TableRow };
 

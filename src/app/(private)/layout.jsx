@@ -17,6 +17,8 @@ const BREADCRUMB_VERTICAL_PADDING = 20;
 const BREADCRUMB_BORDER_HEIGHT = 1;
 const PAGE_WORKSPACE_TOP_GAP = 10;
 const NAVIGATION_HORIZONTAL_PADDING = 50;
+const MOBILE_BREAKPOINT = 767;
+const MOBILE_NAVIGATION_HORIZONTAL_PADDING = 16;
 const PAGE_ACTIONS_WIDTH = 220;
 const PAGE_ACTIONS_COLLAPSED_WIDTH = 48;
 const BREADCRUMB_HEIGHT = BREADCRUMB_CONTROL_HEIGHT + BREADCRUMB_VERTICAL_PADDING + BREADCRUMB_BORDER_HEIGHT;
@@ -35,12 +37,20 @@ const NavigationContainer = styled.div`
   width: 100%;
   border-bottom: 1px solid #ddd;
   z-index: 3;
+  min-width: 0;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    padding-left: ${MOBILE_NAVIGATION_HORIZONTAL_PADDING}px;
+    padding-right: ${MOBILE_NAVIGATION_HORIZONTAL_PADDING}px;
+  }
 `;
 
 const BreadcrumbContainer = styled.div`
   display: flex;
   align-items: center;
   column-gap: 10px;
+  min-width: 0;
+  max-width: 100%;
 `;
 
 const PageWorkspace = styled.div`
@@ -50,11 +60,19 @@ const PageWorkspace = styled.div`
   align-items: start;
   padding: ${PILOT_STICKY_TOP}px ${({ $hasActions }) => ($hasActions ? "0" : `${NAVIGATION_HORIZONTAL_PADDING}px`)} 20px ${NAVIGATION_HORIZONTAL_PADDING}px;
   width: 100%;
+  min-width: 0;
   min-height: 80vh;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 0;
+    padding: ${PILOT_STICKY_TOP}px ${MOBILE_NAVIGATION_HORIZONTAL_PADDING}px 20px;
+  }
 `;
 
 const PageContent = styled.div`
   min-width: 0;
+  width: 100%;
 `;
 
 const PageActionsRail = styled.aside`
@@ -63,6 +81,13 @@ const PageActionsRail = styled.aside`
   width: ${PAGE_ACTIONS_COLLAPSED_WIDTH}px;
   justify-self: end;
   z-index: 4;
+  min-width: 0;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    position: fixed;
+    right: ${MOBILE_NAVIGATION_HORIZONTAL_PADDING}px;
+    width: ${PAGE_ACTIONS_COLLAPSED_WIDTH}px;
+  }
 `;
 
 const PageActionsSurface = styled.div`

@@ -14,7 +14,7 @@ import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Dropdown, Icon, Popup } from 'semantic-ui-react';
 import { IconedButton } from '../buttons';
-import { FiltersContainer, HeaderSegment, MainContainer } from './styles';
+import { FiltersActions, FiltersContainer, HeaderSegment, MainContainer } from './styles';
 
 const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, hydrated, showRefetchAction = true }) => {
   const ENTITY_MAPPING = {
@@ -74,7 +74,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
           />
           {children}
         </FiltersContainer>
-        <Flex $columnGap="10px" $marginBottom="2px" $alignSelf="flex-end">
+        <FiltersActions $columnGap="10px" $marginBottom="2px" $alignSelf="flex-end">
           {hydrated && appliedCount > 0 && (
             <Popup
               content="Filtros activos"
@@ -103,7 +103,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
               </Dropdown.Menu>
             </Dropdown>
           }
-        </Flex>
+        </FiltersActions>
       </HeaderSegment>
       <ModalAction
         title={`¿Quieres realizar una actualización completa de ${text} ?  `}

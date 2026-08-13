@@ -1,9 +1,14 @@
 import { CONTENT_SIZES } from "@/common/constants";
 import styled, { css } from "styled-components";
 
+const MOBILE_BREAKPOINT = 767;
+const MOBILE_HORIZONTAL_PADDING = 16;
+const HEADER_HEIGHT = 64;
+
 export const MenuContainer = styled.div`
   position: relative;
   display: inline-flex;
+  min-width: 0;
 `;
 
 export const MenuCard = styled.div`
@@ -29,6 +34,16 @@ export const MenuCard = styled.div`
     opacity 0.18s ease,
     transform 0.18s ease,
     visibility 0.18s ease;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    position: fixed;
+    top: ${HEADER_HEIGHT + 10}px;
+    right: ${MOBILE_HORIZONTAL_PADDING}px;
+    left: ${MOBILE_HORIZONTAL_PADDING}px;
+    width: auto;
+    max-width: calc(100vw - ${MOBILE_HORIZONTAL_PADDING * 2}px);
+    max-height: calc(100vh - ${HEADER_HEIGHT + 26}px);
+  }
 `;
 
 export const MenuHeader = styled.div`
@@ -43,6 +58,8 @@ export const UserName = styled.div`
   font-size: 18px;
   font-weight: 700;
   color: #1f2937;
+  min-width: 0;
+  overflow-wrap: anywhere;
 `;
 
 export const UserMeta = styled.div`
@@ -50,11 +67,13 @@ export const UserMeta = styled.div`
   color: #6b7280;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 `;
 
 export const SelectedAccountText = styled.span`
   color: #2185d0;
   font-weight: 600;
+  overflow-wrap: anywhere;
 `;
 
 export const MenuBody = styled.div`
