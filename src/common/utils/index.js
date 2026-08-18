@@ -12,6 +12,7 @@ export {
   PLURAL_LABELS,
   pluralize,
 } from "./pluralization";
+export { showWarningToast } from "./toasts";
 
 export const getFormatedPrice = (number) => {
   const safeNumber = Number(number) ?? 0;
