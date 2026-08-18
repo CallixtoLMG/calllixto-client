@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Form, Popup } from "semantic-ui-react";
 import { IconedButton } from "../../buttons";
-import { Box, FieldsContainer, Flex, FormField, Input } from '../../custom';
+import { Box, Flex, FormField, Input } from '../../custom';
 import { Table } from '../../table';
 import { clearErrorField, updateFieldToAdd } from "./contact.helpers";
+import { ContactPopupFields } from "./styles";
 
 export const ContactSectionControlled = ({
   addButtonText,
@@ -101,7 +102,7 @@ export const ContactSectionControlled = ({
         position={POPUP_POSITIONS.TOP_LEFT}
       >
         <Form>
-          <FieldsContainer width={popupWidth} $alignItems="center" $rowGap="5px">
+          <ContactPopupFields width={popupWidth} $alignItems="center" $rowGap="5px">
             {fieldsConfig.map((fieldConfig, index) => {
               const errorKey = fieldConfig.errorKey || fieldConfig.name;
               const errorContent = error?.[section]?.[errorKey];
@@ -147,7 +148,7 @@ export const ContactSectionControlled = ({
               height="38px"
               dataTestId={`contact-confirm-${section}`}
             />
-          </FieldsContainer>
+          </ContactPopupFields>
         </Form>
       </Popup>
       <Box $marginTop="8px" />

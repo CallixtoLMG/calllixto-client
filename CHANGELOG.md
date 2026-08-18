@@ -3,6 +3,24 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-08-18
+
+### Changed
+
+- Responsive layout: Added the first mobile baseline for the private shell, reducing structural mobile padding, allowing the workspace to use the available viewport width, and keeping the action rail from permanently reserving content width on small screens.
+- Tables: Updated shared list controls for mobile by making filters, table overflow, and pagination adapt within the content width while preserving desktop behavior.
+- Forms: Improved shared form controls for mobile, including responsive search results and a one-column mobile policy for `FieldsContainer` / `FormField`.
+- Modals: Improved responsive behavior for common modal actions, multi-delete confirmations, open-cash-balance, add-payment, budget confirmation, and batch-import flows.
+- Contact popups: Added mobile-safe popup sizing so contact phone, email, and address editors stay within the viewport.
+- Settings: Improved responsive behavior in configuration tabs and setting sections, including payment methods, blocked products, categories, and sales-history date ranges.
+
+### Fixed
+
+- Settings: Fixed narrow mobile layouts caused by local percentage widths in configuration sections.
+- Forms: Fixed compressed mobile fields caused by `flex="1"` rows staying horizontal below the mobile breakpoint.
+- Tables: Prevented wide tables from expanding the document by containing horizontal scroll inside the table wrapper.
+- Pagination: Prevented pagination controls from overflowing the content width on small screens.
+
 ## 2026-08-04
 
 ### Changed
