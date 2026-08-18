@@ -208,7 +208,7 @@ const CustomTable = ({
         />
       )}
       <Loader $marginTop active={isLoading} $greyColor>
-        <Table sortable celled compact striped={!basic} color={color} definition={isSelectable}>
+        <Table sortable celled compact striped={!basic} color={color} definition={isSelectable} unstackable>
           <TableHeader fullWidth>
             <TableRow>
               {isSelectable && (

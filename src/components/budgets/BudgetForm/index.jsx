@@ -14,7 +14,7 @@ import {
 import { SearchResultContent, SearchResultDescription, SearchResultTitle } from "@/common/components/form/Search/styles";
 import { Table, Total } from "@/common/components/table";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { POPUP_POSITIONS, CONTENT_SIZES, COLORS, DATE_FORMATS, ERROR_MESSAGES, FIELD_LABELS, ICONS, RULES, SHORTKEYS, SIZES, TOOLTIPS } from "@/common/constants";
+import { COLORS, CONTENT_SIZES, DATE_FORMATS, ERROR_MESSAGES, FIELD_LABELS, ICONS, POPUP_POSITIONS, RULES, SHORTKEYS, SIZES, TOOLTIPS } from "@/common/constants";
 import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay, removeNullish } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
@@ -478,7 +478,7 @@ const BudgetForm = ({
         onConfirm={handleConfirmUpdate}
       />
       <Form onSubmit={handleSubmit(handleConfirm)}>
-        <FieldsContainer $justifyContent="space-between">
+        <FieldsContainer $rowGap="15px" $justifyContent="space-between">
           <FormField $width="300px">
             <ButtonGroup size={SIZES.SMALL}>
               <IconedButton

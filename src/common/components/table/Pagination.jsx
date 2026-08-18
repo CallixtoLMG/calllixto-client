@@ -6,6 +6,24 @@ import ElementCounter from "./ElementCounter";
 import { PaginationContainer } from "./styles";
 
 const PAGE_SIZE_DROPDOWN_WIDTH = "92px";
+const MOBILE_BREAKPOINT = 767;
+
+const NavigationPagination = styled(SPagination)`
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    &&& {
+      display: flex;
+      justify-content: center;
+      margin: 0 !important;
+      max-width: 100%;
+    }
+
+    &&& .item {
+      min-width: 34px;
+      padding-left: 0.75em !important;
+      padding-right: 0.75em !important;
+    }
+  }
+`;
 
 const PageSizeDropdown = styled(Dropdown)`
   &&& {
@@ -52,7 +70,7 @@ const Pagination = ({
         pageSize={pageSize}
         totalItems={totalItems}
       />
-      <SPagination
+      <NavigationPagination
         activePage={activePage}
         onPageChange={onPageChange}
         siblingRange={2}

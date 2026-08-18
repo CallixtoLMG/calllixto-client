@@ -8,6 +8,7 @@ import { BUTTON_TEXTS, COLORS, ENTITIES, FIELD_LABELS, ICONS, RULES, SIZES } fro
 import { handleEnterKeyDown, mapToDropdownOptions } from "@/common/utils";
 import { useEffect, useMemo, useState } from "react";
 import { Modal, Transition } from "semantic-ui-react";
+import { ModalContent } from "./styles";
 
 const EMPTY_PAYMENT = () => ({
   method: '',
@@ -82,7 +83,7 @@ export const ModalAddPayment = ({
     <Transition visible={open} animation='scale' duration={500}>
       <Modal open={open} onClose={handleClose} >
         <Modal.Header>Agregar pago</Modal.Header>
-        <Modal.Content>
+        <ModalContent>
           <Form>
             <FieldsContainer $justifyContent="space-between" $rowGap="15px" $columnGap="15px">
               <FormField
@@ -163,7 +164,7 @@ export const ModalAddPayment = ({
             </FieldsContainer>
             <TotalList readOnly items={totalListItem} />
           </Form>
-        </Modal.Content>
+        </ModalContent>
         <Modal.Actions>
           <ButtonsContainer>
             <IconedButton

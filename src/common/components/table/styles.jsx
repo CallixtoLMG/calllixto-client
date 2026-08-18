@@ -17,10 +17,17 @@ const Cell = styled(STable.Cell)`
 const Container = styled(Flex)`
   flex-direction: column;
   width: 100% !important;
+  max-width: 100%;
+  min-width: 0;
   max-height: ${({ $tableHeight = 'none' }) => `${$tableHeight}!important`};
   overflow-y: ${({ $tableHeight }) => $tableHeight && "auto"} !important;
-  overflow-x: ${({ $tableHeight }) => $tableHeight && "auto"} !important;
+  overflow-x: auto !important;
   padding: 2px 0;
+
+  @media print {
+    max-height: none !important;
+    overflow: visible !important;
+  }
 `;
 
 const Pagination = styled(SPagination)`
@@ -30,13 +37,28 @@ const Pagination = styled(SPagination)`
 const PaginationContainer = styled(Flex)`
   width:100%;
   align-items: center;
-  position: relative; 
+  position: sticky;
+  left: 0;
+  z-index: 3;
   align-self: center;
   max-height: ${({ height = 'none' }) => `${height}!important`};
   flex-direction: row;
   justify-content: ${({ $justifyContent = "flex-end" }) => $justifyContent && $justifyContent}!important;
   column-gap: 10px;
   justify-content: center;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    max-width: 100%;
+    flex-direction: column;
+    row-gap: 8px;
+    align-items: center;
+    justify-content: center !important;
+
+    > * {
+      flex: 0 0 auto;
+      max-width: 100%;
+    }
+  }
 `;
 
 const FiltersContainer = styled(Flex)`
@@ -73,10 +95,19 @@ const Segment = styled(SSegment)`
 `;
 
 const Table = styled(STable)`
+  width: max-content!important;
+  min-width: 100%!important;
   max-height: ${({ $tableHeight = "none" }) => `${$tableHeight}!important`};
   overflow-y: auto!important;
-  overflow-x: hidden!important;
+  overflow-x: visible!important;
   border: 1px solid black;
+
+  @media print {
+    width: 100%!important;
+    min-width: 0!important;
+    max-height: none!important;
+    overflow: visible!important;
+  }
 `;
 
 const TableHeader = styled(STable.Header)`
@@ -117,6 +148,11 @@ const InnerActionsContainer = styled(Flex)`
   transition: opacity 0.1s ease-in-out!important;
   opacity: ${({ $header, $open }) => $header || $open ? "1" : "0"};
   visibility: ${({ $header, $open }) => $header || $open ? "visible" : "hidden"};
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    opacity: 1;
+    visibility: visible;
+  }
 `;
 
 const TableRow = styled(STable.Row)`

@@ -9,6 +9,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { Form, Modal, Transition } from "semantic-ui-react";
 import { GroupedButtonsControlled } from "../../../common/components/form";
 import { PICK_UP_IN_STORE } from "../budgets.constants";
+import { HeaderContent, ModalContent } from "./styles";
 
 const ModalConfirmation = ({
   isModalOpen,
@@ -54,7 +55,7 @@ const ModalConfirmation = ({
         <Transition visible={isModalOpen} animation='scale' duration={500}>
           <Modal size={SIZES.LARGE} open={isModalOpen} onClose={() => onClose(false)}>
             <Modal.Header>
-              <Flex $alignItems="center" $justifyContent="space-between">
+              <HeaderContent $alignItems="center" $justifyContent="space-between">
                 Desea confirmar el presupuesto?
                 <GroupedButtonsControlled
                   color={COLORS.BLUE}
@@ -65,9 +66,9 @@ const ModalConfirmation = ({
                     { text: 'Enviar a dirección', icon: ICONS.TRUCK, value: false },
                   ]}
                 />
-              </Flex>
+              </HeaderContent>
             </Modal.Header>
-            <Modal.Content>
+            <ModalContent>
               <FlexColumn $rowGap="15px">
                 <FieldsContainer>
                   <TextField
@@ -89,7 +90,7 @@ const ModalConfirmation = ({
                   update
                 />
               </FlexColumn>
-            </Modal.Content>
+            </ModalContent>
             <Modal.Actions>
               <ButtonsContainer width="100%">
                 <IconedButton
