@@ -21,6 +21,7 @@ import {
   HeaderBar,
   HeaderLeft,
   HeaderRight,
+  MenuSlot,
   Overlay,
   RightActions,
   UserButton
@@ -156,7 +157,8 @@ const Header = () => {
     return (
       <HeaderBar>
         <HeaderLeft>
-          <Brand>CallixtoGLM</Brand>
+          <MenuSlot aria-hidden="true" />
+          <Brand src="/accounts/callixto.png" alt="CallixtoGLM" />
         </HeaderLeft>
         <HeaderRight>
           <UserButton onClick={handleLogout}>Ingresar</UserButton>
@@ -169,13 +171,15 @@ const Header = () => {
     <>
       <HeaderBar>
         <HeaderLeft>
-          <IconedButton
-            onClick={() => setIsSidebarOpen(true)}
-            icon={ICONS.LIST}
-            color={COLORS.BLUE}
-            text="Menú"
-          />
-          <Brand>CallixtoGLM</Brand>
+          <MenuSlot>
+            <IconedButton
+              onClick={() => setIsSidebarOpen(true)}
+              icon={ICONS.LIST}
+              color={COLORS.BLUE}
+              text="Menú"
+            />
+          </MenuSlot>
+          <Brand src="/accounts/callixto.png" alt="CallixtoGLM" />
         </HeaderLeft>
         <HeaderRight>
           <RightActions>

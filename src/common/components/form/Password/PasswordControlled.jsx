@@ -9,6 +9,8 @@ import PasswordField from "./PasswordField";
 export const PasswordControlled = forwardRef(({
   name,
   showPasswordRequirements,
+  additionalPasswordRequirements,
+  passwordRequirementsContext,
   rules,
   ...inputParams
 }, ref) => {
@@ -33,6 +35,8 @@ export const PasswordControlled = forwardRef(({
             <PasswordRequirements
               requirements={PASSWORD_REQUIREMENTS}
               password={value}
+              additionalRequirements={additionalPasswordRequirements}
+              context={passwordRequirementsContext}
             />
           )}
         </FlexColumn>

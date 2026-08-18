@@ -1,16 +1,16 @@
 "use client";
 import { getUserData } from "@/api/userData";
-import { ICONS, PAGES, RULES, SIZES } from "@/common/constants";
+import { Button } from "@/common/components/custom";
+import { COLORS, ICONS, PAGES, RULES, SIZES } from "@/common/constants";
+import AuthLayout, { AuthSecondaryLink } from "@/components/auth/AuthLayout";
 import { Loader } from "@/components/layout";
 import { useMutation } from "@tanstack/react-query";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Form } from "../../common/components/custom";
 import { PasswordControlled, TextControlled } from "../../common/components/form";
-import { ModButton, ModGrid, ModGridColumn, ModHeader, PasswordLink, Text } from "./styles";
 
 const LoginForm = ({ onSubmit }) => {
   const { push } = useRouter();
@@ -57,50 +57,44 @@ const LoginForm = ({ onSubmit }) => {
 
   return (
     <Loader active={isPending || isRedirecting}>
-      <ModGrid>
-        <ModGridColumn>
-          <ModHeader as="h3">
-            <div>
-              <Image
-                src="/Callixto.png"
-                alt="Callixto.png Logo"
-                width={300}
-                height={100}
-                priority
-              />
-              <Text>Ingresa a tu cuenta</Text>
-            </div>
-          </ModHeader>
-          <FormProvider {...methods}>
-            <Form onSubmit={handleSubmit(login)} size={SIZES.LARGE}>
-              <TextControlled
-                name="username"
-                rules={{
-                  ...RULES.REQUIRED,
-                  pattern: {
-                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: "El correo electrónico no es válido",
-                  },
-                }}
-                placeholder="Correo electrónico"
-                icon={ICONS.USER}
-                iconPosition="left"
-              />
-              <PasswordControlled
-                name="password"
-                rules={RULES.REQUIRED}
-                placeholder="Contraseña"
-              />
-              <ModButton $fluid size={SIZES.LARGE} disabled={!isMounted || isPending || isRedirecting}>
-                Ingresar
-              </ModButton>
-              <PasswordLink onClick={() => push(PAGES.RESTORE_PASSWORD.BASE)}>
-                ¿Olvidaste tu contraseña?
-              </PasswordLink>
-            </Form>
-          </FormProvider>
-        </ModGridColumn>
-      </ModGrid>
+      <AuthLayout title="Iniciar sesión">
+        <FormProvider {...methods}>
+          <Form onSubmit={handleSubmit(login)} size={SIZES.LARGE}>
+            <TextControlled
+              name="username"
+              rules={{
+                ...RULES.REQUIRED,
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "El correo electrónico no es válido",
+                },
+              }}
+              placeholder="Correo electrónico"
+              icon={ICONS.USER}
+              iconPosition="left"
+            />
+            <PasswordControlled
+              name="password"
+              rules={RULES.REQUIRED}
+              placeholder="Contraseña"
+            />
+            <Button
+              color={COLORS.BLUE}
+              width="100%"
+              height="42px"
+              $fontSize="15px"
+              padding="0 18px"
+              type="submit"
+              disabled={!isMounted || isPending || isRedirecting}
+            >
+              Ingresar
+            </Button>
+            <AuthSecondaryLink onClick={() => push(PAGES.RESTORE_PASSWORD.BASE)}>
+              ¿Olvidaste tu contraseña?
+            </AuthSecondaryLink>
+          </Form>
+        </FormProvider>
+      </AuthLayout>
     </Loader>
   );
 };
