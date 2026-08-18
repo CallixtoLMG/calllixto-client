@@ -101,6 +101,7 @@ const AuthLayout = ({
                 width={300}
                 height={100}
                 priority
+                unoptimized
               />
             )}
             {title && <AuthTitle>{title}</AuthTitle>}
