@@ -1,21 +1,24 @@
-const MADERERA_LAS_TAPIAS_BUDGET_LOGO = {
-  src: "/accounts/maderera-las-tapias.png",
-  alt: "Maderera Las Tapias",
-  width: 160,
-  height: 50,
-  showCustomPDFDisclaimer: true,
-};
-
-const CALLIXTO_BUDGET_LOGO = {
-  src: "/callixto.png",
-  alt: "Callixto",
-  width: 100,
-  height: 40,
-};
-
 const ACCOUNT_BUDGET_BRANDING = {
-  "maderera-las-tapias": MADERERA_LAS_TAPIAS_BUDGET_LOGO,
-  callixto: CALLIXTO_BUDGET_LOGO,
+  callixto: {
+    src: "/accounts/callixto.png",
+    alt: "Callixto",
+    width: 160,
+    height: 50,
+  },
+  "facundo-attili": {
+    src: "/accounts/facundo-attili.png",
+    alt: "Facundo Attili",
+    width: 160,
+    height: 50,
+    showCustomPDFDisclaimer: true,
+  },
+  "maderera-las-tapias": {
+    src: "/accounts/maderera-las-tapias.png",
+    alt: "Maderera Las Tapias",
+    width: 160,
+    height: 50,
+    showCustomPDFDisclaimer: true,
+  },
 };
 
 const isValidLogoUrl = (logoUrl) =>
@@ -44,7 +47,6 @@ const resolveAccountBudgetLogo = ({
 
 export {
   ACCOUNT_BUDGET_BRANDING,
-  CALLIXTO_BUDGET_LOGO,
-  MADERERA_LAS_TAPIAS_BUDGET_LOGO,
-  resolveAccountBudgetLogo,
+  resolveAccountBudgetLogo
 };
+

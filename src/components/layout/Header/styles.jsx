@@ -21,6 +21,14 @@ export const HeaderLeft = styled.div`
   gap: 14px;
 `;
 
+export const MenuSlot = styled.div`
+  flex: 0 0 110px;
+  width: 110px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+`;
+
 export const HeaderRight = styled.div`
   display: flex;
   align-items: center;
@@ -42,10 +50,12 @@ export const HamburgerButton = styled.button`
   }
 `;
 
-export const Brand = styled.div`
-  font-size: 18px;
-  font-weight: 700;
-  color: #1f2937;
+export const Brand = styled.img`
+  display: block;
+  height: 50px;
+  width: auto;
+  max-width: 150px;
+  flex-shrink: 0;
 `;
 
 export const RightActions = styled.div`

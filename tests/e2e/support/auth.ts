@@ -31,7 +31,7 @@ const selectAccount = async (page: Page, accountName: RegExp | string) => {
     accountButton.click(),
   ]);
 
-  await expect(page.getByText("CallixtoGLM")).toBeVisible();
+  await expect(page.getByRole("img", { name: "CallixtoGLM" })).toBeVisible();
   await expect(page.getByRole("button", { name: /men/i })).toBeVisible();
 };
 
@@ -53,7 +53,7 @@ export const loginAsE2EUser = async (page: Page, options: LoginAsE2EUserOptions 
 
   await expect(page).not.toHaveURL(/\/login\?[^#]*username=/);
 
-  await expect(page.getByText("CallixtoGLM")).toBeVisible();
+  await expect(page.getByRole("img", { name: "CallixtoGLM" })).toBeVisible();
   await expect(page.getByRole("button", { name: /men/i })).toBeVisible();
 
   const closeUpdatesButton = page.getByRole("button", { name: /cerrar/i });
