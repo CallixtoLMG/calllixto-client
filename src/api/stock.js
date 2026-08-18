@@ -5,7 +5,69 @@ import { GET_SUPPLIER_QUERY_KEY } from "@/components/suppliers/suppliers.constan
 import { ADD, CONSUME, PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getInstance } from "./axios";
-import { useCreateItem, usePostUpdateItem } from "./common";
+import { useCreateItem, useInvalidateQueries, usePostUpdateItem } from "./common";
+
+export const MAX_STOCK_TRANSACTION_OPERATIONS = 90;
+
+export const buildSupplierStockBatches = (flows = []) => {
+  if (!Array.isArray(flows) || flows.length === 0) return [];
+
+  const batches = [];
+  let batch = [];
+  let productIds = new Set();
+
+  const getOperationCount = (nextProductId) => {
+    const productCost = productIds.has(nextProductId) ? 0 : 1;
+    return batch.length + productIds.size + 1 + productCost;
+  };
+
+  const flushBatch = () => {
+    if (!batch.length) return;
+    batches.push(batch);
+    batch = [];
+    productIds = new Set();
+  };
+
+  flows.forEach((flow) => {
+    const productId = flow?.productId;
+
+    if (batch.length && getOperationCount(productId) > MAX_STOCK_TRANSACTION_OPERATIONS) {
+      flushBatch();
+    }
+
+    batch.push(flow);
+    productIds.add(productId);
+  });
+
+  flushBatch();
+
+  return batches;
+};
+
+export const postSupplierStockBatches = async ({
+  supplierId,
+  inflow,
+  flows,
+  post,
+}) => {
+  const batches = buildSupplierStockBatches(flows);
+  let lastResponse = { statusOk: true };
+
+  for (const batch of batches) {
+    const { data } = await post(`/${PATHS.STOCK_FLOWS}/${supplierId}/${ADD}`, {
+      inflow,
+      flows: batch,
+    });
+
+    if (!data?.statusOk) {
+      return data;
+    }
+
+    lastResponse = data;
+  }
+
+  return lastResponse;
+};
 
 export function useGetStockFlow(productId, { enabled = true } = {}) {
   const getStockFlow = async () => {
@@ -43,20 +105,26 @@ export const useCreateStockFlow = () => {
 };
 
 export const useAddSupplierStock = () => {
-  const updateItem = usePostUpdateItem();
+  const invalidate = useInvalidateQueries();
 
-  const addSupplierStock = ({ supplierId, inflow, flows, }) => {
-    return updateItem({
-      entity: ENTITIES.PRODUCTS,
-      url: `/${PATHS.STOCK_FLOWS}/${supplierId}/${ADD}`,
-      value: { inflow, flows, },
-      responseEntity: null,
-      skipStorageUpdate: true,
-      invalidateQueries: [
-        [LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY]
-        [GET_SUPPLIER_QUERY_KEY, supplierId],
-      ],
+  const addSupplierStock = async ({ supplierId, inflow, flows, }) => {
+    const hasFlows = Array.isArray(flows) && flows.length > 0;
+    const data = await postSupplierStockBatches({
+      supplierId,
+      inflow,
+      flows,
+      post: (...args) => getInstance().post(...args),
     });
+
+    if (hasFlows && data?.statusOk) {
+      invalidate([
+        [LIST_PRODUCTS_QUERY_KEY],
+        [GET_PRODUCT_QUERY_KEY],
+        [GET_SUPPLIER_QUERY_KEY, supplierId],
+      ]);
+    }
+
+    return data;
   };
 
   return addSupplierStock;

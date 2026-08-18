@@ -47,7 +47,7 @@ const CreateExpense = () => {
     mutationFn: createExpense,
     onSuccess: (response) => {
       if (response.statusOk) {
-        push(PAGES.EXPENSES.SHOW(response.expense.id));
+        expenseUnsaved.runWithoutPrompt(() => push(PAGES.EXPENSES.SHOW(response.expense.id)));
         toast.success("Gasto creado!");
       } else {
         toast.error(`${response?.message} (${response?.error?.message})`);

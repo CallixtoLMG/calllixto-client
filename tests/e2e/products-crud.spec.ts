@@ -1,5 +1,11 @@
-import { expect, test, type Page } from "@playwright/test";
-import { expectSuccessfulApiResponse, isApiResponse } from "./support/api";
+import { expect, test, type Locator, type Page } from "@playwright/test";
+import {
+  expectSuccessfulApiResponse,
+  getE2EAccountApiUrl,
+  getE2EApiHeaders,
+  getE2EApiJson,
+  isApiResponse,
+} from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
 import { E2E_ACCOUNTS } from "./support/env";
 import {
@@ -26,6 +32,14 @@ type ProductDependencies = {
   brand: { id: string; name: string; url: string };
 };
 
+type OpenCreatePageOptions = {
+  createActionTestId: string;
+  createUrl: RegExp;
+  listPath: string;
+  listUrl: RegExp;
+  readyLocator: (page: Page) => Locator;
+};
+
 const productsListUrl = /\/productos(?:\?|$)/;
 const suppliersListUrl = /\/proveedores(?:\?|$)/;
 const brandsListUrl = /\/marcas(?:\?|$)/;
@@ -34,6 +48,44 @@ const twoDigitId = (seed: number) => (seed % 1296).toString(36).padStart(2, "0")
 const twoDigitIdWithAttempt = (seed: number, attempt: number) => twoDigitId(seed + attempt * 97);
 const productLocalId = (seed: number) => (seed % 1_679_616).toString(36).padStart(4, "0").toUpperCase();
 
+const getAvailableSupplierId = async (page: Page, timestamp: number, attemptOffset = 0) => {
+  const body = await getE2EApiJson<{ statusOk?: boolean; suppliers?: { id?: string }[] }>(
+    page,
+    "suppliers?attributes=%5B%22id%22%5D",
+  );
+  expect(body.statusOk, JSON.stringify(body)).toBe(true);
+
+  const usedIds = new Set((body.suppliers ?? []).map((supplier) => supplier.id).filter(Boolean));
+
+  for (let attempt = 0; attempt < 1296; attempt += 1) {
+    const candidateId = twoDigitIdWithAttempt(timestamp, attempt + attemptOffset * 16);
+    if (!usedIds.has(candidateId)) return candidateId;
+  }
+
+  throw new Error("No available two-character supplier id for the E2E account");
+};
+
+const isBrandIdAvailable = async (page: Page, id: string) => {
+  const response = await page.request.get(getE2EAccountApiUrl(`brands/${id}`), {
+    headers: await getE2EApiHeaders(page),
+  });
+
+  if (response.status() === 404) return true;
+  if (!response.ok()) return false;
+
+  const body = await response.json().catch(() => ({}));
+  return !body.brand;
+};
+
+const getAvailableBrandId = async (page: Page, timestamp: number, attemptOffset = 0) => {
+  for (let attempt = 0; attempt < 1296; attempt += 1) {
+    const candidateId = twoDigitIdWithAttempt(timestamp + 37, attempt + attemptOffset * 16);
+    if (await isBrandIdAvailable(page, candidateId)) return candidateId;
+  }
+
+  throw new Error("No available two-character brand id for the E2E account");
+};
+
 const fillTestIdInput = async (page: Page, testId: string, value: string) => {
   await page.getByTestId(testId).locator("input").fill(value);
 };
@@ -41,49 +93,111 @@ const fillTestIdInput = async (page: Page, testId: string, value: string) => {
 const openProductsList = async (page: Page) => {
   await page.goto("/productos");
   await expect(page).toHaveURL(productsListUrl);
-  await expect(page.getByTestId("nav-action-crear")).toBeVisible();
+  const createAction = await getCreateProductAction(page);
+  await expectActionReady(createAction);
+};
+
+const getPageActionsRail = (page: Page) => page.getByTestId("page-actions-aside");
+
+const expectActionReady = async (action: Locator) => {
+  await expect(action).toBeVisible();
+  await expect(action).toBeEnabled();
+  await action.click({ trial: true });
+};
+
+const expandPageActionsRail = async (page: Page) => {
+  const rail = getPageActionsRail(page);
+  await expect(rail).toBeAttached();
+
+  const railToggle = rail.getByTestId("page-actions-rail-toggle");
+
+  if (await railToggle.getAttribute("aria-expanded") === "false") {
+    await railToggle.click();
+    await expect(railToggle).toHaveAttribute("aria-expanded", "true");
+  }
+
+  return rail;
+};
+
+const getActionFromRail = async (page: Page, testId: string) => {
+  const rail = await expandPageActionsRail(page);
+  return rail.getByTestId(testId);
+};
+
+const getCreateProductAction = async (page: Page) => getActionFromRail(page, "nav-action-crear producto");
+
+const openCreatePageFromList = async (page: Page, options: OpenCreatePageOptions) => {
+  await page.goto(options.listPath);
+  await expect(page).toHaveURL(options.listUrl);
+
+  const createAction = await getActionFromRail(page, options.createActionTestId);
+  await expectActionReady(createAction);
+  await createAction.click();
+
+  await expect(page).toHaveURL(options.createUrl);
+  await expect(options.readyLocator(page)).toBeVisible({ timeout: 30_000 });
 };
 
 const createSupplier = async (page: Page, timestamp: number, attempt = 0) => {
   const supplier = {
-    id: twoDigitIdWithAttempt(timestamp, attempt),
+    id: await getAvailableSupplierId(page, timestamp, attempt),
     name: `E2E Product Supplier ${timestamp}`,
     comment: `Comentario E2E product supplier ${timestamp}`,
   };
 
-  await page.goto("/proveedores");
-  await expect(page).toHaveURL(suppliersListUrl);
-  await page.getByTestId("nav-action-crear").click();
-  await expect(page).toHaveURL(/\/proveedores\/crear(?:\?|$)/);
+  await openCreatePageFromList(page, {
+    createActionTestId: "nav-action-crear proveedor",
+    createUrl: /\/proveedores\/crear(?:\?|$)/,
+    listPath: "/proveedores",
+    listUrl: suppliersListUrl,
+    readyLocator: (currentPage) => currentPage.locator('input[name="id"]'),
+  });
 
   await page.locator('input[name="id"]').fill(supplier.id);
   await page.locator('input[name="name"]').fill(supplier.name);
   await page.getByPlaceholder("Siempre demora en los pedidos").fill(supplier.comment);
+
+  const responsePromise = page.waitForResponse((response) => isApiResponse(response, "POST", "suppliers"));
   await page.locator("form").getByRole("button", { name: /crear/i }).click();
+  const body = await expectSuccessfulApiResponse(await responsePromise, {
+    responseEntity: "supplier",
+    expectedId: supplier.id,
+  });
   await dismissUnsavedChangesIfVisible(page);
   await waitForEntityDetailAfterSubmit(page, "proveedores");
+  await expect(page).toHaveURL(new RegExp(`/proveedores/${body.supplier.id}(?:\\?|$)`));
 
   return { ...supplier, url: page.url() };
 };
 
 const createBrand = async (page: Page, timestamp: number, attempt = 0) => {
   const brand = {
-    id: twoDigitIdWithAttempt(timestamp + 37, attempt),
+    id: await getAvailableBrandId(page, timestamp, attempt),
     name: `E2E Product Brand ${timestamp}`,
     comment: `Comentario E2E product brand ${timestamp}`,
   };
 
-  await page.goto("/marcas");
-  await expect(page).toHaveURL(brandsListUrl);
-  await page.getByTestId("nav-action-crear").click();
-  await expect(page).toHaveURL(/\/marcas\/crear(?:\?|$)/);
+  await openCreatePageFromList(page, {
+    createActionTestId: "nav-action-crear marca",
+    createUrl: /\/marcas\/crear(?:\?|$)/,
+    listPath: "/marcas",
+    listUrl: brandsListUrl,
+    readyLocator: (currentPage) => currentPage.locator('input[name="id"]'),
+  });
 
   await page.locator('input[name="id"]').fill(brand.id);
   await page.locator('input[name="name"]').fill(brand.name);
   await page.getByPlaceholder("Una marca macanuda").fill(brand.comment);
+
+  const responsePromise = page.waitForResponse((response) => isApiResponse(response, "POST", "brands"));
   await page.locator("form").getByRole("button", { name: /crear/i }).click();
+  const body = await expectSuccessfulApiResponse(await responsePromise, {
+    responseEntity: "brand",
+    expectedId: brand.id,
+  });
   await dismissUnsavedChangesIfVisible(page);
   await waitForEntityDetailAfterSubmit(page, "marcas");
+  await expect(page).toHaveURL(new RegExp(`/marcas/${body.brand.id}(?:\\?|$)`));
 
   return { ...brand, url: page.url() };
 };
@@ -91,7 +205,7 @@ const createBrand = async (page: Page, timestamp: number, attempt = 0) => {
 const cleanupDependencies = async (page: Page, dependencies: ProductDependencies | null) => {
   if (!dependencies) return;
 
-  await deleteEntityIfPresent(page, dependencies.brand.url, brandsListUrl);
+  await deleteEntityIfPresent(page, dependencies.brand.url, brandsListUrl, "nav-action-eliminar marca");
   await deleteEntityIfPresent(page, dependencies.supplier.url, suppliersListUrl, "nav-action-eliminar proveedor");
 };
 
@@ -101,7 +215,7 @@ const cleanupPartialDependencies = async (
   brand: ProductDependencies["brand"] | null,
 ) => {
   if (brand) {
-    await deleteEntityIfPresent(page, brand.url, brandsListUrl);
+    await deleteEntityIfPresent(page, brand.url, brandsListUrl, "nav-action-eliminar marca");
   }
 
   if (supplier) {
@@ -192,9 +306,13 @@ const fillProductForm = async (page: Page, product: ProductFixture, dependencies
 };
 
 const createProduct = async (page: Page, product: ProductFixture, dependencies: ProductDependencies) => {
-  await openProductsList(page);
-  await page.getByTestId("nav-action-crear").click();
-  await expect(page).toHaveURL(/\/productos\/crear(?:\?|$)/);
+  await openCreatePageFromList(page, {
+    createActionTestId: "nav-action-crear producto",
+    createUrl: /\/productos\/crear(?:\?|$)/,
+    listPath: "/productos",
+    listUrl: productsListUrl,
+    readyLocator: (currentPage) => currentPage.getByTestId("product-supplier-search"),
+  });
 
   const selectedData = await fillProductForm(page, product, dependencies);
 
@@ -223,13 +341,13 @@ const confirmDelete = async (page: Page) => {
 };
 
 const softDeleteCurrentProduct = async (page: Page) => {
-  await page.getByTestId("nav-action-eliminar").click();
+  await page.getByTestId("nav-action-eliminar producto").click();
   await confirmDelete(page);
-  await expect(page.getByTestId("nav-action-recuperar")).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId("nav-action-recuperar producto")).toBeVisible({ timeout: 30_000 });
 };
 
 const permanentlyDeleteCurrentProduct = async (page: Page) => {
-  await page.getByTestId("nav-action-eliminar").click();
+  await page.getByTestId("nav-action-eliminar producto").click();
   await confirmDelete(page);
   await expect(page).toHaveURL(productsListUrl, { timeout: 30_000 });
 };
@@ -240,8 +358,8 @@ const deleteProductPermanentlyIfPresent = async (page: Page, productUrl: string 
   try {
     await page.goto(productUrl);
 
-    const recoverButton = page.getByTestId("nav-action-recuperar");
-    const deleteButton = page.getByTestId("nav-action-eliminar");
+    const recoverButton = page.getByTestId("nav-action-recuperar producto");
+    const deleteButton = page.getByTestId("nav-action-eliminar producto");
 
     if (!(await recoverButton.isVisible({ timeout: 5_000 }).catch(() => false))) {
       if (!(await deleteButton.isVisible({ timeout: 5_000 }).catch(() => false))) return;
@@ -367,11 +485,11 @@ test.describe("products", () => {
       }, dependencies);
       productUrl = createdProduct.url;
 
-      await page.getByTestId("nav-action-desactivar").click();
+      await page.getByTestId("nav-action-desactivar producto").click();
       await page.getByPlaceholder(/motivo/i).fill(inactiveReason);
       await page.getByTestId("modal-confirm").click();
       await expect(page.getByText(inactiveReason)).toBeVisible({ timeout: 30_000 });
-      await expect(page.getByTestId("nav-action-activar")).toBeVisible();
+      await expect(page.getByTestId("nav-action-activar producto")).toBeVisible();
 
       await openProductsList(page);
       await selectInactiveFilter(page);
@@ -379,9 +497,9 @@ test.describe("products", () => {
       await expect(page.getByText(productName)).toBeVisible();
 
       await openProductFromList(page, productName);
-      await page.getByTestId("nav-action-activar").click();
+      await page.getByTestId("nav-action-activar producto").click();
       await page.getByTestId("modal-confirm").click();
-      await expect(page.getByTestId("nav-action-desactivar")).toBeVisible({ timeout: 30_000 });
+      await expect(page.getByTestId("nav-action-desactivar producto")).toBeVisible({ timeout: 30_000 });
 
       await deleteProductPermanentlyIfPresent(page, productUrl);
       productUrl = null;

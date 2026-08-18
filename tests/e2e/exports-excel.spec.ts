@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import * as XLSX from "xlsx";
 import { loginAsE2EUser } from "./support/auth";
 import { E2E_ACCOUNTS, getE2EApiBaseUrl } from "./support/env";
@@ -94,17 +94,38 @@ const getExpectedExportRowsCount = async (page: Page) => {
 
 const getPageActionsRail = (page: Page) => page.getByTestId("page-actions-aside");
 const getExcelDownloadAction = (page: Page) =>
-  getPageActionsRail(page).getByTestId("nav-action-descargar excel");
+  getPageActionsRail(page).getByTestId(/^nav-action-descargar .+ en excel$/);
+const isActionReady = async (action: Locator) => {
+  if (await action.count() !== 1) return false;
+  return action.click({ trial: true }).then(() => true).catch(() => false);
+};
+const expectActionReady = async (action: Locator) => {
+  await expect(action).toBeVisible();
+  await expect(action).toBeEnabled();
+  await action.click({ trial: true });
+};
 
 const revealExcelDownloadAction = async (page: Page) => {
+  const rail = getPageActionsRail(page);
   const directAction = getExcelDownloadAction(page);
 
-  if (await directAction.isVisible().catch(() => false)) {
+  if (await isActionReady(directAction)) {
     return directAction;
   }
 
-  await getPageActionsRail(page).getByTestId("nav-action-excel").click();
-  await expect(directAction).toBeVisible();
+  const railToggle = rail.getByTestId("page-actions-rail-toggle");
+
+  if (await railToggle.isVisible().catch(() => false)) {
+    await railToggle.click();
+  }
+
+  const excelGroup = rail.getByTestId("nav-action-excel");
+
+  if (await excelGroup.isVisible().catch(() => false)) {
+    await excelGroup.click();
+  }
+
+  await expectActionReady(directAction);
 
   return directAction;
 };

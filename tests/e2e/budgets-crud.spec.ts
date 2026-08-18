@@ -1,5 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
-import { expectSuccessfulApiResponse, isApiResponse } from "./support/api";
+import { expect, test, type Locator, type Page, type Request, type Route } from "@playwright/test";
+import { apiPathEndsWith, expectSuccessfulApiResponse, getApiResponseBody, isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
 import { E2E_ACCOUNTS } from "./support/env";
 import {
@@ -12,7 +12,7 @@ import {
 
 type BudgetDependencies = {
   customer: { name: string; address: string };
-  product: { name: string };
+  product: { localId: string; name: string };
 };
 
 type BudgetFormOptions = {
@@ -20,6 +20,10 @@ type BudgetFormOptions = {
   productDiscount?: string;
   totalDiscount?: string;
   surcharge?: string;
+};
+
+type BudgetDependencyOptions = {
+  stockControl?: boolean;
 };
 
 const responseEntityByApiPath: Record<string, string> = {
@@ -138,7 +142,11 @@ const createBrand = async (page: Page, timestamp: number, attempt = 0) => {
   return brand;
 };
 
-const createProductForBudgetIfNeeded = async (page: Page, timestamp: number) => {
+const createProductForBudgetIfNeeded = async (
+  page: Page,
+  timestamp: number,
+  { stockControl = false }: BudgetDependencyOptions = {},
+) => {
   let lastError: unknown;
 
   for (let attempt = 0; attempt < 6; attempt += 1) {
@@ -163,6 +171,9 @@ const createProductForBudgetIfNeeded = async (page: Page, timestamp: number) => 
       await expect(page.locator('input[name="name"]')).toHaveValue(product.name);
       await fillTestIdInput(page, "product-cost-field", "1000", "1,000");
       await fillTestIdInput(page, "product-price-field", "1500", "1,500");
+      if (stockControl) {
+        await page.getByTestId("product-stock-control-toggle").click();
+      }
       await page.getByPlaceholder("Realmente son muchas pulgadas").fill(`Producto E2E para presupuesto ${timestamp}`);
       await expect(page.getByPlaceholder("Realmente son muchas pulgadas")).toHaveValue(`Producto E2E para presupuesto ${timestamp}`);
       await submitCreateForm(page, "products", "productos");
@@ -176,9 +187,13 @@ const createProductForBudgetIfNeeded = async (page: Page, timestamp: number) => 
   throw lastError;
 };
 
-const createBudgetDependencies = async (page: Page, timestamp: number): Promise<BudgetDependencies> => {
+const createBudgetDependencies = async (
+  page: Page,
+  timestamp: number,
+  options: BudgetDependencyOptions = {},
+): Promise<BudgetDependencies> => {
   const customer = await createCustomerForBudgetIfNeeded(page, timestamp);
-  const product = await createProductForBudgetIfNeeded(page, timestamp);
+  const product = await createProductForBudgetIfNeeded(page, timestamp, options);
 
   return { customer, product };
 };
@@ -217,13 +232,33 @@ const fillBudgetForm = async (
   await page.getByTestId("textarea-comments").fill(`Comentario E2E presupuesto ${timestamp}`);
 };
 
+const getPageActionsRail = (page: Page) => page.getByTestId("page-actions-aside");
+const expectActionReady = async (action: Locator) => {
+  await expect(action).toBeVisible();
+  await expect(action).toBeEnabled();
+  await action.click({ trial: true });
+};
+
 const openCreateBudgetPage = async (page: Page) => {
   await page.goto("/ventas");
   await expect(page).toHaveURL(budgetsListUrl);
-  await expect(page.getByTestId("nav-action-crear")).toBeVisible({ timeout: 30_000 });
-  await page.getByTestId("nav-action-crear").click();
+  await expect(page.getByTestId("table-row")).not.toHaveCount(0, { timeout: 30_000 });
+  const rail = getPageActionsRail(page);
+  await expect(rail).toBeAttached();
+
+  const railToggle = rail.getByTestId("page-actions-rail-toggle");
+
+  if (await railToggle.getAttribute("aria-expanded") === "false") {
+    await railToggle.click();
+    await expect(railToggle).toHaveAttribute("aria-expanded", "true");
+  }
+
+  const createAction = rail.getByTestId("nav-action-crear venta");
+  await expectActionReady(createAction);
+  await createAction.click();
   await expect(page).toHaveURL(/\/ventas\/crear(?:\?|$)/);
   await waitForCurrentRouteChunk(page);
+  await expect(page.getByTestId("budget-customer-search")).toBeVisible({ timeout: 30_000 });
 };
 
 const createDraftBudget = async (page: Page, dependencies: BudgetDependencies, timestamp: number) => {
@@ -254,10 +289,74 @@ const moveBudgetToPending = async (page: Page) => {
   await expect(page.getByText(/pendiente/i).first()).toBeVisible({ timeout: 30_000 });
 };
 
-const confirmBudget = async (page: Page) => {
+const collectConsumeRequests = async (page: Page, budgetId: string) => {
+  const requests: Request[] = [];
+
+  await page.route("**/stock-flows/**/consume", async (route) => {
+    const request = route.request();
+
+    if (request.method() === "POST" && apiPathEndsWith(request.url(), `stock-flows/${budgetId}/consume`)) {
+      requests.push(request);
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ statusOk: true }),
+      });
+      return;
+    }
+
+    await route.continue();
+  });
+
+  return requests;
+};
+
+const collectBudgetProductPayloads = async (page: Page) => {
+  const payloads: Array<{ products?: Record<string, unknown>[] }> = [];
+
+  const collectPayload = async (route: Route) => {
+    const request = route.request();
+    const pathname = new URL(request.url()).pathname.replace(/\/+$/g, "");
+    const isBudgetSave =
+      ["POST", "PUT"].includes(request.method()) &&
+      /\/budgets(?:\/[^/]+)?$/.test(pathname);
+
+    if (isBudgetSave) {
+      const body = request.postDataJSON();
+
+      if (Array.isArray(body?.products)) {
+        payloads.push(body);
+      }
+    }
+
+    await route.continue();
+  };
+
+  await page.route("**/budgets", collectPayload);
+  await page.route("**/budgets/**", collectPayload);
+
+  return payloads;
+};
+
+const openConfirmBudgetModal = async (page: Page) => {
   await page.getByRole("button", { name: /^confirmar$/i }).click();
   await expect(page.getByText(/desea confirmar/i)).toBeVisible({ timeout: 30_000 });
-  await page.locator(".ui.modal").getByRole("button", { name: /^confirmar$/i }).click();
+};
+
+const confirmBudget = async (page: Page, budgetId: string) => {
+  await openConfirmBudgetModal(page);
+
+  const responsePromise = page.waitForResponse((response) =>
+    isApiResponse(response, "PUT", `budgets/${budgetId}/confirm`)
+  );
+
+  await Promise.all([
+    responsePromise,
+    page.locator(".ui.modal").getByTestId("modal-confirm").click(),
+  ]);
+
+  const response = await responsePromise;
+  await expectSuccessfulApiResponse(response, { responseEntity: "budget", expectedId: budgetId });
   await expect(page.getByText(/confirmado/i).first()).toBeVisible({ timeout: 30_000 });
 };
 
@@ -348,6 +447,7 @@ test.describe("budgets", () => {
 
     const timestamp = Date.now();
     const dependencies = await createBudgetDependencies(page, timestamp);
+    const budgetProductPayloads = await collectBudgetProductPayloads(page);
 
     const budgetId = await createDraftBudget(page, dependencies, timestamp);
     await expect(page).toHaveURL(new RegExp(`/ventas/${budgetId}/borrador(?:\\?|$)`));
@@ -355,7 +455,15 @@ test.describe("budgets", () => {
     await moveBudgetToPending(page);
     await expect(page).toHaveURL(new RegExp(`/ventas/${budgetId}(?:\\?|$)`));
 
-    await confirmBudget(page);
+    const consumeRequests = await collectConsumeRequests(page, budgetId);
+    await confirmBudget(page, budgetId);
+    expect(consumeRequests).toHaveLength(0);
+    expect(budgetProductPayloads.length).toBeGreaterThan(0);
+    budgetProductPayloads.forEach((payload) => {
+      payload.products?.forEach((product) => {
+        expect(product).not.toHaveProperty("stockControl");
+      });
+    });
     await expect(page).toHaveURL(new RegExp(`/ventas/${budgetId}(?:\\?|$)`));
   });
 
@@ -377,11 +485,107 @@ test.describe("budgets", () => {
     const dependencies = await createBudgetDependencies(page, timestamp);
 
     const budgetId = await createPendingBudget(page, dependencies, timestamp);
-    await confirmBudget(page);
+    await confirmBudget(page, budgetId);
     await expect(page).toHaveURL(new RegExp(`/ventas/${budgetId}(?:\\?|$)`));
 
     await completeBudgetPayments(page, timestamp);
     await completeBudgetDeliveries(page, timestamp);
+  });
+
+  test("confirms a pending budget with a partial delivery", async ({ page }) => {
+    test.setTimeout(300_000);
+
+    const timestamp = Date.now();
+    const dependencies = await createBudgetDependencies(page, timestamp, { stockControl: true });
+
+    const budgetId = await createPendingBudget(page, dependencies, timestamp);
+    const consumeRequests = await collectConsumeRequests(page, budgetId);
+
+    await openConfirmBudgetModal(page);
+    await page.locator(".ui.modal").getByText("Entrega").click();
+    await page.getByTestId("budget-confirm-delivery-note-field").locator("input").fill(`R-${timestamp}`);
+    await fillTestIdInput(page, "budget-confirm-delivery-product-0-quantity-field", "1");
+    await page.getByTestId("budget-confirm-delivery-product-0-comment-field").locator("input").fill("Entrega parcial E2E");
+
+    const confirmResponsePromise = page.waitForResponse((response) =>
+      isApiResponse(response, "PUT", `budgets/${budgetId}/confirm`)
+    );
+    const consumeResponsePromise = page.waitForResponse((response) =>
+      isApiResponse(response, "POST", `stock-flows/${budgetId}/consume`)
+    );
+
+    await page.locator(".ui.modal").getByTestId("modal-confirm").click();
+
+    const confirmResponse = await confirmResponsePromise;
+    const consumeResponse = await consumeResponsePromise;
+
+    await expectSuccessfulApiResponse(confirmResponse, { responseEntity: "budget", expectedId: budgetId });
+    await expectSuccessfulApiResponse(consumeResponse);
+    await expect(page.getByText(/confirmado/i).first()).toBeVisible({ timeout: 30_000 });
+
+    expect(consumeRequests).toHaveLength(1);
+    const consumeBody = consumeRequests[0].postDataJSON();
+
+    expect(consumeBody).toEqual({
+      deliveryNote: `R-${timestamp}`,
+      inflow: false,
+      flows: [
+        expect.objectContaining({
+          productId: expect.stringContaining(dependencies.product.localId),
+          rowId: expect.any(String),
+          quantity: 1,
+          comments: "Entrega parcial E2E",
+        }),
+      ],
+    });
+    expect(consumeBody.flows[0].date).toEqual(expect.any(String));
+    expect(consumeBody.flows[0]).not.toHaveProperty("stockControl");
+  });
+
+  test("does not consume stock when pending budget confirmation fails", async ({ page }) => {
+    test.setTimeout(300_000);
+
+    const timestamp = Date.now();
+    const dependencies = await createBudgetDependencies(page, timestamp);
+
+    const budgetId = await createPendingBudget(page, dependencies, timestamp);
+    const consumeRequests = await collectConsumeRequests(page, budgetId);
+
+    await page.route("**/budgets/**/confirm", async (route) => {
+      const request = route.request();
+
+      if (request.method() === "PUT" && apiPathEndsWith(request.url(), `budgets/${budgetId}/confirm`)) {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            statusOk: false,
+            message: "Confirmacion E2E fallida",
+            error: { message: "Forzado por test" },
+          }),
+        });
+        return;
+      }
+
+      await route.continue();
+    });
+
+    await openConfirmBudgetModal(page);
+    await page.locator(".ui.modal").getByText("Entrega").click();
+    await fillTestIdInput(page, "budget-confirm-delivery-product-0-quantity-field", "1");
+
+    const confirmResponsePromise = page.waitForResponse((response) =>
+      isApiResponse(response, "PUT", `budgets/${budgetId}/confirm`)
+    );
+
+    await page.locator(".ui.modal").getByTestId("modal-confirm").click();
+    const confirmResponse = await confirmResponsePromise;
+    const confirmBody = await getApiResponseBody(confirmResponse);
+
+    expect(confirmBody.statusOk).toBe(false);
+    await expect(page.locator(".ui.modal").getByTestId("modal-confirm")).toBeEnabled({ timeout: 30_000 });
+    expect(consumeRequests).toHaveLength(0);
+    await expect(page.getByText(/pendiente/i).first()).toBeVisible({ timeout: 30_000 });
   });
 
   test("creates a confirmed budget and completes payments and deliveries", async ({ page }) => {

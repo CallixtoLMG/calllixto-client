@@ -3,7 +3,7 @@ import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, O
 import { DropdownField, PriceControlled, PriceLabel } from "@/common/components/form";
 import { Table, Total, TotalList } from "@/common/components/table";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { POPUP_POSITIONS, COLORS, DATE_FORMATS, ICONS, SIZES } from "@/common/constants";
+import { COLORS, DATE_FORMATS, ICONS, POPUP_POSITIONS, SIZES } from "@/common/constants";
 import { getFormatedPercentage, getFormatedPhone } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { PRODUCT_STATES } from "@/components/products/products.constants";

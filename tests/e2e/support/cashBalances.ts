@@ -1,4 +1,4 @@
-import { expect, type Page, type Response } from "@playwright/test";
+import { expect, type Locator, type Page, type Response } from "@playwright/test";
 
 type CreateCashBalanceResponse = {
   statusOk?: boolean;
@@ -11,6 +11,40 @@ const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\
 
 const isCreateCashBalanceResponse = (response: Response) => {
   return response.request().method() === "POST" && new URL(response.url()).pathname.endsWith("/cash-balances");
+};
+
+const getPageActionsRail = (page: Page) => page.getByTestId("page-actions-aside");
+
+const expectActionReady = async (action: Locator) => {
+  await expect(action).toBeVisible();
+  await expect(action).toBeEnabled();
+  await action.click({ trial: true });
+};
+
+const expandPageActionsRail = async (page: Page) => {
+  const rail = getPageActionsRail(page);
+  await expect(rail).toBeAttached();
+
+  const railToggle = rail.getByTestId("page-actions-rail-toggle");
+
+  if (await railToggle.getAttribute("aria-expanded") === "false") {
+    await railToggle.click();
+    await expect(railToggle).toHaveAttribute("aria-expanded", "true");
+  }
+
+  return rail;
+};
+
+export const openCashBalanceModal = async (page: Page) => {
+  await page.goto("/cajas");
+  await expect(page).toHaveURL(/\/cajas(?:\?|$)/);
+  await expect(page).not.toHaveURL(/\/ups(?:\?|$)/);
+
+  const rail = await expandPageActionsRail(page);
+  const openAction = rail.getByTestId("nav-action-abrir caja");
+  await expectActionReady(openAction);
+  await openAction.click();
+  await expect(page.getByTestId("open-cash-balance-modal")).toBeVisible({ timeout: 30_000 });
 };
 
 export const confirmOpenCashBalance = async (page: Page, comment?: string) => {

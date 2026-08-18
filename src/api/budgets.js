@@ -84,10 +84,7 @@ export const useCreateBudget = () => {
     return createItem({
       entity: ENTITIES.BUDGETS,
       url: PATHS.BUDGETS,
-      value: {
-        ...budget,
-        publicEnabled: true,
-      },
+      value: budget,
       responseEntity: ENTITIES.BUDGET,
       invalidateQueries: [[LIST_BUDGETS_QUERY_KEY]],
     });

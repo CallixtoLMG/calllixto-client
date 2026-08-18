@@ -18,7 +18,7 @@ import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { useBudgetTotals, useUnsavedChanges } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
@@ -45,6 +45,13 @@ const CreateBudget = () => {
 
   const isCloning = Boolean(cloneId);
   const isDraft = Boolean(budget && !cloneId);
+  const [resolvedProductUpdatesCloneId, setResolvedProductUpdatesCloneId] = useState(null);
+  const productUpdatesResolved = Boolean(cloneId) && resolvedProductUpdatesCloneId === cloneId;
+  const handleProductUpdatesResolved = useCallback(() => {
+    if (cloneId) {
+      setResolvedProductUpdatesCloneId(cloneId);
+    }
+  }, [cloneId]);
 
   const EXCLUDED_STATES = useMemo(
     () => new Set([PRODUCT_STATES.DELETED.id, PRODUCT_STATES.INACTIVE.id]),
@@ -108,7 +115,8 @@ const CreateBudget = () => {
 
   const defaultValues = clonedDefaults || draftDefaults || emptyDefaults;
 
-  const hasResetRef = useRef(false);
+  const resetFormKey = cloneId || "create-budget";
+  const lastResetKeyRef = useRef(null);
 
   useEffect(() => {
     formRef.current = {
@@ -119,11 +127,11 @@ const CreateBudget = () => {
 
   useEffect(() => {
     if (!defaultValues) return;
-    if (hasResetRef.current) return;
+    if (lastResetKeyRef.current === resetFormKey) return;
 
     methods.reset(defaultValues);
-    hasResetRef.current = true;
-  }, [defaultValues, methods]);
+    lastResetKeyRef.current = resetFormKey;
+  }, [defaultValues, methods, resetFormKey]);
 
   const watchProducts = useWatch({ control: methods.control, name: "products", });
   const watchGlobalDiscount = useWatch({ control: methods.control, name: "globalDiscount", });
@@ -219,6 +227,7 @@ const CreateBudget = () => {
       render: () => (
         <Tab.Pane>
           <BudgetForm
+            key={resetFormKey}
             budget={budget}
             products={products}
             customers={customers}
@@ -232,6 +241,8 @@ const CreateBudget = () => {
             isDraft={isDraft}
             paymentMethods={paymentMethodOptions}
             onSubmit={handleCreateBudget}
+            productUpdatesResolved={productUpdatesResolved}
+            onProductUpdatesResolved={handleProductUpdatesResolved}
           />
         </Tab.Pane>
       ),

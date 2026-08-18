@@ -34,7 +34,7 @@ const CreateBrand = () => {
     mutationFn: createBrand,
     onSuccess: async (response) => {
       if (response.statusOk) {
-        push(PAGES.BRANDS.SHOW(response.brand.id))
+        brandUnsaved.runWithoutPrompt(() => push(PAGES.BRANDS.SHOW(response.brand.id)))
         toast.success('Marca creada!');
       } else {
         toast.error(`${response?.message} (${response?.error?.message})`);
