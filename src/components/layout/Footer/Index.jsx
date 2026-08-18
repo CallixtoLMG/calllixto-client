@@ -14,8 +14,7 @@ const Footer = () => {
           <ModContainer>
             <div>
               <Image
-                // src="/callixto.png"
-                src="/Logo-Callixto3.png"
+                src="/accounts/callixto.png"
                 alt="Callixto logo"
                 width={100}
                 height={40}
