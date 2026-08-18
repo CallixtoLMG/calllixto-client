@@ -96,7 +96,7 @@ const AuthLayout = ({
           <AuthHeader>
             {showLogo && (
               <AuthLogo
-                src="/accounts/callixtoViejo.png"
+                src="/callixtoViejo.png"
                 alt="Logo Callixto.png"
                 width={300}
                 height={100}
