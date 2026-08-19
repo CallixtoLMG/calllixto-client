@@ -6,8 +6,22 @@ import { useRef, useState } from "react";
 import { useFieldArray } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { AddBillPopup } from "../AddBillPopup";
+import { ADD_BILL_POPUP_CLASS_NAME } from "../AddBillPopup/styles";
 import { BILLS_DETAILS_TABLE_HEADERS } from "../cashBalances.constants";
 import { Header } from "./styles";
+
+const addBillPopupModifiers = [
+  {
+    name: "preventOverflow",
+    enabled: true,
+    options: {
+      rootBoundary: "viewport",
+      padding: 16,
+      altAxis: true,
+      tether: false,
+    },
+  },
+];
 
 export const BillDetails = ({ name }) => {
   const [openBillPopup, setOpenBillPopup] = useState(false);
@@ -45,6 +59,8 @@ export const BillDetails = ({ name }) => {
           onClose={handleClosePopup}
           closeOnDocumentClick
           position={POPUP_POSITIONS.TOP_LEFT}
+          className={ADD_BILL_POPUP_CLASS_NAME}
+          popperModifiers={addBillPopupModifiers}
         >
           <AddBillPopup
             billDetailsFields={billDetailsFields}

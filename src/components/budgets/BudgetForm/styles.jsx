@@ -27,4 +27,13 @@ const VerticalDivider = styled.div`
   margin: 0 10px;
 `;
 
-export { Container, MessageHeader, MessageItem, MessageList, VerticalDivider };
+const BudgetFormActions = styled.div`
+  @media (max-width: 767px) {
+    > * {
+      flex-wrap: wrap;
+      row-gap: 10px;
+    }
+  }
+`;
+
+export { BudgetFormActions, Container, MessageHeader, MessageItem, MessageList, VerticalDivider };

@@ -32,7 +32,7 @@ import { CUSTOMER_STATES, getCustomerSearchDescription, getCustomerSearchTitle }
 import ModalCreateCustomer from "../ModalCreateCustomer";
 import ModalProductUpdates from "../ModalProductUpdates";
 import ModalComment from "./ModalComment";
-import { Container, VerticalDivider } from "./styles";
+import { BudgetFormActions, Container, VerticalDivider } from "./styles";
 
 const BudgetForm = ({
   onSubmit,
@@ -811,35 +811,37 @@ const BudgetForm = ({
           />
         </FieldsContainer>
         <TextAreaControlled name="comments" label={FIELD_LABELS.COMMENTS} placeholder="Pago con billetes de 100" />
-        <SubmitAndRestore
-          canSubmitWithoutChanges={canSubmit}
-          isLoading={isLoading && !isBudgetDraft(watchState)}
-          disabled={isLoading}
-          isDirty={isDirty}
-          isUpdating={draft || isCloning}
-          onReset={handleTryReset}
-          color={currentState.color}
-          onSubmit={handleSubmit(handleConfirm)}
-          icon={currentState.icon}
-          text={currentState.singularTitle}
-          submit
-          submitDataTestId="budget-submit-current-state-button"
-          extraButton={
-            <IconedButton
-              icon={BUDGET_STATES.DRAFT.icon}
-              labelPosition="left"
-              disabled={isLoading || !isDirty}
-              loading={isLoading && isBudgetDraft(watchState)}
-              type="button"
-              onClick={handleSubmit(handleDraft)}
-              color={BUDGET_STATES.DRAFT.color}
-              width={CONTENT_SIZES.FIT}
-              text={BUDGET_STATES.DRAFT.singularTitle}
-              dataTestId="budget-submit-draft-button"
-            >
-            </IconedButton>
-          }
-        />
+        <BudgetFormActions>
+          <SubmitAndRestore
+            canSubmitWithoutChanges={canSubmit}
+            isLoading={isLoading && !isBudgetDraft(watchState)}
+            disabled={isLoading}
+            isDirty={isDirty}
+            isUpdating={draft || isCloning}
+            onReset={handleTryReset}
+            color={currentState.color}
+            onSubmit={handleSubmit(handleConfirm)}
+            icon={currentState.icon}
+            text={currentState.singularTitle}
+            submit
+            submitDataTestId="budget-submit-current-state-button"
+            extraButton={
+              <IconedButton
+                icon={BUDGET_STATES.DRAFT.icon}
+                labelPosition="left"
+                disabled={isLoading || !isDirty}
+                loading={isLoading && isBudgetDraft(watchState)}
+                type="button"
+                onClick={handleSubmit(handleDraft)}
+                color={BUDGET_STATES.DRAFT.color}
+                width={CONTENT_SIZES.FIT}
+                text={BUDGET_STATES.DRAFT.singularTitle}
+                dataTestId="budget-submit-draft-button"
+              >
+              </IconedButton>
+            }
+          />
+        </BudgetFormActions>
       </Form >
     </>
   );
