@@ -9,7 +9,7 @@ const read = (...segments) => fs.readFileSync(path.join(root, ...segments), "utf
 test("account budget branding registry contains declarative account logos", () => {
   const branding = read("src", "components", "budgets", "PDFfile", "accountBudgetBranding.js");
 
-  assert.match(branding, /const ACCOUNT_BUDGET_BRANDING = \{\s*callixto: \{\s*src: "\/accounts\/callixto\.png",\s*alt: "Callixto",\s*width: 160,\s*height: 50,\s*\},/s);
+  assert.match(branding, /const ACCOUNT_BUDGET_BRANDING = \{\s*callixto: \{\s*src: "\/branding\/logo-callixto\.png",\s*alt: "Callixto",\s*width: 160,\s*height: 50,\s*\},/s);
   assert.match(branding, /"facundo-attili": \{\s*src: "\/accounts\/facundo-attili\.png",\s*alt: "Facundo Attili",\s*width: 160,\s*height: 50,\s*showCustomPDFDisclaimer: true,\s*\},/s);
   assert.match(branding, /"maderera-las-tapias": \{\s*src: "\/accounts\/maderera-las-tapias\.png",\s*alt: "Maderera Las Tapias",\s*width: 160,\s*height: 50,\s*showCustomPDFDisclaimer: true,\s*\},/s);
   assert.doesNotMatch(branding, /const (MADERERA_LAS_TAPIAS|FACUNDO_ATTILI|CALLIXTO)_BUDGET_LOGO/);

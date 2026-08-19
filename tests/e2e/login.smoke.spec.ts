@@ -5,8 +5,8 @@ test.describe("login smoke", () => {
   test("loads the login page", async ({ page }) => {
     const { emailInput, submitButton } = await openLoginPage(page);
 
-    await expect(page.getByRole("img", { name: /callixto.*logo/i })).toBeVisible();
-    await expect(page.getByText(/ingresa a tu cuenta/i)).toBeVisible();
+    await expect(page.getByRole("img", { name: "Callixto" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /iniciar sesi/i })).toBeVisible();
     await expect(emailInput).toBeVisible();
     await expect(submitButton).toBeVisible();
   });
@@ -32,7 +32,7 @@ test.describe("login smoke", () => {
     await page.getByText(/olvidaste/i).click();
 
     await expect(page).toHaveURL(/\/recuperar-contrasena(?:\?|$)/);
-    await expect(page.getByText(/recuperar contrase/i)).toBeVisible();
+    await expect(page.getByRole("heading", { name: /recuperar contrase/i })).toBeVisible();
 
     await page.getByPlaceholder(/correo/i).fill("reset.e2e@example.com");
     await page.getByRole("button", { name: /enviar/i }).click();

@@ -1,6 +1,6 @@
 const ACCOUNT_BUDGET_BRANDING = {
   callixto: {
-    src: "/accounts/callixto.png",
+    src: "/branding/logo-callixto.png",
     alt: "Callixto",
     width: 160,
     height: 50,
