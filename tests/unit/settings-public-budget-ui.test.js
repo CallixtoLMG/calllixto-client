@@ -87,7 +87,7 @@ test("budget PDF renders account logo only when known public asset exists", () =
   assert.match(pdfFile, /customerPdf\s*&&\s*accountBudgetLogo\s*&&\s*\(/);
   assert.match(pdfFile, /src=\{accountBudgetLogo\.src\}/);
   assert.doesNotMatch(pdfFile, /account\?\.id\s*===\s*['"]maderera-las-tapias['"]|account\?\.id\s*===\s*['"]callixto['"]/);
-  assert.match(branding, /callixto: \{\s*src: "\/accounts\/callixto\.png"/s);
+  assert.match(branding, /callixto: \{\s*src: "\/branding\/logo-callixto\.png"/s);
   assert.match(branding, /"facundo-attili": \{\s*src: "\/accounts\/facundo-attili\.png"/s);
   assert.match(branding, /"maderera-las-tapias": \{\s*src: "\/accounts\/maderera-las-tapias\.png"/s);
   assert.doesNotMatch(branding, /_BUDGET_LOGO/);

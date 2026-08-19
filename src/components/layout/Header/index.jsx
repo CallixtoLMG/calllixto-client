@@ -158,7 +158,7 @@ const Header = () => {
       <HeaderBar>
         <HeaderLeft>
           <MenuSlot aria-hidden="true" />
-          <Brand src="/accounts/callixto.png" alt="CallixtoGLM" />
+          <Brand src="/branding/logo-callixto.png" alt="Callixto" />
         </HeaderLeft>
         <HeaderRight>
           <UserButton onClick={handleLogout}>Ingresar</UserButton>
@@ -179,7 +179,7 @@ const Header = () => {
               text="Menú"
             />
           </MenuSlot>
-          <Brand src="/accounts/callixto.png" alt="CallixtoGLM" />
+          <Brand src="/branding/logo-callixto.png" alt="Callixto" />
         </HeaderLeft>
         <HeaderRight>
           <RightActions>
