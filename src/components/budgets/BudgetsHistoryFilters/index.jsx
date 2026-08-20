@@ -5,6 +5,7 @@ import { DatePickerControlled } from "@/common/components/form/DatePicker/DatePi
 import { CONTENT_SIZES, COLORS, ICONS } from "@/common/constants";
 import { getDateUTC } from "@/common/utils/dates";
 import { FormProvider, useForm } from "react-hook-form";
+import { FilterActions, FilterFieldsRow, FilterRoot } from "./styles";
 
 const BudgetsHistoryFilter = ({
   onSearch,
@@ -59,7 +60,7 @@ const BudgetsHistoryFilter = ({
   return (
     <FormProvider {...form}>
       <Form>
-        <Flex $columnGap="15px" $rowGap="15px">
+        <FilterRoot $columnGap="15px" $rowGap="15px">
           <DropdownControlled
             width={CONTENT_SIZES.FIT}
             name="presetDays"
@@ -71,7 +72,7 @@ const BudgetsHistoryFilter = ({
             }))}
             afterChange={handlePresetChange}
           />
-          <Flex $columnGap="15px">
+          <FilterFieldsRow $columnGap="15px" $rowGap="15px">
             <DatePickerControlled
               name="startDate"
               label="Desde"
@@ -86,7 +87,7 @@ const BudgetsHistoryFilter = ({
               afterChange={(date) => handleDateChange("endDate", date)}
               width={CONTENT_SIZES.FIT}
             />
-            <Flex $columnGap="15px" $alignItems="flex-end">
+            <FilterActions $columnGap="15px" $alignItems="flex-end">
               <IconedButton
                 disabled={isLoading}
                 isLoading={isLoading}
@@ -106,9 +107,9 @@ const BudgetsHistoryFilter = ({
                 disabled={isLoading}
                 iconOnly
               />
-            </Flex>
-          </Flex>
-        </Flex>
+            </FilterActions>
+          </FilterFieldsRow>
+        </FilterRoot>
       </Form>
     </FormProvider>
   );

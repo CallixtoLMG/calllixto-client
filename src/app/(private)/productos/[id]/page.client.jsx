@@ -22,6 +22,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Tab } from "semantic-ui-react";
+import { ProductTabsContainer } from "./styles";
 
 const ProductPageClient = ({ product }) => {
   const { role } = useUserContext();
@@ -439,11 +440,13 @@ const ProductPageClient = ({ product }) => {
 
   return (
     <>
-      <Tab
-        panes={panes}
-        activeIndex={activeIndex}
-        onTabChange={handleTabChange}
-      />
+      <ProductTabsContainer>
+        <Tab
+          panes={panes}
+          activeIndex={activeIndex}
+          onTabChange={handleTabChange}
+        />
+      </ProductTabsContainer>
       <UnsavedChangesModal
         open={showUnsavedModal}
         onDiscard={handleDiscard}
