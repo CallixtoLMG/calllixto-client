@@ -1,5 +1,5 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
-import { Button, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
+import { Button, FieldsContainer, Flex, Form, FormField, Input, Label, OverflowWrapper } from "@/common/components/custom";
 import {
   GroupedButtonsControlled,
   NumberControlled,
@@ -13,7 +13,7 @@ import {
 } from "@/common/components/form";
 import { SearchResultContent, SearchResultDescription, SearchResultTitle } from "@/common/components/form/Search/styles";
 import { Table, Total } from "@/common/components/table";
-import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
+import { AddressesTooltip, CommentTooltip, IconTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { POPUP_POSITIONS, CONTENT_SIZES, COLORS, DATE_FORMATS, ERROR_MESSAGES, FIELD_LABELS, ICONS, RULES, SHORTKEYS, SIZES, TOOLTIPS } from "@/common/constants";
 import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay, removeNullish } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
@@ -333,7 +333,20 @@ const BudgetForm = ({
             {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
             {product.comments && <CommentTooltip tooltip="true" comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
-              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position={POPUP_POSITIONS.TOP_CENTER} trigger={<Icon lineHeight="normal" name={ICONS.TRUCK} color={COLORS.BLUE} />} />
+              <IconTooltip
+                size="mini"
+                content={product.dispatchComment || product?.dispatch?.comment}
+                icon={ICONS.TRUCK}
+                color={COLORS.BLUE}
+                position={POPUP_POSITIONS.TOP_CENTER}
+                ariaLabel="Comentario de despacho"
+                iconProps={{
+                  lineHeight: "normal",
+                  $lineHeight: "normal",
+                  margin: undefined,
+                  $pointer: false,
+                }}
+              />
             )}
           </Flex>
         </Container>
