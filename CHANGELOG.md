@@ -3,6 +3,54 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-08-20
+
+### Fixed
+
+- Sales: Fixed clone product-change detection so historical missing boolean flags (`editablePrice`, `fractionConfig.active`) are treated like disabled flags instead of showing empty product-change rows.
+
+## 2026-08-19
+
+### Changed
+
+- Budgets: Migrated the dispatch comment truck tooltip in budget details to the shared `IconTooltip`, preserving the existing icon, color, position, and content behavior.
+
+## 2026-08-18
+
+### Changed
+
+- Responsive layout: Added the first mobile baseline for the private shell, allowing the workspace to use the available viewport width and keeping the action rail from permanently reserving mobile content width.
+- Tables: Updated shared list controls for mobile by making filters, table overflow, and pagination adapt within the content width while preserving desktop behavior.
+- Forms: Improved shared form controls for mobile, including responsive search results and a one-column mobile policy for `FieldsContainer` / `FormField`.
+- Modals: Improved responsive behavior for common modal actions, multi-delete confirmations, open-cash-balance, add-payment, budget confirmation, and batch-import flows.
+- Contact popups: Added mobile-safe popup sizing so contact phone, email, and address editors stay within the viewport.
+- Settings: Improved responsive behavior in configuration tabs and setting sections, including payment methods, blocked products, categories, and sales-history date ranges.
+
+### Fixed
+
+- Settings: Fixed narrow mobile layouts caused by local percentage widths in configuration sections.
+- Forms: Fixed compressed mobile fields caused by `flex="1"` rows staying horizontal below the mobile breakpoint.
+- Tables: Prevented wide tables from expanding the document by containing horizontal scroll inside the table wrapper.
+- Pagination: Prevented pagination controls from overflowing the content width on small screens.
+
+## 2026-08-17
+
+### Added
+
+- Auth: Added a shared `AuthLayout` for the public login and password-recovery card layout, reusing the existing Callixto background, logo, inputs, buttons, and validation styles.
+- Auth: Added the password confirmation requirement to `PasswordRequirements`, showing `Las contraseñas coinciden.` in both password recovery and authenticated password change flows.
+
+### Changed
+
+- Auth: Updated login and password recovery to use centered white cards on the shared light-gray background while preserving the existing logo and form behavior.
+- Auth: Moved `/cambiar-contrasena` into the authenticated route group while keeping the same URL, restoring the private Header and breadcrumb context.
+- Auth: Moved the `Cambiar contraseña` title to the breadcrumb, removed the duplicate logo/title from the card, and placed the explanatory reset-code text below the validation-code request button.
+
+### Fixed
+
+- Auth: Kept `/recuperar-contrasena` public without the authenticated Header while preserving `/cambiar-contrasena` access protection for unauthenticated users.
+- Auth: Fixed the authenticated change-password workspace background so the shared gray fills the content area below the Header without adding unnecessary scroll.
+
 ## 2026-08-04
 
 ### Changed
