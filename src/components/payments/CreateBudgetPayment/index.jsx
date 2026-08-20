@@ -1,15 +1,16 @@
 import { useGetSetting } from "@/api/settings";
 import { IconedButton } from "@/common/components/buttons";
-import { FieldsContainer, Flex, FlexColumn, FormField, Icon, OverflowWrapper, Segment } from "@/common/components/custom";
+import { FieldsContainer, Flex, FlexColumn, FormField, OverflowWrapper, Segment } from "@/common/components/custom";
 import { DropdownField, PriceField, PriceLabel, TextField } from "@/common/components/form";
 import { DatePicker } from "@/common/components/form/DatePicker";
 import { Table, TotalList } from "@/common/components/table";
+import { IconTooltip } from "@/common/components/tooltips";
 import { POPUP_POSITIONS, CONTENT_SIZES, COLORS, ENTITIES, FIELD_LABELS, ICONS, RULES, SIZES, TOOLTIPS } from "@/common/constants";
 import { calculateTotals, handleEnterKeyDown, mapToDropdownOptions } from "@/common/utils";
 import { getFormatedDate, getSortedPaymentsByDate } from "@/common/utils/dates";
 import { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { Header, Popup } from "semantic-ui-react";
+import { Header } from "semantic-ui-react";
 
 const EMPTY_PAYMENT = () => ({
   method: '',
@@ -27,11 +28,14 @@ const getPaymentTableHeaders = () => [
       <Flex $columnGap="10px">
         {getFormatedDate(element.date)}
         {element.isOverdue && (
-          <Popup
+          <IconTooltip
             content="Pago posterior a la fecha de vencimiento"
+            icon={ICONS.EXCLAMATION_CIRCLE}
+            color={COLORS.RED}
             position={POPUP_POSITIONS.TOP_CENTER}
             size={SIZES.MINI}
-            trigger={<Icon name={ICONS.EXCLAMATION_CIRCLE} color={COLORS.RED} size={SIZES.SMALL} />}
+            ariaLabel="Pago vencido"
+            iconProps={{ size: SIZES.SMALL, $pointer: false }}
           />
         )}
       </Flex>
