@@ -112,6 +112,7 @@ const CashBalanceMovements = ({ cashBalance }) => {
             onFilter={onFilter}
             filters={filters}
             setFilters={setFilters}
+            $ribbonOverflow
           />
         </Form>
       </FormProvider>

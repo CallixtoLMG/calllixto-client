@@ -3,6 +3,7 @@ import { Pagination as SPagination, Segment as SSegment, Table as STable } from 
 import styled from "styled-components";
 
 const MOBILE_BREAKPOINT = 767;
+const RIBBON_SAFE_AREA = "22px";
 
 const Cell = styled(STable.Cell)`
   height: 37px!important;
@@ -16,13 +17,14 @@ const Cell = styled(STable.Cell)`
 
 const Container = styled(Flex)`
   flex-direction: column;
+  box-sizing: border-box;
   width: 100% !important;
   max-width: 100%;
   min-width: 0;
   max-height: ${({ $tableHeight = 'none' }) => `${$tableHeight}!important`};
   overflow-y: ${({ $tableHeight }) => $tableHeight && "auto"} !important;
   overflow-x: auto !important;
-  padding: 2px 0;
+  padding: ${({ $ribbonOverflow }) => $ribbonOverflow ? `2px 0 8px ${RIBBON_SAFE_AREA}` : "2px 0"};
 
   @media print {
     max-height: none !important;
@@ -39,7 +41,7 @@ const PaginationContainer = styled(Flex)`
   align-items: center;
   position: sticky;
   left: 0;
-  z-index: 3;
+  z-index: 1;
   align-self: center;
   max-height: ${({ height = 'none' }) => `${height}!important`};
   flex-direction: row;
@@ -47,16 +49,31 @@ const PaginationContainer = styled(Flex)`
   column-gap: 10px;
   justify-content: center;
 
+  > .ui.label {
+    white-space: nowrap;
+  }
+
   @media (max-width: ${MOBILE_BREAKPOINT}px) {
     max-width: 100%;
-    flex-direction: column;
-    row-gap: 8px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: 6px;
+    row-gap: 6px;
     align-items: center;
-    justify-content: center !important;
+    justify-content: space-between !important;
 
     > * {
       flex: 0 0 auto;
-      max-width: 100%;
+      min-width: 0;
+    }
+
+    > .ui.pagination {
+      flex: 1 1 auto;
+    }
+
+    > .ui.label {
+      padding-left: 0.6em !important;
+      padding-right: 0.6em !important;
     }
   }
 `;
@@ -98,7 +115,7 @@ const Table = styled(STable)`
   width: max-content!important;
   min-width: 100%!important;
   max-height: ${({ $tableHeight = "none" }) => `${$tableHeight}!important`};
-  overflow-y: auto!important;
+  overflow-y: visible!important;
   overflow-x: visible!important;
   border: 1px solid black;
 

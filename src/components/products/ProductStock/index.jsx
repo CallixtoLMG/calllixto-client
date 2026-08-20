@@ -202,6 +202,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
         setFilters={setFilters}
         mainKey="id"
         disableDefaultPageLink
+        $ribbonOverflow
       />
       <ModalAction
         title={STOCK_FLOWS_MODAL_CONFIG[modalMode]?.title}

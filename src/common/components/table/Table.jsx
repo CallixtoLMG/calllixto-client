@@ -36,6 +36,7 @@ const CustomTable = ({
   onDownloadExcel,
   onFilteredElementsChange,
   disableDefaultPageLink = false,
+  $ribbonOverflow = false,
 }) => {
 
   const { push } = useRouter();
@@ -196,7 +197,7 @@ const CustomTable = ({
   });
 
   return (
-    <Container ref={tableRef} $tableHeight={$tableHeight}>
+    <Container ref={tableRef} $tableHeight={$tableHeight} $ribbonOverflow={$ribbonOverflow}>
       {paginate && (
         <Pagination
           activePage={activePage}
