@@ -4,7 +4,7 @@ import { Box, FieldsContainer, Flex, OverflowWrapper } from "@/common/components
 import { NumberField, TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import { Table } from "@/common/components/table";
-import { POPUP_POSITIONS, COLORS, ICONS } from "@/common/constants";
+import { CONTENT_SIZES, POPUP_POSITIONS, COLORS, ICONS } from "@/common/constants";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
@@ -13,6 +13,7 @@ import { FlexColumn } from "../../../common/components/custom";
 import { Header } from "../../products/ProductStock/styles";
 import { ADJUST_DELIVERY, DELIVERY, buildBudgetDeliveriesColumns, getDeliveryStats, hasInvalidStockQuantities } from "../budgets.constants";
 import { isBudgetCancelled } from "../budgets.utils";
+import { useBudgetActionButtonMode } from "../useBudgetActionButtonMode";
 
 const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => {
   const consumeStock = useConsumeStock();
@@ -23,6 +24,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
   const [commentsByRow, setCommentsByRow] = useState({});
   const [deliveryNote, setDeliveryNote] = useState("");
   const [mode, setMode] = useState(null);
+  const { isMobile, showText } = useBudgetActionButtonMode();
 
   const watchedProducts = useWatch({ control, name: "products" });
 
@@ -319,7 +321,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
       <FlexColumn width="100%" $rowGap="15px" className="ui form">
         <Flex $columnGap="15px" $justifyContent="space-between">
           <Header>Productos</Header>
-          <Flex>
+          <Flex $columnGap="15px" $rowGap="10px" wrap="wrap" $justifyContent="flex-end">
             <Box>
               <IconedButton
                 labelPosition="left"
@@ -331,21 +333,26 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
                   setMode(DELIVERY);
                   setShowModal(true);
                 }}
-                iconOnly
+                iconOnly={!showText}
+                popupDisabled={isMobile}
+                width={showText ? CONTENT_SIZES.FIT : undefined}
                 dataTestId="budget-open-delivery-modal-button"
               />
             </Box>
-            <Box $marginLeft="15px">
+            <Box>
               <IconedButton
                 labelPosition="left"
                 icon={ICONS.ARROW_DOWN}
+                text="Descontar entregas"
                 color={COLORS.ORANGE}
                 disabled={!canReturn}
                 onClick={() => {
                   setMode(ADJUST_DELIVERY);
                   setShowModal(true);
                 }}
-                iconOnly
+                iconOnly={!showText}
+                popupDisabled={isMobile}
+                width={showText ? CONTENT_SIZES.FIT : undefined}
                 popupPosition={POPUP_POSITIONS.TOP_LEFT}
                 popupContent={
                   <>
@@ -356,13 +363,15 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
               />
             </Box>
             {canPrint && (
-              <Box $marginLeft="15px">
+              <Box>
                 <IconedButton
                   icon={ICONS.PRINT}
                   color={COLORS.BLUE}
                   text="Imprimir entregas"
                   onClick={onPrint}
-                  iconOnly
+                  iconOnly={!showText}
+                  popupDisabled={isMobile}
+                  width={showText ? CONTENT_SIZES.FIT : undefined}
                   popupPosition={POPUP_POSITIONS.TOP_LEFT}
                 />
               </Box>
@@ -411,7 +420,9 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
                 }
                 onClick={handleToggleAll}
                 disabled={!operableProducts.length}
-                iconOnly
+                iconOnly={!showText}
+                popupDisabled={isMobile}
+                width={showText ? CONTENT_SIZES.FIT : undefined}
                 popupPosition={POPUP_POSITIONS.TOP_LEFT}
                 dataTestId="budget-complete-all-deliveries-button"
               />

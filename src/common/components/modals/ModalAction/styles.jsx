@@ -34,6 +34,10 @@ const Form = styled.form`
 
 const ModalContent = styled(Modal.Content)`
   padding: 5px 0!important;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}) {
+    padding: 14px 16px !important;
+  }
 `;
 
 const Message = styled(SMessage)`

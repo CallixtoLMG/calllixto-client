@@ -479,11 +479,12 @@ const BudgetForm = ({
       />
       <Form onSubmit={handleSubmit(handleConfirm)}>
         <FieldsContainer $rowGap="15px" $justifyContent="space-between">
-          <FormField $width="300px">
+          <FormField $alignItems="flex-end" $width={CONTENT_SIZES.FIT} $maxWidth="100%">
             <ButtonGroup size={SIZES.SMALL}>
               <IconedButton
                 text="Confirmado"
                 icon={ICONS.CHECK}
+                width={CONTENT_SIZES.FIT}
                 basic={!isConfirmed}
                 color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
                 dataTestId="budget-state-confirmed-button"
@@ -495,6 +496,7 @@ const BudgetForm = ({
               <IconedButton
                 text="Pendiente"
                 icon={ICONS.HOURGLASS_HALF}
+                width={CONTENT_SIZES.FIT}
                 basic={isConfirmed}
                 color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
                 dataTestId="budget-state-pending-button"

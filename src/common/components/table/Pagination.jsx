@@ -9,6 +9,7 @@ import { PaginationContainer } from "./styles";
 const PAGE_SIZE_DROPDOWN_WIDTH = "92px";
 const MOBILE_PAGE_SIZE_DROPDOWN_WIDTH = "58px";
 const MOBILE_BREAKPOINT = 767;
+const COMPACT_PAGINATION_BREAKPOINT = 1000;
 
 const NavigationPagination = styled(SPagination)`
   @media (max-width: ${MOBILE_BREAKPOINT}px) {
@@ -82,16 +83,16 @@ const Pagination = ({
   onPageChange,
   onPageSizeChange,
 }) => {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isCompactPagination, setIsCompactPagination] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`);
-    const updateIsMobile = () => setIsMobile(mediaQuery.matches);
+    const mediaQuery = window.matchMedia(`(max-width: ${COMPACT_PAGINATION_BREAKPOINT}px)`);
+    const updateIsCompactPagination = () => setIsCompactPagination(mediaQuery.matches);
 
-    updateIsMobile();
-    mediaQuery.addEventListener("change", updateIsMobile);
+    updateIsCompactPagination();
+    mediaQuery.addEventListener("change", updateIsCompactPagination);
 
-    return () => mediaQuery.removeEventListener("change", updateIsMobile);
+    return () => mediaQuery.removeEventListener("change", updateIsCompactPagination);
   }, []);
 
   return (
@@ -105,8 +106,8 @@ const Pagination = ({
       <NavigationPagination
         activePage={activePage}
         onPageChange={onPageChange}
-        siblingRange={isMobile ? 0 : 2}
-        boundaryRange={isMobile ? 1 : 2}
+        siblingRange={isCompactPagination ? 0 : 2}
+        boundaryRange={isCompactPagination ? 1 : 2}
         firstItem={null}
         lastItem={null}
         pointing

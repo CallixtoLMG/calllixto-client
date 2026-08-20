@@ -107,6 +107,32 @@ export const AccountBadge = styled.div`
   }
 `;
 
+export const InfoMenuAccount = styled.div`
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  min-width: 0;
+`;
+
+export const InfoMenuAccountLabel = styled.div`
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 5px;
+`;
+
+export const InfoMenuAccountValue = styled.div`
+  color: #2185d0;
+  font-size: 14px;
+  font-weight: 700;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
 export const UserButton = styled.button`
   height: 35px;
   padding: 0 14px;

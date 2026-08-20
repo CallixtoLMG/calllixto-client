@@ -18,29 +18,32 @@ const StyledModal = styled(Modal)`
   overflow: auto;
 `;
 
-const ModalUpdates = () => {
+const ModalUpdates = ({ trigger }) => {
   const activeVersion = '2026-05-20';
   const latestNews = typeof window !== 'undefined' ? window.localStorage.getItem('latestNews') : activeVersion;
   const [open, setOpen] = useState(!latestNews || isDateBefore(latestNews, activeVersion));
+  const handleOpen = () => setOpen(true);
 
   return (
     <>
-      <Popup
-        content="Últimas novedades"
-        trigger={
-          <Icon
-            $cursor
-            margin="0"
-            $pointer
-            size={SIZES.LARGE}
-            name={ICONS.BULLHORN}
-            color={COLORS.BLUE}
-            onClick={() => setOpen(true)}
-          />
-        }
-        position={POPUP_POSITIONS.BOTTOM_RIGHT}
-        size={SIZES.TINY}
-      />
+      {trigger ? trigger(handleOpen) : (
+        <Popup
+          content="Últimas novedades"
+          trigger={
+            <Icon
+              $cursor
+              margin="0"
+              $pointer
+              size={SIZES.LARGE}
+              name={ICONS.BULLHORN}
+              color={COLORS.BLUE}
+              onClick={handleOpen}
+            />
+          }
+          position={POPUP_POSITIONS.BOTTOM_RIGHT}
+          size={SIZES.TINY}
+        />
+      )}
       <Transition visible={open} animation="scale" duration={500}>
         <StyledModal open={open} onClose={() => setOpen(false)}>
           <StyledModalHeader icon={ICONS.BULLHORN} content="Últimas novedades - 20 - 05 - 2026" />

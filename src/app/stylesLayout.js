@@ -28,6 +28,12 @@ const GlobalStyle = createGlobalStyle`
     scrollbar-width: thin;
     scrollbar-color: #888 #f1f1f1;
   }
+
+  @media (max-width: 767px) {
+    .ui.modal > .actions {
+      padding: 12px 16px !important;
+    }
+  }
 `;
 
 const LayoutChildrenContainer = styled.div`

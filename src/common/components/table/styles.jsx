@@ -3,6 +3,7 @@ import { Pagination as SPagination, Segment as SSegment, Table as STable } from 
 import styled from "styled-components";
 
 const MOBILE_BREAKPOINT = 767;
+const NARROW_FILTER_ACTIONS_BREAKPOINT = 400;
 const RIBBON_SAFE_AREA = "22px";
 
 const Cell = styled(STable.Cell)`
@@ -17,13 +18,12 @@ const Cell = styled(STable.Cell)`
 
 const Container = styled(Flex)`
   flex-direction: column;
+  row-gap: 15px;
   box-sizing: border-box;
   width: 100% !important;
   max-width: 100%;
   min-width: 0;
-  max-height: ${({ $tableHeight = 'none' }) => `${$tableHeight}!important`};
-  overflow-y: ${({ $tableHeight }) => $tableHeight && "auto"} !important;
-  overflow-x: auto !important;
+  overflow: visible !important;
   padding: ${({ $ribbonOverflow }) => $ribbonOverflow ? `2px 0 8px ${RIBBON_SAFE_AREA}` : "2px 0"};
 
   @media print {
@@ -127,6 +127,93 @@ const Table = styled(STable)`
   }
 `;
 
+const TableOuterWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: visible;
+`;
+
+const TableScrollContainer = styled.div`
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  max-height: ${({ $tableHeight = 'none' }) => `${$tableHeight}!important`};
+  overflow-y: ${({ $tableHeight }) => $tableHeight && "auto"} !important;
+  overflow-x: auto !important;
+
+  @media print {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+`;
+
+const TableLoaderArea = styled.div`
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+
+  ${({ $hasPagination }) => $hasPagination && `
+    > .ui.table {
+      margin-top: 0!important;
+    }
+  `}
+`;
+
+const SelectionActionsBar = styled(Flex)`
+  display: none;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid #d4d4d5;
+  border-radius: 4px;
+  background-color: #f7f7f7;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 10px;
+
+    > .ui.button {
+      flex: 0 0 auto;
+    }
+  }
+`;
+
+const SelectionActionsCount = styled.span`
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: bold;
+`;
+
+const BatchGearDesktop = styled.div`
+  display: none;
+
+  @media (min-width: ${MOBILE_BREAKPOINT + 1}px) {
+    display: flex;
+    position: absolute;
+    top: 2px;
+    right: calc(100% + 4px);
+    z-index: 2;
+    padding: 8px 5px;
+    border: 1px solid #d4d4d5;
+    border-radius: 10px 0 0 10px;
+    background-color: #f7f7f7;
+  }
+`;
+
 const TableHeader = styled(STable.Header)`
   height: 35px!important;
 `;
@@ -138,6 +225,7 @@ const HeaderCell = styled(STable.HeaderCell)`
   padding: ${({ padding }) => padding}!important;
   max-height: ${({ maxhHeight }) => maxhHeight}!important;
   cursor: ${({ $cursor }) => $cursor}!important;
+
 `;
 
 const ActionsContainer = styled.td`
@@ -244,6 +332,60 @@ const FiltersActions = styled(Flex)`
   }
 `;
 
+const DesktopRestoreAction = styled.div`
+  display: contents;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    display: none;
+  }
+`;
+
+const MobileRestoreAction = styled.div`
+  display: none;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    display: contents;
+  }
+`;
+
+const WideRestoreAction = styled.div`
+  display: contents;
+
+  @media (max-width: ${NARROW_FILTER_ACTIONS_BREAKPOINT}px) {
+    display: none;
+  }
+`;
+
+const NarrowRestoreAction = styled.div`
+  display: none;
+
+  @media (max-width: ${NARROW_FILTER_ACTIONS_BREAKPOINT}px) {
+    display: contents;
+  }
+`;
+
+const FiltersSearchActions = styled.div`
+  display: contents;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    display: flex;
+    flex: 0 0 auto;
+    max-width: 100%;
+    column-gap: 10px;
+    justify-content: flex-end;
+    order: 2;
+  }
+`;
+
+const RefetchAction = styled.div`
+  display: contents;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    display: flex;
+    order: 1;
+  }
+`;
+
 const ResponsiveHeaderSegment = styled(HeaderSegment)`
   @media (max-width: ${MOBILE_BREAKPOINT}px) {
     width: 100%;
@@ -252,5 +394,4 @@ const ResponsiveHeaderSegment = styled(HeaderSegment)`
   }
 `;
 
-export { ActionsContainer, Cell, Container, FiltersActions, FiltersContainer, HeaderCell, ResponsiveHeaderSegment as HeaderSegment, InnerActionsContainer, LinkCell, LinkContent, LinkOverlay, MainContainer, Pagination, PaginationContainer, Segment, Table, TableHeader, TableRow };
-
+export { ActionsContainer, BatchGearDesktop, Cell, Container, DesktopRestoreAction, FiltersActions, FiltersContainer, FiltersSearchActions, HeaderCell, ResponsiveHeaderSegment as HeaderSegment, InnerActionsContainer, LinkCell, LinkContent, LinkOverlay, MainContainer, MobileRestoreAction, NarrowRestoreAction, Pagination, PaginationContainer, RefetchAction, Segment, SelectionActionsBar, SelectionActionsCount, Table, TableHeader, TableLoaderArea, TableOuterWrapper, TableRow, TableScrollContainer, WideRestoreAction };

@@ -1,5 +1,5 @@
 import { POPUP_POSITIONS, CONTENT_SIZES, COLORS, DEFAULT_PAGE_SIZE, ICONS, SHORTKEYS, SIZES, SORTING } from "@/common/constants";
-import { preventSend } from "@/common/utils";
+import { formatCount, preventSend } from "@/common/utils";
 import { Loader } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks";
 import { useRouter } from "next/navigation";
@@ -10,8 +10,9 @@ import { CenteredFlex, Flex, Icon } from "../custom";
 import Actions from "./Actions";
 import Pagination from "./Pagination";
 
-import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, LinkContent, LinkOverlay, Table, TableHeader, TableRow } from "./styles";
+import { ActionsContainer, BatchGearDesktop, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, LinkContent, LinkOverlay, SelectionActionsBar, SelectionActionsCount, Table, TableHeader, TableLoaderArea, TableOuterWrapper, TableRow, TableScrollContainer } from "./styles";
 const { ASC, DESC } = SORTING;
+const MOBILE_TABLE_ACTIONS_QUERY = "(max-width: 767px)";
 
 const CustomTable = ({
   isLoading,
@@ -46,9 +47,11 @@ const CustomTable = ({
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupOpenId, setPopupOpenId] = useState(null);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
   const tableRef = useRef(null);
   const lastFilteredElementsRef = useRef([]);
   const [sortConfig, setSortConfig] = useState(filters?.sorting ?? { key: mainKey, direction: ASC });
+  const selectedCount = useMemo(() => Object.keys(selection).length, [selection]);
 
   const handleSort = (columnKey) => {
     let newSorting = { key: columnKey, direction: ASC };
@@ -110,6 +113,16 @@ const CustomTable = ({
 
   useEffect(() => {
     setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    const mobileQuery = window.matchMedia(MOBILE_TABLE_ACTIONS_QUERY);
+    const updateViewport = () => setIsMobileViewport(mobileQuery.matches);
+
+    updateViewport();
+    mobileQuery.addEventListener("change", updateViewport);
+
+    return () => mobileQuery.removeEventListener("change", updateViewport);
   }, []);
 
   useEffect(() => {
@@ -196,6 +209,17 @@ const CustomTable = ({
     [SHORTKEYS.LEFT_ARROW]: () => handleShortcutPageChange(activePage - 1),
   });
 
+  const renderSelectionActionsPopup = (trigger, position) => (
+    <PopupActions
+      position={position}
+      trigger={trigger}
+      buttons={selectionActions}
+      open={isPopupOpen}
+      onOpen={() => setIsPopupOpen(true)}
+      onClose={() => setIsPopupOpen(false)}
+    />
+  );
+
   return (
     <Container ref={tableRef} $tableHeight={$tableHeight} $ribbonOverflow={$ribbonOverflow}>
       {paginate && (
@@ -208,35 +232,66 @@ const CustomTable = ({
           onPageSizeChange={handlePageSizeChange}
         />
       )}
-      <Loader $marginTop active={isLoading} $greyColor>
-        <Table sortable celled compact striped={!basic} color={color} definition={isSelectable} unstackable>
-          <TableHeader fullWidth>
-            <TableRow>
-              {isSelectable && (
-                <HeaderCell $width="50px" padding="0">
-                  <CenteredFlex>
-                    <Checkbox
-                      indeterminate={!!Object.keys(selection).length && !allSelected}
-                      checked={!isLoading && allSelected}
-                      onChange={handleToggleAll}
-                    />
-                  </CenteredFlex>
-                  {!!Object.keys(selection).length && (
-                    <ActionsContainer as="div" $header $open={isPopupOpen}>
-                      <InnerActionsContainer $header>
-                        <PopupActions
-                          position={POPUP_POSITIONS.RIGHT_CENTER}
-                          trigger={<Button icon circular color={COLORS.YELLOW} size="mini"><Icon name={ICONS.COG} /></Button>}
-                          buttons={selectionActions}
-                          open={isPopupOpen}
-                          onOpen={() => setIsPopupOpen(true)}
-                          onClose={() => setIsPopupOpen(false)}
+      <TableOuterWrapper>
+        {!!selectedCount && !isMobileViewport && (
+          <BatchGearDesktop>
+            {renderSelectionActionsPopup(
+              <Button
+                type="button"
+                icon
+                circular
+                color={COLORS.YELLOW}
+                size="mini"
+                aria-label="Acciones"
+                data-testid="table-selection-actions-trigger-desktop"
+              >
+                <Icon name={ICONS.COG} />
+              </Button>,
+              POPUP_POSITIONS.RIGHT_CENTER
+            )}
+          </BatchGearDesktop>
+        )}
+        <TableScrollContainer $tableHeight={$tableHeight}>
+          <TableLoaderArea $hasPagination={paginate}>
+            {!!selectedCount && isMobileViewport && (
+              <SelectionActionsBar>
+                <SelectionActionsCount>
+                  {formatCount(selectedCount, "seleccionado", "seleccionados")}
+                </SelectionActionsCount>
+                {renderSelectionActionsPopup(
+                  (
+                    <Button
+                      type="button"
+                      icon
+                      labelPosition="left"
+                      color={COLORS.YELLOW}
+                      size="small"
+                      aria-label="Acciones"
+                      data-testid="table-selection-actions-trigger"
+                    >
+                      <Icon name={ICONS.COG} />
+                      Acciones
+                    </Button>
+                  ),
+                  POPUP_POSITIONS.BOTTOM_RIGHT
+                )}
+              </SelectionActionsBar>
+            )}
+            <Loader $marginTop $tableArea active={isLoading} $greyColor>
+              <Table sortable celled compact striped={!basic} color={color} definition={isSelectable} unstackable>
+              <TableHeader fullWidth>
+                <TableRow>
+                  {isSelectable && (
+                    <HeaderCell $width="50px" padding="0">
+                      <CenteredFlex>
+                        <Checkbox
+                          indeterminate={!!Object.keys(selection).length && !allSelected}
+                          checked={!isLoading && allSelected}
+                          onChange={handleToggleAll}
                         />
-                      </InnerActionsContainer>
-                    </ActionsContainer>
+                      </CenteredFlex>
+                    </HeaderCell>
                   )}
-                </HeaderCell>
-              )}
               {headers.map((header) => (
                 <HeaderCell
                   key={`header_${header.id}`}
@@ -436,18 +491,21 @@ const CustomTable = ({
               )}
             </Table.Body>
           )}
-        </Table>
-        {onDownloadExcel && (
-          <Flex width={CONTENT_SIZES.FIT} $alignSelf="flex-end">
-            <IconedButton
-              text="Descargar excel"
-              icon={ICONS.FILE_EXCEL}
-              onClick={() => onDownloadExcel(filteredElements)}
-              width={CONTENT_SIZES.FIT}
-            />
-          </Flex>
-        )}
-      </Loader>
+          </Table>
+          {onDownloadExcel && (
+            <Flex width={CONTENT_SIZES.FIT} $alignSelf="flex-end">
+              <IconedButton
+                text="Descargar excel"
+                icon={ICONS.FILE_EXCEL}
+                onClick={() => onDownloadExcel(filteredElements)}
+                width={CONTENT_SIZES.FIT}
+              />
+            </Flex>
+          )}
+            </Loader>
+          </TableLoaderArea>
+        </TableScrollContainer>
+      </TableOuterWrapper>
     </Container>
   );
 };

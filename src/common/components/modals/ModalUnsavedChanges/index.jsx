@@ -1,12 +1,22 @@
-import { ButtonsContainer, Modal } from "@/common/components/custom";
+import { ButtonsContainer } from "@/common/components/custom";
 import { CONTENT_SIZES, COLORS, ICONS } from "@/common/constants";
-import { Transition } from "semantic-ui-react";
+import { Icon, Modal, Transition } from "semantic-ui-react";
 import { IconedButton } from "../../buttons";
+import { CloseButton, UnsavedModal } from "./styles";
 
 const UnsavedChangesModal = ({ open, onDiscard, onContinue }) => (
   <Transition visible={open} animation="scale" duration={500}>
-    <Modal width="50%" open={open} onClose={onContinue}>
-      <Modal.Header>¡Existen cambios sin guardar!</Modal.Header>
+    <UnsavedModal width="50%" open={open} onClose={onContinue}>
+      <Modal.Header>
+        ¡Existen cambios sin guardar!
+        <CloseButton
+          type="button"
+          aria-label="Continuar editando"
+          onClick={onContinue}
+        >
+          <Icon name={ICONS.TIMES} />
+        </CloseButton>
+      </Modal.Header>
       <Modal.Content>
         Si salís ahora, los cambios se perderán.
       </Modal.Content>
@@ -29,7 +39,7 @@ const UnsavedChangesModal = ({ open, onDiscard, onContinue }) => (
           />
         </ButtonsContainer>
       </Modal.Actions>
-    </Modal>
+    </UnsavedModal>
   </Transition>
 );
 
