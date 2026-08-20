@@ -1,11 +1,11 @@
 import { IconedButton } from "@/common/components/buttons";
-import { Flex, FlexColumn, Icon } from "@/common/components/custom";
+import { Flex, FlexColumn } from "@/common/components/custom";
 import { NumberField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
+import { IconTooltip } from "@/common/components/tooltips";
 import { POPUP_POSITIONS, COLORS, ICONS } from "@/common/constants";
 import { useMemo } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
-import { Popup } from "semantic-ui-react";
 import { Header } from "../../products/ProductStock/styles";
 import { getDeliveryStats } from "../budgets.constants";
 
@@ -43,21 +43,19 @@ const CreateBudgetDeliveriesForm = ({ dataTestIdPrefix = "budget-create-delivery
           <Flex $columnGap="10px" $justifyContent="space-between">
             {product.id}
             {isCompleted && (
-              <Popup
-                trigger={
-                  <Flex $alignItems="center" >
-                    {isCompleted && (
-                      <Icon
-                        $lowTooltip
-                        name={ICONS.CHECK}
-                        color={COLORS.GREEN}
-                      />
-                    )}
-                  </Flex>
-                }
+              <IconTooltip
                 content="Entrega completa"
+                icon={ICONS.CHECK}
+                color={COLORS.GREEN}
                 position={POPUP_POSITIONS.RIGHT_CENTER}
                 size="mini"
+                ariaLabel="Entrega completa"
+                iconProps={{
+                  $lowTooltip: true,
+                  margin: undefined,
+                  $lineHeight: undefined,
+                  $pointer: false,
+                }}
               />
             )}
           </Flex>

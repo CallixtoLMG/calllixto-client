@@ -1,4 +1,4 @@
-import { Box, Flex, Icon, OverflowWrapper } from "@/common/components/custom";
+import { Box, Flex, OverflowWrapper } from "@/common/components/custom";
 import { ALL, COLORS, CONTENT_SIZES, DATE_FORMATS, FIELD_LABELS, ICONS, POPUP_POSITIONS, SELECT_ALL_OPTION, SORTING } from "@/common/constants";
 import { getLabelColor } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate, getStartOfUnit, now } from "@/common/utils/dates";
@@ -108,16 +108,18 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
                 </Label>
               )}
               {isPaid && (
-                <Popup
+                <IconTooltip
                   content="Pagado"
+                  icon={ICONS.DOLLAR}
+                  color={COLORS.GREEN}
                   position={POPUP_POSITIONS.RIGHT_CENTER}
                   size="mini"
-                  trigger={
-                    <Icon
-                      name={ICONS.DOLLAR}
-                      color={COLORS.GREEN}
-                    />
-                  }
+                  ariaLabel="Pagado"
+                  iconProps={{
+                    margin: undefined,
+                    $lineHeight: undefined,
+                    $pointer: false,
+                  }}
                 />
               )}
             </Flex>
@@ -519,21 +521,19 @@ export const buildBudgetDeliveriesColumns = ({
           <Flex $columnGap="5px" $justifyContent="space-between">
             {product.id}
             {isCompleted && (
-              <Popup
-                trigger={
-                  <Flex $alignItems="center" >
-                    {isCompleted && (
-                      <Icon
-                        $lowTooltip
-                        name={ICONS.CHECK}
-                        color={COLORS.GREEN}
-                      />
-                    )}
-                  </Flex>
-                }
+              <IconTooltip
                 content="Entrega completa"
+                icon={ICONS.CHECK}
+                color={COLORS.GREEN}
                 position={POPUP_POSITIONS.RIGHT_CENTER}
                 size="mini"
+                ariaLabel="Entrega completa"
+                iconProps={{
+                  $lowTooltip: true,
+                  margin: undefined,
+                  $lineHeight: undefined,
+                  $pointer: false,
+                }}
               />
             )}
           </Flex>

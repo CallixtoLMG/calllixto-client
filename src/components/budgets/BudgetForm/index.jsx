@@ -19,6 +19,7 @@ import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay, removeNu
 import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
+import { getBudgetProductChanges } from "@/components/budgets/productUpdates.utils";
 import { Loader } from "@/components/layout";
 import { LIST_ATTRIBUTES, PRODUCT_STATES, getProductSearchDescription, getProductSearchTitle } from "@/components/products/products.constants";
 import { getBrandId, getPrice, getProductId, getSupplierId, getTotal, isProductOOS, normalizeBudgetProductFractionConfig } from "@/components/products/products.utils";
@@ -106,12 +107,7 @@ const BudgetForm = ({
       const original = budgetProducts.find(budgetProducts => budgetProducts.id === product.id);
       if (!original) return false;
 
-      return (
-        original.price !== product.price ||
-        original.state !== product.state ||
-        original.editablePrice !== product.editablePrice ||
-        original.fractionConfig?.active !== product.fractionConfig?.active
-      );
+      return getBudgetProductChanges(original, product).hasChanges;
     });
 
     if (outdated.length || removed.length) {
