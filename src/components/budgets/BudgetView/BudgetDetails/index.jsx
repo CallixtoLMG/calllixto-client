@@ -1,8 +1,8 @@
 import { IconedButton } from "@/common/components/buttons";
-import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, OverflowWrapper, TextArea, ViewContainer } from "@/common/components/custom";
+import { Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label, OverflowWrapper, TextArea, ViewContainer } from "@/common/components/custom";
 import { DropdownField, PriceControlled, PriceLabel } from "@/common/components/form";
 import { Table, Total, TotalList } from "@/common/components/table";
-import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
+import { CommentTooltip, IconTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { COLORS, DATE_FORMATS, ICONS, POPUP_POSITIONS, SIZES } from "@/common/constants";
 import { getFormatedPercentage, getFormatedPhone } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
@@ -131,11 +131,18 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                 {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
                 {product.comments && <CommentTooltip lineHeight="normal" comment={product.comments} />}
                 {product.dispatchComment && (
-                  <Popup
+                  <IconTooltip
                     size="mini"
                     content={product.dispatchComment}
                     position={POPUP_POSITIONS.TOP_CENTER}
-                    trigger={<Icon name={ICONS.TRUCK} color={COLORS.ORANGE} />}
+                    icon={ICONS.TRUCK}
+                    color={COLORS.ORANGE}
+                    ariaLabel="Comentario de despacho"
+                    iconProps={{
+                      margin: undefined,
+                      $lineHeight: undefined,
+                      $pointer: false,
+                    }}
                   />
                 )}
               </Flex>
@@ -302,16 +309,19 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
             <>
               <TotalList items={TOTAL_LIST_ITEMS} />
               <Flex $alignSelf="flex-end" $rowGap="15px">
-                <Popup
-                  trigger={
-                    <Icon
-                      fontSize="larger"
-                      name={ICONS.INFO_CIRCLE}
-                      color={COLORS.BLUE} />
-                  }
+                <IconTooltip
                   content="Permite aplicar un descuento una vez confirmada la venta"
+                  icon={ICONS.INFO_CIRCLE}
+                  color={COLORS.BLUE}
                   position={POPUP_POSITIONS.LEFT_CENTER}
                   size="mini"
+                  ariaLabel="Información sobre descuento"
+                  iconProps={{
+                    fontSize: "larger",
+                    margin: undefined,
+                    $lineHeight: undefined,
+                    $pointer: false,
+                  }}
                 />
                 <Flex width="250px" $alignSelf="flex-end" $alignItems="flex-end" $columnGap="10px">
                   <PriceControlled
