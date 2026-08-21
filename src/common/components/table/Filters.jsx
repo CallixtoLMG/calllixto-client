@@ -14,7 +14,7 @@ import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Dropdown, Icon, Popup } from 'semantic-ui-react';
 import { IconedButton } from '../buttons';
-import { FiltersContainer, HeaderSegment, MainContainer } from './styles';
+import { DesktopRestoreAction, FiltersActions, FiltersContainer, FiltersSearchActions, HeaderSegment, MainContainer, MobileRestoreAction, NarrowRestoreAction, RefetchAction, WideRestoreAction } from './styles';
 
 const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, hydrated, showRefetchAction = true }) => {
   const ENTITY_MAPPING = {
@@ -62,19 +62,21 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
     <MainContainer>
       <HeaderSegment flex="1">
         <FiltersContainer>
-          <Popup
-            content="Restaurar filtros"
-            position={POPUP_POSITIONS.TOP_CENTER}
-            size={SIZES.TINY}
-            trigger={(
-              <CustomButton $marginBottom="2px" $alignSelf="flex-end" width={CONTENT_SIZES.FIT} $fontSize="14px" $paddingLeft="11px" padding="11px" circular icon type="button" onClick={onRestoreFilters}>
-                <Icon name={ICONS.UNDO} />
-              </CustomButton>
-            )}
-          />
+          <DesktopRestoreAction>
+            <Popup
+              content="Restaurar filtros"
+              position={POPUP_POSITIONS.TOP_CENTER}
+              size={SIZES.TINY}
+              trigger={(
+                <CustomButton $marginBottom="2px" $alignSelf="flex-end" width={CONTENT_SIZES.FIT} $fontSize="14px" $paddingLeft="11px" padding="11px" circular icon type="button" onClick={onRestoreFilters}>
+                  <Icon name={ICONS.UNDO} />
+                </CustomButton>
+              )}
+            />
+          </DesktopRestoreAction>
           {children}
         </FiltersContainer>
-        <Flex $columnGap="10px" $marginBottom="2px" $alignSelf="flex-end">
+        <FiltersActions $columnGap="10px" $marginBottom="2px" $alignSelf="flex-end">
           {hydrated && appliedCount > 0 && (
             <Popup
               content="Filtros activos"
@@ -85,25 +87,49 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
               }
             />
           )}
-          <IconedButton
-            text="Buscar"
-            icon={ICONS.SEARCH}
-            submit
-            color={isDirty ? COLORS.BLUE : undefined}
-          />
+          <FiltersSearchActions>
+            <MobileRestoreAction>
+              <WideRestoreAction>
+                <IconedButton
+                  text="Restaurar filtros"
+                  icon={ICONS.UNDO}
+                  onClick={onRestoreFilters}
+                  width="160px"
+                  minWidth="160px"
+                />
+              </WideRestoreAction>
+              <NarrowRestoreAction>
+                <IconedButton
+                  text="Restaurar filtros"
+                  icon={ICONS.UNDO}
+                  onClick={onRestoreFilters}
+                  iconOnly
+                  popupContent="Restaurar filtros"
+                />
+              </NarrowRestoreAction>
+            </MobileRestoreAction>
+            <IconedButton
+              text="Buscar"
+              icon={ICONS.SEARCH}
+              submit
+              color={isDirty ? COLORS.BLUE : undefined}
+            />
+          </FiltersSearchActions>
           {showRefetchAction && onRefetch &&
-            <Dropdown width="130px" pointing as={CustomButton} text={BUTTON_TEXTS.UPDATE} icon={ICONS.REFRESH} floating labeled button className='icon'>
-              <Dropdown.Menu>
-                <DropdownItem onClick={onRefetch}>
-                  <Icon color={COLORS.BLUE} name={ICONS.BOLT} />Actualización rápida
-                </DropdownItem>
-                <DropdownItem onClick={handleHardUpdate}>
-                  <Icon color={COLORS.RED} name={ICONS.CLOUD_DOWNLOAD} />Actualización completa
-                </DropdownItem>
-              </Dropdown.Menu>
-            </Dropdown>
+            <RefetchAction>
+              <Dropdown width="130px" pointing as={CustomButton} text={BUTTON_TEXTS.UPDATE} icon={ICONS.REFRESH} floating labeled button className='icon'>
+                <Dropdown.Menu>
+                  <DropdownItem onClick={onRefetch}>
+                    <Icon color={COLORS.BLUE} name={ICONS.BOLT} />Actualización rápida
+                  </DropdownItem>
+                  <DropdownItem onClick={handleHardUpdate}>
+                    <Icon color={COLORS.RED} name={ICONS.CLOUD_DOWNLOAD} />Actualización completa
+                  </DropdownItem>
+                </Dropdown.Menu>
+              </Dropdown>
+            </RefetchAction>
           }
-        </Flex>
+        </FiltersActions>
       </HeaderSegment>
       <ModalAction
         title={`¿Quieres realizar una actualización completa de ${text} ?  `}

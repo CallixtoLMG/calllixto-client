@@ -3,6 +3,26 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-08-21
+
+### Changed
+
+- Private layout: Refined the mobile action rail gutter so closed actions reserve only the collapsed rail width plus the existing gap, while expanded actions remain an overlay.
+- Private layout: Increased the mobile expanded action rail width and allowed long action labels and subactions to wrap instead of relying on touch tooltips.
+- Header: Replaced separate mobile header shortcuts with a single informational menu and moved the current account label into that menu for `callixto` users.
+- Tables: Updated mobile filter actions so restore and search stay grouped, with restore switching to icon-only only on very narrow screens.
+- Tables: Reworked batch-selection actions so desktop uses a lateral yellow gear outside the scroll container, while mobile uses a contextual "N seleccionados" action bar.
+- Budgets: Improved responsive action-button discoverability in delivery and post-confirmation discount flows, showing icon plus text when mobile/tablet space allows.
+
+### Fixed
+
+- Private layout: Removed redundant mobile action tooltips for touch interactions and preserved desktop hover tooltips.
+- Private layout: Adjusted closed mobile and desktop action rail edge spacing independently so mobile keeps the compact gap and desktop keeps a small right margin.
+- Tables: Centered loading indicators within the table area and restored consistent spacing between pagination and table content.
+- Tables: Prevented batch-selection action triggers from being clipped by horizontal table overflow.
+- Modals: Restored mobile padding for unsaved-changes and action-confirmation modals, and added an explicit close button to the unsaved-changes guard.
+- Sales: Aligned confirmation and delivery option controls in the sale form without changing their behavior.
+
 ## 2026-08-20
 
 ### Fixed
@@ -19,7 +39,7 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- Responsive layout: Added the first mobile baseline for the private shell, allowing the workspace to use the available viewport width and keeping the action rail from permanently reserving mobile content width.
+- Responsive layout: Added the first mobile baseline for the private shell, reducing structural mobile padding, allowing the workspace to use the available viewport width, and keeping the action rail from permanently reserving content width on small screens.
 - Tables: Updated shared list controls for mobile by making filters, table overflow, and pagination adapt within the content width while preserving desktop behavior.
 - Forms: Improved shared form controls for mobile, including responsive search results and a one-column mobile policy for `FieldsContainer` / `FormField`.
 - Modals: Improved responsive behavior for common modal actions, multi-delete confirmations, open-cash-balance, add-payment, budget confirmation, and batch-import flows.

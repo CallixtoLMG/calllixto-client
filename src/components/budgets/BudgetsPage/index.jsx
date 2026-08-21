@@ -321,6 +321,7 @@ const BudgetsPage = ({
         setFilters={setFilters}
         onDownloadExcel={useSideActions ? undefined : downloadBudgetsExcel}
         onFilteredElementsChange={useSideActions ? handleFilteredBudgetsChange : undefined}
+        $ribbonOverflow
       />
     </>
   );

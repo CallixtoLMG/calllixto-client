@@ -64,7 +64,8 @@ const SidebarActionButton = styled(Button)`
   &&&&&& {
     width: 100% !important;
     min-width: 35px !important;
-    height: 36px !important;
+    height: ${({ $isOpen, $wrapLabel }) => ($isOpen && $wrapLabel ? "auto" : "36px")} !important;
+    min-height: 36px !important;
     display: ${({ $isOpen }) => ($isOpen ? "grid" : "flex")} !important;
     grid-template-columns: ${({ $isOpen }) => ($isOpen ? "34px minmax(0, 1fr) 16px" : "none")};
     align-items: center !important;
@@ -101,10 +102,17 @@ const SidebarActionText = styled.span`
   min-width: 0;
   line-height: 1.2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  text-overflow: ${({ $wrapLabel }) => ($wrapLabel ? "clip" : "ellipsis")};
+  white-space: ${({ $wrapLabel }) => ($wrapLabel ? "normal" : "nowrap")};
   color: #263238;
   padding: 0 9px;
+
+  ${({ $wrapLabel }) => $wrapLabel && `
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow-wrap: anywhere;
+  `}
 `;
 
 const SidebarActionIconSlot = styled.span`
@@ -163,7 +171,8 @@ const SidebarChildrenList = styled.div`
 
 const SidebarChildButton = styled(SidebarActionButton)`
   &&&&&& {
-    height: 32px !important;
+    height: ${({ $wrapLabel }) => ($wrapLabel ? "auto" : "32px")} !important;
+    min-height: 32px !important;
     display: grid !important;
     grid-template-columns: 32px minmax(0, 1fr);
     align-items: center !important;
@@ -206,7 +215,8 @@ const SidebarCustomAction = styled.div`
   &&&&&& .${SIDEBAR_CUSTOM_TRIGGER_CLASS} {
     width: 100% !important;
     min-width: 35px !important;
-    height: ${({ $child }) => ($child ? "32px" : "36px")} !important;
+    height: ${({ $child, $isOpen, $wrapLabel }) => ($isOpen && $wrapLabel ? "auto" : ($child ? "32px" : "36px"))} !important;
+    min-height: ${({ $child }) => ($child ? "32px" : "36px")} !important;
     display: ${({ $isOpen }) => ($isOpen ? "grid" : "flex")} !important;
     grid-template-columns: ${({ $child, $isOpen }) => ($isOpen ? `${$child ? "32px" : "34px"} minmax(0, 1fr)` : "none")};
     align-items: center !important;
@@ -254,10 +264,17 @@ const SidebarCustomAction = styled.div`
       display: ${({ $isOpen }) => ($isOpen ? "block" : "none")};
       min-width: 0;
       overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      text-overflow: ${({ $wrapLabel }) => ($wrapLabel ? "clip" : "ellipsis")};
+      white-space: ${({ $wrapLabel }) => ($wrapLabel ? "normal" : "nowrap")};
       line-height: 1.2;
       padding: 0 9px;
+
+      ${({ $wrapLabel }) => $wrapLabel && `
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow-wrap: anywhere;
+      `}
     }
   }
 `;
@@ -331,6 +348,7 @@ const SidebarActionWithTooltip = ({
   hasItems,
   isGroupOpen,
   isSidebarOpen,
+  disableActionTooltips,
   label,
   sidebarColor,
 }) => {
@@ -340,6 +358,10 @@ const SidebarActionWithTooltip = ({
   const tooltipContent = isSidebarOpen
     ? getExpandedActionTooltip(action, label, isLabelTruncated)
     : getCollapsedActionTooltip(action, label);
+  const resolvedTooltipContent = disableActionTooltips && isSameTooltipText(tooltipContent, label)
+    ? undefined
+    : tooltipContent;
+  const wrapLabel = disableActionTooltips && isSidebarOpen;
 
   useIsomorphicLayoutEffect(() => {
     if (!isSidebarOpen || !label) {
@@ -378,6 +400,7 @@ const SidebarActionWithTooltip = ({
       loading={action.loading}
       $isOpen={isSidebarOpen}
       $isGroupOpen={isGroupOpen}
+      $wrapLabel={wrapLabel}
       $sidebarColor={sidebarColor}
       data-testid={getActionTestId(label)}
     >
@@ -386,7 +409,7 @@ const SidebarActionWithTooltip = ({
           <Icon name={action.icon} />
         </SidebarActionIconSlot>
       )}
-      {isSidebarOpen && label && <SidebarActionText ref={labelRef}>{label}</SidebarActionText>}
+      {isSidebarOpen && label && <SidebarActionText ref={labelRef} $wrapLabel={wrapLabel}>{label}</SidebarActionText>}
       {isSidebarOpen && hasItems && (
         <SidebarChevron
           $sidebarColor={sidebarColor}
@@ -396,10 +419,10 @@ const SidebarActionWithTooltip = ({
     </ActionButton>
   );
 
-  return renderSidebarTooltip(tooltipContent, button, child);
+  return renderSidebarTooltip(resolvedTooltipContent, button, child);
 };
 
-const NavActions = ({ orientation, variant = NAV_ACTION_VARIANTS.HORIZONTAL, isOpen = false, onRequestOpen }) => {
+const NavActions = ({ orientation, variant = NAV_ACTION_VARIANTS.HORIZONTAL, isOpen = false, onRequestOpen, disableActionTooltips = false }) => {
   const { actions } = useNavActionsContext();
   const resolvedVariant = orientation === "vertical" ? NAV_ACTION_VARIANTS.SIDEBAR_EXPANDED : variant;
   const isSidebar = resolvedVariant !== NAV_ACTION_VARIANTS.HORIZONTAL;
@@ -416,15 +439,21 @@ const NavActions = ({ orientation, variant = NAV_ACTION_VARIANTS.HORIZONTAL, isO
       : action.button;
 
     if (action.button && !hasItems) {
+      const tooltipContent = isSidebarOpen
+        ? getExpandedActionTooltip(action, label, false)
+        : getCollapsedActionTooltip(action, label);
+      const resolvedTooltipContent = disableActionTooltips && isSameTooltipText(tooltipContent, label)
+        ? undefined
+        : tooltipContent;
+
       return renderSidebarTooltip(
-        isSidebarOpen
-          ? getExpandedActionTooltip(action, label, false)
-          : getCollapsedActionTooltip(action, label),
+        resolvedTooltipContent,
         (
         <SidebarCustomAction
           $child={child}
           $disabled={action.disabled}
           $isOpen={isSidebarOpen}
+          $wrapLabel={disableActionTooltips && isSidebarOpen}
           $sidebarColor={sidebarColor}
         >
           {customButton}
@@ -461,6 +490,7 @@ const NavActions = ({ orientation, variant = NAV_ACTION_VARIANTS.HORIZONTAL, isO
         hasItems={hasItems}
         isGroupOpen={hasItems && openActionId === action.id}
         isSidebarOpen={isSidebarOpen}
+        disableActionTooltips={disableActionTooltips}
         label={label}
         sidebarColor={sidebarColor}
       />

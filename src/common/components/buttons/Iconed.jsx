@@ -46,6 +46,7 @@ const IconedButton = forwardRef(({
       type={submit ? 'submit' : 'button'}
       onKeyDown={onKeyDown}
       data-testid={dataTestId}
+      aria-label={iconOnly ? (popupContent || text) : undefined}
       ref={ref}
     >
       <Icon name={icon} />

@@ -6,10 +6,24 @@ import { useRef, useState } from "react";
 import { useFieldArray } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { AddBillPopup } from "../AddBillPopup";
+import { ADD_BILL_POPUP_CLASS_NAME } from "../AddBillPopup/styles";
 import { BILLS_DETAILS_TABLE_HEADERS } from "../cashBalances.constants";
 import { Header } from "./styles";
 
-export const BillDetails = ({ name }) => {
+const addBillPopupModifiers = [
+  {
+    name: "preventOverflow",
+    enabled: true,
+    options: {
+      rootBoundary: "viewport",
+      padding: 16,
+      altAxis: true,
+      tether: false,
+    },
+  },
+];
+
+export const BillDetails = ({ name, showActionText = false, disableActionTooltip = false }) => {
   const [openBillPopup, setOpenBillPopup] = useState(false);
   const billButtonRef = useRef(null);
   const { fields: billDetailsFields, append: appendBillDetails, remove: removeBillDetails } = useFieldArray({ name });
@@ -36,7 +50,9 @@ export const BillDetails = ({ name }) => {
                 text="Agregar billetes"
                 icon={ICONS.ADD}
                 color={COLORS.GREEN}
-                iconOnly
+                width={showActionText ? CONTENT_SIZES.FIT : undefined}
+                iconOnly={!showActionText}
+                popupDisabled={disableActionTooltip}
               />
             </Box>
           }
@@ -45,6 +61,8 @@ export const BillDetails = ({ name }) => {
           onClose={handleClosePopup}
           closeOnDocumentClick
           position={POPUP_POSITIONS.TOP_LEFT}
+          className={ADD_BILL_POPUP_CLASS_NAME}
+          popperModifiers={addBillPopupModifiers}
         >
           <AddBillPopup
             billDetailsFields={billDetailsFields}

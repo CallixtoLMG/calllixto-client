@@ -9,7 +9,7 @@ import { useMemo, useRef, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Form, Popup } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
-import { Label, List, ListItem } from "./styles";
+import { HistoryDateRangesContainer, Label, List, ListItem } from "./styles";
 
 const getRangeLabel = ({ value, unit }) => {
   if (!unit || !value) return "";
@@ -61,7 +61,7 @@ export const HistoryDateRangesControlled = () => {
   };
 
   return (
-    <FlexColumn width="50%" $rowGap="15px">
+    <HistoryDateRangesContainer width="50%" $rowGap="15px">
       <FlexColumn>
         <Label>
           <SettingsFieldLabel helpText={SETTINGS_HELP_TEXTS.BUDGET_HISTORY_DATE_RANGES}>
@@ -145,6 +145,6 @@ export const HistoryDateRangesControlled = () => {
           </FlexColumn>
         </Form>
       </Popup>
-    </FlexColumn>
+    </HistoryDateRangesContainer>
   );
 };

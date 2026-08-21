@@ -3,7 +3,7 @@ import { Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label, Overflo
 import { DropdownField, PriceControlled, PriceLabel } from "@/common/components/form";
 import { Table, Total, TotalList } from "@/common/components/table";
 import { CommentTooltip, IconTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { COLORS, DATE_FORMATS, ICONS, POPUP_POSITIONS, SIZES } from "@/common/constants";
+import { COLORS, CONTENT_SIZES, DATE_FORMATS, ICONS, POPUP_POSITIONS, SIZES } from "@/common/constants";
 import { getFormatedPercentage, getFormatedPhone } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
@@ -13,12 +13,14 @@ import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { PICK_UP_IN_STORE } from "../../budgets.constants";
 import { getBudgetState, isBudgetCancelled, isBudgetConfirmed } from "../../budgets.utils";
+import { useBudgetActionButtonMode } from "../../useBudgetActionButtonMode";
 import { Container } from "./../styles";
 
 const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact, onConfirmBudgetDiscount, isLoading }) => {
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const budgetState = getBudgetState(budget);
   const [initializedContact, setInitializedContact] = useState(false);
+  const { isMobile, showText } = useBudgetActionButtonMode();
   const totalPending = (
     (total ?? 0) -
     (budget?.paidAmount ?? 0) -
@@ -323,7 +325,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                     $pointer: false,
                   }}
                 />
-                <Flex width="250px" $alignSelf="flex-end" $alignItems="flex-end" $columnGap="10px">
+                <Flex width={showText ? CONTENT_SIZES.FIT : "250px"} $alignSelf="flex-end" $alignItems="flex-end" $columnGap="10px" $rowGap="10px" wrap="wrap">
                   <PriceControlled
                     key={budget?.postConfirmDiscount ?? 'no-discount'}
                     width="160px"
@@ -356,7 +358,9 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                     alignSelf="start"
                     height="38px"
                     disabled={isLoading}
-                    iconOnly
+                    iconOnly={!showText}
+                    popupDisabled={isMobile}
+                    width={showText ? CONTENT_SIZES.FIT : undefined}
                   />
                   <IconedButton
                     text="Aplicar descuento"

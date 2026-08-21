@@ -1,10 +1,10 @@
-import { Box, Button, Flex } from "@/common/components/custom";
+import { Box, Button } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { POPUP_POSITIONS, BUTTON_TEXTS, COLORS, DELETE, ICONS, SIZES, TOOLTIPS } from "@/common/constants";
 import { createPriorityKeyDownHandler } from "@/common/utils";
 import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordionTitle";
-import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
+import { AnimatedContent, AnimatedInner, SettingsAddRow } from "@/components/settings/Common/styles";
 import { SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
@@ -124,7 +124,7 @@ const Blacklist = () => {
           <AnimatedContent $active={isAccordionOpen}>
             <AnimatedInner>
               <Box>
-                <Flex width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
+                <SettingsAddRow width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
                   <TextField
                     width="50%"
                     label="Id(s)"
@@ -158,7 +158,7 @@ const Blacklist = () => {
                     $marginTop="25px"
                     data-testid="settings-blocked-product-add-button"
                   />
-                </Flex>
+                </SettingsAddRow>
                 <Table
                   isLoading={false}
                   headers={headers}

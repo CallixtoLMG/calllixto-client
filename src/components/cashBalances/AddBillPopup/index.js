@@ -5,6 +5,7 @@ import { BUTTON_TEXTS, COLORS, FIELD_LABELS, ICONS } from "@/common/constants";
 import { handleEnterKeyDown } from "@/common/utils";
 import { ARS_BILL_DENOMINATIONS, EMPTY_BILL } from "@/components/cashBalances/cashBalances.constants";
 import { useEffect, useState } from "react";
+import { AddBillFields, AddBillPopupGlobalStyles } from "./styles";
 
 export const AddBillPopup = ({
   billDetailsFields,
@@ -50,8 +51,9 @@ export const AddBillPopup = ({
 
   return (
     <>
+      <AddBillPopupGlobalStyles />
       <Flex as={Form} >
-        <Flex $columnGap="14px" $flexDirection="row">
+        <AddBillFields $columnGap="14px" $flexDirection="row">
           <DropdownField
             dropdownHeight="38px"
             height="auto"
@@ -92,7 +94,7 @@ export const AddBillPopup = ({
             onClick={handleAdd}
             onKeyDown={(e) => handleEnterKeyDown(e, handleAdd)}
           />
-        </Flex>
+        </AddBillFields>
       </Flex>
     </>
   );

@@ -1,4 +1,3 @@
-import { FlexColumn } from "@/common/components/custom";
 import { Tab } from "semantic-ui-react";
 import BrandsModule from "./Entities/Brands";
 import BudgetsModule from "./Entities/Budgets";
@@ -7,6 +6,7 @@ import ExpensesModule from "./Entities/Expenses";
 import GeneralModule from "./Entities/General";
 import ProductsModule from "./Entities/Products";
 import SuppliersModule from "./Entities/Suppliers";
+import { SettingsTabsContainer } from "./styles";
 
 const SettingsTabs = ({
   onEntityChange,
@@ -44,13 +44,13 @@ const SettingsTabs = ({
   };
 
   return (
-    <FlexColumn>
+    <SettingsTabsContainer>
       <Tab
         panes={panes}
         activeIndex={activeIndex}
         onTabChange={handleTabChange}
       />
-    </FlexColumn>
+    </SettingsTabsContainer>
   );
 };
 

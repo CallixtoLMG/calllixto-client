@@ -10,7 +10,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { Form, Modal, Tab as SemanticTab, Transition } from "semantic-ui-react";
 import { GroupedButtonsControlled } from "../../../common/components/form";
 import { mapBudgetToDeliveryForm, PICK_UP_IN_STORE } from "../budgets.constants";
-import { ModalContent, Tab } from "./styles";
+import { HeaderContent, ModalContent, Tab } from "./styles";
 
 const ModalConfirmation = ({
   isModalOpen,
@@ -128,7 +128,7 @@ const ModalConfirmation = ({
         <Transition visible={isModalOpen} animation='scale' duration={500}>
           <Modal size={SIZES.LARGE} open={isModalOpen} onClose={() => !isLoading && onClose(false)}>
             <Modal.Header>
-              <Flex $alignItems="center" $justifyContent="space-between">
+              <HeaderContent $alignItems="center" $justifyContent="space-between">
                 Desea confirmar el presupuesto?
                 <GroupedButtonsControlled
                   color={COLORS.BLUE}
@@ -139,7 +139,7 @@ const ModalConfirmation = ({
                     { text: 'Enviar a dirección', icon: ICONS.TRUCK, value: false },
                   ]}
                 />
-              </Flex>
+              </HeaderContent>
             </Modal.Header>
             <ModalContent>
               <Tab panes={panes} />

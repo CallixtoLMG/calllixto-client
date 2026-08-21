@@ -109,6 +109,7 @@ const ExpensesPage = ({ expenses = [], isLoading, onRefetch, onDownloadExcel, si
         onDownloadExcel={useSideActions ? undefined : onDownloadExcel}
         onFilteredElementsChange={useSideActions ? handleFilteredExpensesChange : undefined}
         color={EXPENSE_STATES[filters.state]?.color}
+        $ribbonOverflow
       />
     </>
   );

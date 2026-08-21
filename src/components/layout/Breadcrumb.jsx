@@ -5,6 +5,8 @@ import { Popup, Breadcrumb as SBreadcrumb, BreadcrumbDivider as SBreadcrumbDivid
 import styled from "styled-components";
 import { useNavActionsContext } from '.';
 
+const MOBILE_BREAKPOINT = 767;
+
 const Label = styled(SLabel)`
   position: sticky!important;
   top: 5px;
@@ -25,12 +27,17 @@ const BreadcrumbItemContent = styled.div`
   align-items: center;
   gap: 10px;
   min-width: 0;
+  max-width: 100%;
 `;
 
 const BreadcrumbName = styled.div`
   min-width: 0;
   max-width: 500px;
-  flex: 0 1 auto;
+  flex: 1 1 auto;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    max-width: 100%;
+  }
 `;
 
 const BreadcrumbDivider = styled(SBreadcrumbDivider)`
@@ -40,11 +47,29 @@ const BreadcrumbDivider = styled(SBreadcrumbDivider)`
 
 const BreadcrumbSection = styled(SBreadcrumbSection)`
   display: flex!important;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+
+  &:not(:last-child) {
+    flex: 0 0 auto;
+  }
+
+  &:last-child {
+    flex: 1 1 auto;
+  }
 `;
 
 const SSBreadcrumb = styled(SBreadcrumb)`
   flex-flow: nowrap;
   display: flex!important;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    flex: 1 1 auto;
+  }
 `;
 
 export const PATHNAME_ENTITY_MAP = {
