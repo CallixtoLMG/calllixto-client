@@ -1,3 +1,4 @@
+import { useListProducts } from "@/api/products";
 import { useConsumeStock } from "@/api/stock";
 import { IconedButton } from "@/common/components/buttons";
 import { Box, FieldsContainer, Flex, OverflowWrapper } from "@/common/components/custom";
@@ -5,6 +6,7 @@ import { NumberField, TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import { Table } from "@/common/components/table";
 import { CONTENT_SIZES, POPUP_POSITIONS, COLORS, ICONS } from "@/common/constants";
+import { showWarningToast } from "@/common/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
@@ -15,6 +17,7 @@ import { Header } from "../../products/ProductStock/styles";
 import { ADJUST_DELIVERY, DELIVERY, buildBudgetDeliveriesColumns, getDeliveryStats, hasInvalidStockQuantities } from "../budgets.constants";
 import { isBudgetCancelled } from "../budgets.utils";
 import { useBudgetActionButtonMode } from "../useBudgetActionButtonMode";
+import { getConsumeStockErrorMessage, getConsumeStockWarningMessage, getStockControlDisabledProductIds, hasConsumeStockResponseError } from "./utils";
 
 const DeliveryNoteActions = styled(FieldsContainer)`
   @media (min-width: 501px) and (max-width: 767px) {
@@ -63,12 +66,18 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
   const [deliveryNote, setDeliveryNote] = useState("");
   const [mode, setMode] = useState(null);
   const { isMobile, showText } = useBudgetActionButtonMode();
+  const { data: currentProductsData } = useListProducts();
 
   const watchedProducts = useWatch({ control, name: "products" });
 
   const products = useMemo(
     () => watchedProducts ?? [],
     [watchedProducts]
+  );
+
+  const stockControlDisabledProductIds = useMemo(
+    () => new Set(getStockControlDisabledProductIds(currentProductsData?.products ?? [])),
+    [currentProductsData?.products]
   );
 
   const operableProducts = useMemo(() => {
@@ -97,13 +106,24 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
   const { mutate: consumeStockMutate, isPending } = useMutation({
 
     mutationFn: consumeStock,
-    onSuccess: () => {
+    onSuccess: (response) => {
+      if (hasConsumeStockResponseError(response)) {
+        toast.error(getConsumeStockErrorMessage(response));
+        return;
+      }
 
-      toast.success(
-        mode === DELIVERY
-          ? 'Entrega registrada correctamente'
-          : 'Entrega descontada correctamente'
-      );
+      const warningMessage = getConsumeStockWarningMessage(response);
+
+      if (warningMessage) {
+        showWarningToast(warningMessage);
+      } else {
+        toast.success(
+          mode === DELIVERY
+            ? 'Entrega registrada correctamente'
+            : 'Entrega descontada correctamente'
+        );
+      }
+
       onSuccess?.();
       resetModalState();
       setShowModal(false);
@@ -186,8 +206,9 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
     () => buildBudgetDeliveriesColumns({
       create: false,
       setValue,
+      stockControlDisabledProductIds,
     }),
-    [, setValue]
+    [setValue, stockControlDisabledProductIds]
   );
 
   const getRowTargetQuantity = useCallback((product) => {

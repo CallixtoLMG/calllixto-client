@@ -1,5 +1,5 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
-import { Button, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
+import { Button, FieldsContainer, Flex, Form, FormField, Input, Label, OverflowWrapper } from "@/common/components/custom";
 import {
   GroupedButtonsControlled,
   NumberControlled,
@@ -13,12 +13,13 @@ import {
 } from "@/common/components/form";
 import { SearchResultContent, SearchResultDescription, SearchResultTitle } from "@/common/components/form/Search/styles";
 import { Table, Total } from "@/common/components/table";
-import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { COLORS, CONTENT_SIZES, DATE_FORMATS, ERROR_MESSAGES, FIELD_LABELS, ICONS, POPUP_POSITIONS, RULES, SHORTKEYS, SIZES, TOOLTIPS } from "@/common/constants";
+import { AddressesTooltip, CommentTooltip, IconTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
+import { POPUP_POSITIONS, CONTENT_SIZES, COLORS, DATE_FORMATS, ERROR_MESSAGES, FIELD_LABELS, ICONS, RULES, SHORTKEYS, SIZES, TOOLTIPS } from "@/common/constants";
 import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay, removeNullish } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
+import { getBudgetProductChanges } from "@/components/budgets/productUpdates.utils";
 import { Loader } from "@/components/layout";
 import { LIST_ATTRIBUTES, PRODUCT_STATES, getProductSearchDescription, getProductSearchTitle } from "@/components/products/products.constants";
 import { getBrandId, getPrice, getProductId, getSupplierId, getTotal, isProductOOS, normalizeBudgetProductFractionConfig } from "@/components/products/products.utils";
@@ -106,12 +107,7 @@ const BudgetForm = ({
       const original = budgetProducts.find(budgetProducts => budgetProducts.id === product.id);
       if (!original) return false;
 
-      return (
-        original.price !== product.price ||
-        original.state !== product.state ||
-        original.editablePrice !== product.editablePrice ||
-        original.fractionConfig?.active !== product.fractionConfig?.active
-      );
+      return getBudgetProductChanges(original, product).hasChanges;
     });
 
     if (outdated.length || removed.length) {
@@ -333,7 +329,20 @@ const BudgetForm = ({
             {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
             {product.comments && <CommentTooltip tooltip="true" comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
-              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position={POPUP_POSITIONS.TOP_CENTER} trigger={<Icon lineHeight="normal" name={ICONS.TRUCK} color={COLORS.BLUE} />} />
+              <IconTooltip
+                size="mini"
+                content={product.dispatchComment || product?.dispatch?.comment}
+                icon={ICONS.TRUCK}
+                color={COLORS.BLUE}
+                position={POPUP_POSITIONS.TOP_CENTER}
+                ariaLabel="Comentario de despacho"
+                iconProps={{
+                  lineHeight: "normal",
+                  $lineHeight: "normal",
+                  margin: undefined,
+                  $pointer: false,
+                }}
+              />
             )}
           </Flex>
         </Container>
