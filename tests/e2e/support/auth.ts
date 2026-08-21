@@ -33,6 +33,19 @@ type LoginFormControls = {
   submitButton: Locator;
 };
 
+const getPrivateHeader = (page: Page) =>
+  page.getByRole("banner").filter({
+    has: page.getByRole("button", { name: /men[uú]/i }),
+  });
+
+export const expectPrivateHeaderVisible = async (page: Page) => {
+  const privateHeader = getPrivateHeader(page);
+
+  await expect(privateHeader).toBeVisible({ timeout: 30_000 });
+  await expect(privateHeader.getByRole("img", { name: "Callixto", exact: true })).toBeVisible();
+  await expect(privateHeader.getByRole("button", { name: /men[uú]/i })).toBeVisible();
+};
+
 export const openLoginPage = async (page: Page): Promise<LoginFormControls> => {
   const response = await page.goto("/login", { waitUntil: "domcontentloaded" });
   expect(response?.status(), "Expected /login to render without a server error").toBeLessThan(500);
@@ -65,8 +78,7 @@ const selectAccount = async (page: Page, accountName: RegExp | string) => {
     accountButton.click(),
   ]);
 
-  await expect(page.getByRole("img", { name: "Callixto" })).toBeVisible();
-  await expect(page.getByRole("button", { name: /men/i })).toBeVisible();
+  await expectPrivateHeaderVisible(page);
 };
 
 export const loginAsE2EUser = async (page: Page, options: LoginAsE2EUserOptions = {}) => {
@@ -86,8 +98,7 @@ export const loginAsE2EUser = async (page: Page, options: LoginAsE2EUserOptions 
 
   await expect(page).not.toHaveURL(/\/login\?[^#]*username=/);
 
-  await expect(page.getByRole("img", { name: "Callixto" })).toBeVisible();
-  await expect(page.getByRole("button", { name: /men/i })).toBeVisible();
+  await expectPrivateHeaderVisible(page);
 
   const closeUpdatesButton = page.getByRole("button", { name: /cerrar/i });
   if (await closeUpdatesButton.isVisible({ timeout: 5_000 }).catch(() => false)) {

@@ -115,7 +115,7 @@ const PageWorkspace = styled.div`
   grid-template-columns: ${({ $hasActions }) => ($hasActions ? `minmax(0, 1fr) ${PAGE_ACTIONS_COLLAPSED_WIDTH}px` : "minmax(0, 1fr)")};
   column-gap: ${({ $hasActions }) => ($hasActions ? `${PAGE_ACTIONS_GAP}px` : "0")};
   align-items: start;
-  padding: ${PILOT_STICKY_TOP}px ${({ $hasActions }) => ($hasActions ? `${MOBILE_NAVIGATION_HORIZONTAL_PADDING}px` : `${NAVIGATION_HORIZONTAL_PADDING}px`)} 20px ${NAVIGATION_HORIZONTAL_PADDING}px;
+  padding: ${PILOT_STICKY_TOP}px ${({ $hasActions }) => ($hasActions ? `${MOBILE_NAVIGATION_HORIZONTAL_PADDING}px` : `${NAVIGATION_HORIZONTAL_PADDING}px`)} ${({ $fullBleedBackground }) => ($fullBleedBackground ? "0" : "20px")} ${NAVIGATION_HORIZONTAL_PADDING}px;
   width: 100%;
   min-width: 0;
   min-height: 80vh;
@@ -131,7 +131,7 @@ const PageWorkspace = styled.div`
   @media (max-width: ${MOBILE_BREAKPOINT}px) {
     grid-template-columns: minmax(0, 1fr);
     column-gap: 0;
-    padding: ${PILOT_STICKY_TOP}px ${MOBILE_CONTENT_HORIZONTAL_PADDING}px 20px;
+    padding: ${PILOT_STICKY_TOP}px ${MOBILE_CONTENT_HORIZONTAL_PADDING}px ${({ $fullBleedBackground }) => ($fullBleedBackground ? "0" : "20px")};
   }
 `;
 
