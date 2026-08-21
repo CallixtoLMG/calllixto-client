@@ -74,16 +74,11 @@ export const HamburgerButton = styled.button`
 
 export const Brand = styled.img`
   display: block;
-  height: 50px;
+  height: 70px;
   width: auto;
   max-width: 150px;
   flex-shrink: 0;
   min-width: 0;
-
-  @media (max-width: ${MOBILE_BREAKPOINT}px) {
-    height: 38px;
-    max-width: 132px;
-  }
 `;
 
 export const RightActions = styled.div`
