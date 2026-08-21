@@ -337,6 +337,19 @@ const chooseUpdateProductValues = async (page: Page) => {
   await expect(page.getByTestId("budget-product-updates-apply-current-button")).toBeHidden({ timeout: 30_000 });
 };
 
+const assertProductChangesModalDoesNotReopenAfterTabRoundTrip = async (page: Page) => {
+  const modal = page.getByTestId("budget-product-updates-modal");
+  const tabs = page.locator(".ui.tabular.menu .item");
+
+  await expect(modal).toBeHidden({ timeout: 30_000 });
+  await page.getByTestId("budget-state-confirmed-button").click();
+  await expect(tabs.filter({ hasText: /^Pagos$/ })).toBeVisible({ timeout: 30_000 });
+  await tabs.filter({ hasText: /^Pagos$/ }).click();
+  await expect(modal).toBeHidden({ timeout: 30_000 });
+  await tabs.filter({ hasText: /^Venta$/ }).click();
+  await expect(modal).toBeHidden({ timeout: 30_000 });
+};
+
 const completeRequiredCloneFields = async (page: Page, dependencies: BudgetDependencies, timestamp: number) => {
   await page.getByTestId("budget-state-confirmed-button").click();
   await fillTestIdInput(page, "budget-expiration-days-field", "7");
@@ -384,15 +397,17 @@ test.describe("budget actions", () => {
     await openBudgetDetail(page, budget.url, { reload: true });
     await cloneCurrentBudget(page);
     await assertProductChangesModalVisible(page, product);
-    await chooseKeepPreviousProductValues(page);
-    await assertBudgetProductPrice(page, "1500");
+    await chooseUpdateProductValues(page);
+    await assertBudgetProductPrice(page, "1800");
+    await completeRequiredCloneFields(page, dependencies, timestamp);
+    await assertProductChangesModalDoesNotReopenAfterTabRoundTrip(page);
+    await confirmClonedBudget(page);
 
     await openBudgetDetail(page, budget.url, { reload: true });
     await cloneCurrentBudget(page);
     await assertProductChangesModalVisible(page, product);
-    await chooseUpdateProductValues(page);
-    await assertBudgetProductPrice(page, "1800");
-    await completeRequiredCloneFields(page, dependencies, timestamp);
-    await confirmClonedBudget(page);
+    await chooseKeepPreviousProductValues(page);
+    await assertBudgetProductPrice(page, "1500");
+    await assertProductChangesModalDoesNotReopenAfterTabRoundTrip(page);
   });
 });

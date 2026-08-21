@@ -23,7 +23,7 @@ const addBillPopupModifiers = [
   },
 ];
 
-export const BillDetails = ({ name }) => {
+export const BillDetails = ({ name, showActionText = false, disableActionTooltip = false }) => {
   const [openBillPopup, setOpenBillPopup] = useState(false);
   const billButtonRef = useRef(null);
   const { fields: billDetailsFields, append: appendBillDetails, remove: removeBillDetails } = useFieldArray({ name });
@@ -50,7 +50,9 @@ export const BillDetails = ({ name }) => {
                 text="Agregar billetes"
                 icon={ICONS.ADD}
                 color={COLORS.GREEN}
-                iconOnly
+                width={showActionText ? CONTENT_SIZES.FIT : undefined}
+                iconOnly={!showActionText}
+                popupDisabled={disableActionTooltip}
               />
             </Box>
           }

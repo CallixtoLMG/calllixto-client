@@ -126,7 +126,8 @@ export const PAGES = {
     BADGE: isNewFeature('2026-01-01') ? 'new' : undefined
   },
   CHANGE_PASSWORD: {
-    BASE: CHANGE_PASSWORD_PAGE
+    BASE: CHANGE_PASSWORD_PAGE,
+    NAME: "Cambiar contraseña"
   },
   RESTORE_PASSWORD: {
     BASE: RESTORE_PASSWORD_PAGE

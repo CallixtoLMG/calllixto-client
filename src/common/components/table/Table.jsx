@@ -251,7 +251,7 @@ const CustomTable = ({
             )}
           </BatchGearDesktop>
         )}
-        <TableScrollContainer $tableHeight={$tableHeight}>
+        <TableScrollContainer $tableHeight={$tableHeight} $hasTableHeight={!!$tableHeight} $ribbonOverflow={$ribbonOverflow}>
           <TableLoaderArea $hasPagination={paginate}>
             {!!selectedCount && isMobileViewport && (
               <SelectionActionsBar>

@@ -27,6 +27,7 @@ import {
   InfoMenuAccount,
   InfoMenuAccountLabel,
   InfoMenuAccountValue,
+  MenuSlot,
   Overlay,
   RightActions,
   UserButton
@@ -272,7 +273,10 @@ const Header = () => {
     return (
       <HeaderBar>
         <HeaderLeft>
-          <Brand>CallixtoGLM</Brand>
+          <HeaderDesktopOnly>
+            <MenuSlot aria-hidden="true" />
+          </HeaderDesktopOnly>
+          <Brand src="/branding/logo-callixto.png" alt="Callixto" />
         </HeaderLeft>
         <HeaderRight>
           <UserButton onClick={handleLogout}>Ingresar</UserButton>
@@ -286,12 +290,14 @@ const Header = () => {
       <HeaderBar>
         <HeaderLeft>
           <HeaderDesktopOnly>
-            <IconedButton
-              onClick={() => setIsSidebarOpen(true)}
-              icon={ICONS.LIST}
-              color={COLORS.BLUE}
-              text="Menú"
-            />
+            <MenuSlot>
+              <IconedButton
+                onClick={() => setIsSidebarOpen(true)}
+                icon={ICONS.LIST}
+                color={COLORS.BLUE}
+                text="Menú"
+              />
+            </MenuSlot>
           </HeaderDesktopOnly>
           <HeaderMobileOnly>
             <IconedButton
@@ -305,7 +311,7 @@ const Header = () => {
               popupPosition={POPUP_POSITIONS.BOTTOM_LEFT}
             />
           </HeaderMobileOnly>
-          <Brand>CallixtoGLM</Brand>
+          <Brand src="/branding/logo-callixto.png" alt="Callixto" />
         </HeaderLeft>
         <HeaderRight>
           {isMobileHeader === false && (

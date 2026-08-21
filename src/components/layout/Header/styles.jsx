@@ -36,6 +36,14 @@ export const HeaderLeft = styled.div`
   }
 `;
 
+export const MenuSlot = styled.div`
+  flex: 0 0 110px;
+  width: 110px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+`;
+
 export const HeaderRight = styled.div`
   display: flex;
   align-items: center;
@@ -64,15 +72,17 @@ export const HamburgerButton = styled.button`
   }
 `;
 
-export const Brand = styled.div`
-  font-size: 18px;
-  font-weight: 700;
-  color: #1f2937;
+export const Brand = styled.img`
+  display: block;
+  height: 50px;
+  width: auto;
+  max-width: 150px;
+  flex-shrink: 0;
   min-width: 0;
-  white-space: nowrap;
 
   @media (max-width: ${MOBILE_BREAKPOINT}px) {
-    font-size: 16px;
+    height: 38px;
+    max-width: 132px;
   }
 `;
 
@@ -146,7 +156,7 @@ export const UserButton = styled.button`
   font-size:13.5px;
   color: rgb(255, 255, 255);
   transition: opacity .1s ease, background-color .1s ease, color .1s ease, box-shadow .1s ease, background .1s ease;
-  
+
   &:hover {
     background: #0d71bb;
   }
@@ -178,4 +188,3 @@ export const HeaderMobileOnly = styled.div`
     display: contents;
   }
 `;
-

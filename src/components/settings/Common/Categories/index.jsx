@@ -1,4 +1,4 @@
-import { Box, Button, FieldsContainer, OverflowWrapper } from "@/common/components/custom";
+import { Box, Button, OverflowWrapper } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { BUTTON_TEXTS, COLORS, DELETE, FIELD_LABELS, ICONS, SEMANTIC_COLORS, SIZES, TOOLTIPS } from "@/common/constants";
@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Accordion, Label } from "semantic-ui-react";
 import SettingsAccordionTitle from "../SettingsAccordionTitle";
-import { AnimatedContent, AnimatedInner } from "../styles";
+import { AnimatedContent, AnimatedInner, SettingsAddRow } from "../styles";
 
 const EMPTY_CATEGORY = {
   name: "",
@@ -130,7 +130,7 @@ const Categories = () => {
           <AnimatedContent $active={isAccordionOpen}>
             <AnimatedInner $active={isAccordionOpen}>
               <Box>
-                <FieldsContainer padding="0 10px 10px 10px!important" >
+                <SettingsAddRow padding="0 10px 10px 10px!important" $columnGap="15px" $rowGap="15px">
                   <TextField
                     label={FIELD_LABELS.NAME}
                     placeholder="Personal"
@@ -172,7 +172,7 @@ const Categories = () => {
                     $marginTop="25px"
                     data-testid="settings-category-add-button"
                   />
-                </FieldsContainer>
+                </SettingsAddRow>
               <Table
                 isLoading={false}
                 headers={headers}

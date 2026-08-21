@@ -3,7 +3,9 @@ import { UserProvider } from "@/User";
 import { RouteHistoryProvider } from "@/app/RouteHistoryContext";
 import { BackToListButton, GoBackButton } from "@/common/components/buttons";
 import { COLORS, ICONS, PAGES, POPUP_POSITIONS, SIZES } from "@/common/constants";
+import { AUTH_BACKGROUND_COLOR } from "@/components/auth/constants";
 import { BreadcrumProvider, Breadcrumb, Header, NavActions, NavActionsProvider, useNavActionsContext } from "@/components/layout";
+import Footer from "@/components/layout/Footer/Index";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Icon, Popup } from "semantic-ui-react";
@@ -27,6 +29,20 @@ const BREADCRUMB_HEIGHT = BREADCRUMB_CONTROL_HEIGHT + BREADCRUMB_VERTICAL_PADDIN
 const PILOT_CONTENT_TOP = HEADER_HEIGHT + BREADCRUMB_HEIGHT;
 const PILOT_STICKY_TOP = PILOT_CONTENT_TOP + PAGE_WORKSPACE_TOP_GAP;
 const MOBILE_ACTIONS_RAIL_QUERY = `(max-width: ${MOBILE_BREAKPOINT}px)`;
+
+const PrivateShell = styled.div`
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+`;
+
+const PrivateMain = styled.main`
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  min-height: auto;
+  min-width: 0;
+`;
 
 const NavigationContainer = styled.div`
   position: fixed;
@@ -57,6 +73,7 @@ const BreadcrumbContainer = styled.div`
 `;
 
 const PageWorkspace = styled.div`
+  flex: 1 0 auto;
   display: grid;
   grid-template-columns: ${({ $hasActions }) => ($hasActions ? `minmax(0, 1fr) ${PAGE_ACTIONS_COLLAPSED_WIDTH}px` : "minmax(0, 1fr)")};
   column-gap: ${({ $hasActions }) => ($hasActions ? `${PAGE_ACTIONS_GAP}px` : "0")};
@@ -65,6 +82,14 @@ const PageWorkspace = styled.div`
   width: 100%;
   min-width: 0;
   min-height: 80vh;
+  box-sizing: border-box;
+  background-color: ${({ $fullBleedBackground }) => ($fullBleedBackground ? AUTH_BACKGROUND_COLOR : "transparent")};
+
+  ${({ $fullBleedBackground }) => $fullBleedBackground && `
+    main {
+      min-height: 0;
+    }
+  `}
 
   @media (max-width: ${MOBILE_BREAKPOINT}px) {
     grid-template-columns: ${({ $hasActions, $isActionsRailOpen }) => ($hasActions && !$isActionsRailOpen ? `minmax(0, 1fr) ${PAGE_ACTIONS_COLLAPSED_WIDTH}px` : "minmax(0, 1fr)")};
@@ -175,6 +200,7 @@ const PrivateLayoutContent = ({ children }) => {
   const hide = [PAGES.BASE, PAGES.NOT_FOUND.BASE];
   const show = !hide.includes(pathname);
   const hasActions = actions.length > 0;
+  const useFullBleedBackground = pathname === PAGES.CHANGE_PASSWORD.BASE;
   const actionsRailToggle = (
     <PageActionsTooltipTrigger>
       <PageActionsToggle
@@ -211,7 +237,7 @@ const PrivateLayoutContent = ({ children }) => {
           <Breadcrumb />
         </BreadcrumbContainer>
       </NavigationContainer>
-      <PageWorkspace $hasActions={hasActions} $isActionsRailOpen={isActionsRailOpen}>
+      <PageWorkspace $hasActions={hasActions} $isActionsRailOpen={isActionsRailOpen} $fullBleedBackground={useFullBleedBackground}>
         <PageContent>
           {children}
         </PageContent>
@@ -249,12 +275,17 @@ const PrivateLayout = ({ children }) => {
     <UserProvider>
       <RouteHistoryProvider>
         <NavActionsProvider>
-          <Header />
-          <BreadcrumProvider pathname={pathname}>
-            <PrivateLayoutContent>
-              {children}
-            </PrivateLayoutContent>
-          </BreadcrumProvider>
+          <PrivateShell>
+            <Header />
+            <BreadcrumProvider pathname={pathname}>
+              <PrivateMain>
+                <PrivateLayoutContent>
+                  {children}
+                </PrivateLayoutContent>
+              </PrivateMain>
+            </BreadcrumProvider>
+            <Footer />
+          </PrivateShell>
         </NavActionsProvider>
       </RouteHistoryProvider>
     </UserProvider>

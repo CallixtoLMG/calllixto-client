@@ -9,7 +9,7 @@ import { Popup } from "semantic-ui-react";
 import { Header } from "../../products/ProductStock/styles";
 import { getDeliveryStats } from "../budgets.constants";
 
-const CreateBudgetDeliveriesForm = () => {
+const CreateBudgetDeliveriesForm = ({ dataTestIdPrefix = "budget-create-delivery" }) => {
   const { control, setValue } = useFormContext();
 
   const watchedProducts = useWatch({ control, name: "products" });
@@ -89,6 +89,7 @@ const CreateBudgetDeliveriesForm = () => {
               padding="9.5px 14px"
               min={0}
               max={pending}
+              dataTestId={`${dataTestIdPrefix}-product-${index}-quantity-field`}
               error={
                 Number(product.delivered ?? 0) > Number(product.quantity ?? 0)
                   ? "No puede ser mayor que la cantidad vendida"
@@ -131,6 +132,7 @@ const CreateBudgetDeliveriesForm = () => {
         <TextField
           width="100%"
           placeholder="Entrega parcial"
+          dataTestId={`${dataTestIdPrefix}-product-${index}-comment-field`}
           value={product.deliveryComment ?? ""}
           onChange={(e) =>
             setValue(
@@ -143,7 +145,7 @@ const CreateBudgetDeliveriesForm = () => {
       ),
       width: 4,
     },
-  ], [setValue]);
+  ], [dataTestIdPrefix, setValue]);
 
   const handleCompleteAll = () => {
     products.forEach((product, index) => {
@@ -233,6 +235,7 @@ const CreateBudgetDeliveriesForm = () => {
             width="250px"
             label="Remito"
             placeholder="0001"
+            dataTestId={`${dataTestIdPrefix}-note-field`}
             value={deliveryNote ?? ""}
             onChange={(e) =>
               setValue("deliveryNote", e.target.value, {
@@ -250,6 +253,7 @@ const CreateBudgetDeliveriesForm = () => {
             height="38px"
             iconOnly
             popupPosition={POPUP_POSITIONS.TOP_LEFT}
+            dataTestId={`${dataTestIdPrefix}-complete-all-button`}
           />
         </Flex>
       </Flex>

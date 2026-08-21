@@ -1,16 +1,19 @@
 import { ButtonsContainer, FieldsContainer, Form, FormField, Input } from "@/common/components/custom";
 import { DatePickerControlled } from "@/common/components/form/DatePicker/DatePickerControlled";
-import { CONTENT_SIZES, BUTTON_TEXTS, COLORS, ENTITIES, ERROR_MESSAGES, FIELD_LABELS, ICONS, SIZES } from "@/common/constants";
+import { BUTTON_TEXTS, COLORS, CONTENT_SIZES, ENTITIES, ERROR_MESSAGES, FIELD_LABELS, ICONS, SIZES } from "@/common/constants";
 import { datePickerNow, getPastDate } from "@/common/utils/dates";
 import { BillDetails } from "@/components/cashBalances/BillsDetails";
 import { getBillsTotal } from "@/components/cashBalances/cashBalances.utils";
 import { useSettingArrayField } from "@/hooks";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";
 import { IconedButton } from "../../buttons";
 import { DropdownControlled, PriceControlled, PriceField, TextAreaControlled } from "../../form";
 import { Header, ModalContent } from "./styles";
+
+const CASH_ACTION_TEXT_QUERY = "(min-width: 501px) and (max-width: 767px)";
+const CASH_ACTION_MOBILE_QUERY = "(max-width: 767px)";
 
 const EMPTPY_CASH_BALANCE = {
   closeDate: null,
@@ -20,12 +23,44 @@ const EMPTPY_CASH_BALANCE = {
   setAllPaymentMethods: false,
 };
 
+const useCashActionButtonMode = () => {
+  const [mode, setMode] = useState({ showText: false, isMobile: false });
+
+  useEffect(() => {
+    const textQuery = window.matchMedia(CASH_ACTION_TEXT_QUERY);
+    const mobileQuery = window.matchMedia(CASH_ACTION_MOBILE_QUERY);
+    const updateMode = () => setMode({
+      showText: textQuery.matches,
+      isMobile: mobileQuery.matches,
+    });
+
+    updateMode();
+    textQuery.addEventListener("change", updateMode);
+    mobileQuery.addEventListener("change", updateMode);
+
+    return () => {
+      textQuery.removeEventListener("change", updateMode);
+      mobileQuery.removeEventListener("change", updateMode);
+    };
+  }, []);
+
+  return mode;
+};
+
 const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoading }) => {
   const methods = useForm({ defaultValues: { ...EMPTPY_CASH_BALANCE, startDate: datePickerNow() } });
   const { handleSubmit, watch, setValue, reset, clearErrors, trigger } = methods;
   const [selectedMethods, watchAllMethods, initialAmount, billsDetails] = watch(['paymentMethods', 'allPaymentMethods', 'initialAmount', 'billsDetails']);
   const showBillsTable = watchAllMethods || selectedMethods?.some(m => m?.name === "Efectivo");
   const billsTotal = useMemo(() => getBillsTotal(billsDetails), [billsDetails]);
+  const { showText: showCashActionText, isMobile: isCashActionMobile } = useCashActionButtonMode();
+  const cashActionIconOnly = !showCashActionText;
+  const cashActionWidth = showCashActionText ? CONTENT_SIZES.FIT : undefined;
+  const cashActionMinWidth = showCashActionText ? CONTENT_SIZES.MAX : undefined;
+  const paymentMethodsActionText = watchAllMethods ? "Deseleccionar métodos" : "Todos los métodos";
+  const paymentMethodsActionTooltip = watchAllMethods
+    ? "Deseleccionar todos los métodos de pago"
+    : "Seleccionar todos los métodos de pago";
   const { options: paymentsOptions, optionsMapper } = useSettingArrayField(
     ENTITIES.GENERAL,
     "paymentMethods",
@@ -70,7 +105,9 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                     onClick={() => setValue("startDate", datePickerNow())}
                     alignSelf="end"
                     height="38px"
-                    iconOnly
+                    width={cashActionWidth}
+                    iconOnly={cashActionIconOnly}
+                    popupDisabled={isCashActionMobile}
                   />
                 </FormField>
                 <FormField $flexDirection="row" flex="1">
@@ -99,7 +136,9 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                     onClick={() => setValue("closeDate", datePickerNow())}
                     alignSelf="end"
                     height="38px"
-                    iconOnly
+                    width={cashActionWidth}
+                    iconOnly={cashActionIconOnly}
+                    popupDisabled={isCashActionMobile}
                   />
                 </FormField>
               </FieldsContainer>
@@ -142,12 +181,16 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                   </FormField>
                   <FormField $flexDirection="row" flex="1">
                     <IconedButton
-                      text={watchAllMethods ? "Deseleccionar todos los métodos de pago" : "Seleccionar todos los métodos de pago"}
+                      text={paymentMethodsActionText}
+                      popupContent={paymentMethodsActionTooltip}
                       icon={watchAllMethods ? ICONS.MINUS : ICONS.ADD}
                       color={watchAllMethods ? COLORS.ORANGE : COLORS.BLUE}
                       height="38px"
                       alignSelf="end"
-                      iconOnly
+                      width={cashActionWidth}
+                      minWidth={cashActionMinWidth}
+                      iconOnly={cashActionIconOnly}
+                      popupDisabled={isCashActionMobile}
                       onClick={() => {
                         const nextValue = !watchAllMethods;
 
@@ -196,18 +239,26 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                     </FormField>
                     <IconedButton
                       height="38px"
-                      text="Actualizar monto inicial al total de billetes"
+                      text={showCashActionText ? "Usar total de billetes" : "Actualizar monto inicial al total de billetes"}
+                      popupContent="Actualizar monto inicial al total de billetes"
                       icon={ICONS.DOLLAR}
                       color={COLORS.BLUE}
                       onClick={() => setValue("initialAmount", billsTotal)}
                       disabled={billsTotal === initialAmount}
-                      iconOnly
+                      width={cashActionWidth}
+                      minWidth={cashActionMinWidth}
+                      iconOnly={cashActionIconOnly}
+                      popupDisabled={isCashActionMobile}
                     />
                   </>
                 ) : <FormField flex="1" />}
               </FieldsContainer>
               {showBillsTable && (
-                <BillDetails name="billsDetails" />
+                <BillDetails
+                  name="billsDetails"
+                  showActionText={showCashActionText}
+                  disableActionTooltip={isCashActionMobile}
+                />
               )}
               <FieldsContainer>
                 <TextAreaControlled

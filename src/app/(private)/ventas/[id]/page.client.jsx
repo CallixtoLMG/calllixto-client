@@ -3,17 +3,18 @@ import { useUserContext } from "@/User";
 import { useCancelBudget, useConfirmBudget } from "@/api/budgets";
 import { useGetPayments } from "@/api/payments";
 import { useGetSetting } from "@/api/settings";
+import { useConsumeStock } from "@/api/stock";
 import { IconedButton } from "@/common/components/buttons";
 import { Flex, Message, MessageHeader } from "@/common/components/custom";
 import ModalCancel from "@/common/components/modals/ModalCancel";
 import { COLORS, CONTENT_SIZES, ENTITIES, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
-import { getFormatedPhone } from "@/common/utils";
+import { getFormatedPhone, showWarningToast } from "@/common/utils";
 import { now } from "@/common/utils/dates";
 import BudgetView from "@/components/budgets/BudgetView";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import ModalPDF from "@/components/budgets/ModalPDF";
-import { BUDGET_STATES, PAYMENTS_TAB_INDEX, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
+import { BUDGET_STATES, buildConsumeStockFlows, PAYMENTS_TAB_INDEX, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending } from "@/components/budgets/budgets.utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useBudgetTotals, useLazyTabs } from "@/hooks";
@@ -24,6 +25,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import toast from "react-hot-toast";
 import { v4 as uuid } from 'uuid';
+
+const CONFIRM_DELIVERY_WARNING_MESSAGE = "Presupuesto confirmado, pero la entrega/stock no pudo procesarse correctamente. Puede realizarse posteriormente.";
 
 const BudgetPageClient = ({ budget }) => {
   const { role } = useUserContext();
@@ -52,6 +55,7 @@ const BudgetPageClient = ({ budget }) => {
   const [selectedContact, setSelectedContact] = useState({ phone: '', address: '' });
   const customerHasInfo = useMemo(() => !!customerData?.addresses?.length && !!customerData?.phoneNumbers?.length, [customerData]);
   const confirmBudget = useConfirmBudget();
+  const consumeStock = useConsumeStock();
   const cancelBudget = useCancelBudget();
   const accountId = useMemo(() => getSelectedAccountId(userData), [userData]);
   const publicHash = budget?.publicHash;
@@ -258,8 +262,8 @@ const BudgetPageClient = ({ budget }) => {
   };
 
   const { mutate, isPending } = useMutation({
-    mutationFn: (dataToSend) => {
-      const { pickUpInStore, paymentsMade, total } = dataToSend;
+    mutationFn: async (dataToSend) => {
+      const { pickUpInStore, paymentsMade, total, products, deliveryNote } = dataToSend;
       const confirmationData = {
         confirmedBy: `${userData.name}`,
         confirmedAt: now(),
@@ -267,16 +271,50 @@ const BudgetPageClient = ({ budget }) => {
         paymentsMade,
         total
       };
-      return confirmBudget(confirmationData, budget?.id);
+
+      const confirmResponse = await confirmBudget(confirmationData, budget?.id);
+
+      if (!confirmResponse?.statusOk) {
+        return { confirmResponse, flows: [] };
+      }
+
+      const flows = buildConsumeStockFlows(products);
+
+      if (!flows.length) {
+        return { confirmResponse, flows };
+      }
+
+      try {
+        const consumeResponse = await consumeStock({
+          budgetId: confirmResponse?.budget?.id ?? budget?.id,
+          deliveryNote,
+          inflow: false,
+          flows,
+        });
+
+        return { confirmResponse, consumeResponse, flows };
+      } catch (consumeError) {
+        return { confirmResponse, consumeError, flows };
+      }
     },
-    onSuccess: (response) => {
-      if (response.statusOk) {
-        toast.success('Presupuesto confirmado!');
+    onSuccess: ({ confirmResponse, consumeResponse, consumeError }) => {
+      if (confirmResponse?.statusOk) {
+        const hasConsumeFailures = Array.isArray(consumeResponse?.failed) && consumeResponse.failed.length > 0;
+
+        if (consumeError || consumeResponse?.error || consumeResponse?.statusOk === false || hasConsumeFailures) {
+          showWarningToast(CONFIRM_DELIVERY_WARNING_MESSAGE);
+        } else {
+          toast.success('Presupuesto confirmado!');
+        }
+
         setIsModalConfirmationOpen(false);
         refresh();
       } else {
-        toast.error(`${response?.message} (${response?.error?.message})`);
+        toast.error(`${confirmResponse?.message} (${confirmResponse?.error?.message})`);
       }
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Error al confirmar presupuesto");
     },
   });
 
@@ -364,6 +402,7 @@ const BudgetPageClient = ({ budget }) => {
         isModalOpen={isModalConfirmationOpen}
         onClose={handleModalConfirmationClose}
         customer={customerData}
+        budget={budget}
         onConfirm={mutate}
         isLoading={isPending}
         pickUpInStore={budget?.pickUpInStore}

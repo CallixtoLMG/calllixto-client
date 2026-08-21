@@ -5,6 +5,7 @@ import styled from "styled-components";
 const MOBILE_BREAKPOINT = 767;
 const NARROW_FILTER_ACTIONS_BREAKPOINT = 400;
 const RIBBON_SAFE_AREA = "22px";
+const TABLE_TOP_SAFE_AREA = "3px";
 
 const Cell = styled(STable.Cell)`
   height: 37px!important;
@@ -24,7 +25,7 @@ const Container = styled(Flex)`
   max-width: 100%;
   min-width: 0;
   overflow: visible !important;
-  padding: ${({ $ribbonOverflow }) => $ribbonOverflow ? `2px 0 8px ${RIBBON_SAFE_AREA}` : "2px 0"};
+  padding: ${({ $ribbonOverflow }) => $ribbonOverflow ? "2px 0 8px" : "2px 0"};
 
   @media print {
     max-height: none !important;
@@ -129,6 +130,7 @@ const Table = styled(STable)`
 
 const TableOuterWrapper = styled.div`
   position: relative;
+  flex: 0 0 auto;
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -136,12 +138,17 @@ const TableOuterWrapper = styled.div`
 `;
 
 const TableScrollContainer = styled.div`
+  box-sizing: border-box;
+  flex: 0 0 auto;
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  max-height: ${({ $tableHeight = 'none' }) => `${$tableHeight}!important`};
-  overflow-y: ${({ $tableHeight }) => $tableHeight && "auto"} !important;
+  height: auto;
+  max-height: ${({ $hasTableHeight, $tableHeight }) => $hasTableHeight ? `${$tableHeight}!important` : "none!important"};
   overflow-x: auto !important;
+  overflow-y: ${({ $hasTableHeight }) => $hasTableHeight ? "auto" : "hidden"} !important;
+  padding-top: ${({ $hasTableHeight }) => $hasTableHeight ? "0" : TABLE_TOP_SAFE_AREA};
+  padding-left: ${({ $ribbonOverflow }) => $ribbonOverflow ? RIBBON_SAFE_AREA : "0"};
 
   @media print {
     max-height: none !important;

@@ -1,7 +1,7 @@
 import { POPUP_POSITIONS, PAGE_SIZE_OPTIONS } from "@/common/constants";
 import { Popup, Pagination as SPagination } from "semantic-ui-react";
 import styled from "styled-components";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dropdown } from "../custom";
 import ElementCounter from "./ElementCounter";
 import { PaginationContainer } from "./styles";
@@ -51,6 +51,7 @@ const PageSizeDropdown = styled(Dropdown)`
   &&& .menu {
     width: ${PAGE_SIZE_DROPDOWN_WIDTH}!important;
     min-width: ${PAGE_SIZE_DROPDOWN_WIDTH}!important;
+    z-index: 30;
   }
 
   &&& .menu > .item {
@@ -75,6 +76,10 @@ const PageSizeDropdown = styled(Dropdown)`
   }
 `;
 
+const PageSizePaginationContainer = styled(PaginationContainer)`
+  z-index: ${({ $pageSizeOpen }) => ($pageSizeOpen ? 30 : 1)};
+`;
+
 const Pagination = ({
   activePage,
   pageSize,
@@ -84,6 +89,8 @@ const Pagination = ({
   onPageSizeChange,
 }) => {
   const [isCompactPagination, setIsCompactPagination] = useState(false);
+  const [isPageSizeOpen, setIsPageSizeOpen] = useState(false);
+  const pageSizeDropdownRef = useRef(null);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(`(max-width: ${COMPACT_PAGINATION_BREAKPOINT}px)`);
@@ -95,8 +102,26 @@ const Pagination = ({
     return () => mediaQuery.removeEventListener("change", updateIsCompactPagination);
   }, []);
 
+  useEffect(() => {
+    if (!isPageSizeOpen) return undefined;
+
+    const handleOutsidePointerDown = (event) => {
+      if (!pageSizeDropdownRef.current?.contains(event.target)) {
+        setIsPageSizeOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsidePointerDown);
+    document.addEventListener("touchstart", handleOutsidePointerDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsidePointerDown);
+      document.removeEventListener("touchstart", handleOutsidePointerDown);
+    };
+  }, [isPageSizeOpen]);
+
   return (
-    <PaginationContainer $justifyContent="space-between">
+    <PageSizePaginationContainer $justifyContent="space-between" $pageSizeOpen={isPageSizeOpen}>
       <ElementCounter
         fontWeight
         currentPage={activePage}
@@ -118,21 +143,36 @@ const Pagination = ({
         size="mini"
         content="Elementos mostrados"
         trigger={(
-          <PageSizeDropdown
-            options={PAGE_SIZE_OPTIONS}
-            value={pageSize}
-            onChange={onPageSizeChange}
-            selection
-            compact
-            $boxShadow
-            height="40px"
-            width={PAGE_SIZE_DROPDOWN_WIDTH}
-          />
+          <div
+            ref={pageSizeDropdownRef}
+            onMouseDown={(event) => event.stopPropagation()}
+            onTouchStart={(event) => event.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <PageSizeDropdown
+              options={PAGE_SIZE_OPTIONS}
+              value={pageSize}
+              onChange={(event, data) => {
+                onPageSizeChange(event, data);
+                setIsPageSizeOpen(false);
+              }}
+              onOpen={() => setIsPageSizeOpen(true)}
+              onClose={() => setIsPageSizeOpen(false)}
+              open={isPageSizeOpen}
+              closeOnBlur={false}
+              selectOnBlur={false}
+              selection
+              compact
+              $boxShadow
+              height="40px"
+              width={PAGE_SIZE_DROPDOWN_WIDTH}
+            />
+          </div>
         )}
         position={POPUP_POSITIONS.LEFT_CENTER}
         mouseEnterDelay={500}
       />
-    </PaginationContainer>
+    </PageSizePaginationContainer>
   );
 };
 

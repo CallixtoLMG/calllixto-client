@@ -19,19 +19,22 @@ export const Span = styled.span`
 
 export const SettingsAddRow = styled(Flex)`
   @media (max-width: 767px) {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     row-gap: 15px;
-    column-gap: 0;
+    column-gap: 15px;
     min-width: 0;
 
     > .field {
-      width: 100% !important;
+      flex: 1 1 220px !important;
+      width: auto !important;
       max-width: 100%;
       min-width: 0 !important;
     }
 
     > .ui.button {
       align-self: flex-end;
+      flex: 0 0 auto;
       margin-top: 0 !important;
     }
   }

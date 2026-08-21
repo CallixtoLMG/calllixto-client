@@ -10,6 +10,11 @@ import { getFormatedDate, getSortedPaymentsByDate } from "@/common/utils/dates";
 import { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Header, Popup } from "semantic-ui-react";
+import styled from "styled-components";
+
+const PAYMENT_ACTION_TEXT_QUERY = "(min-width: 501px) and (max-width: 767px)";
+const PAYMENT_MOBILE_LAYOUT_QUERY = "(max-width: 767px)";
+const PAYMENT_COMPACT_ACTION_QUERY = "(max-width: 500px)";
 
 const EMPTY_PAYMENT = () => ({
   method: '',
@@ -17,6 +22,76 @@ const EMPTY_PAYMENT = () => ({
   comments: '',
   date: new Date(),
 });
+
+const PaymentFieldsContainer = styled(FieldsContainer)`
+  @media ${PAYMENT_MOBILE_LAYOUT_QUERY} {
+    && > .field {
+      flex: 1 1 calc(50% - 8px) !important;
+      width: auto !important;
+      min-width: 0 !important;
+      max-width: none !important;
+    }
+
+    && > .field:nth-child(3) {
+      flex: 1 1 100% !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+
+    && > .field:nth-child(3) > .field:first-child {
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+    }
+
+    && > .field:nth-child(3) > .field:last-child {
+      flex: 0 0 auto !important;
+      width: auto !important;
+      min-width: 0 !important;
+      max-width: none !important;
+    }
+  }
+`;
+
+const PaymentCommentsContainer = styled(FieldsContainer)`
+  @media ${PAYMENT_MOBILE_LAYOUT_QUERY} {
+    && > .field:first-child {
+      flex: 1 1 auto !important;
+      width: auto !important;
+      min-width: 0 !important;
+      max-width: none !important;
+    }
+
+    && > .field:last-child {
+      flex: 0 0 auto !important;
+      width: auto !important;
+      min-width: 0 !important;
+    }
+  }
+`;
+
+const usePaymentActionTextMode = () => {
+  const [mode, setMode] = useState({ showText: false, isCompactMobile: false });
+
+  useEffect(() => {
+    const textQuery = window.matchMedia(PAYMENT_ACTION_TEXT_QUERY);
+    const compactQuery = window.matchMedia(PAYMENT_COMPACT_ACTION_QUERY);
+    const updateMode = () => setMode({
+      showText: textQuery.matches,
+      isCompactMobile: compactQuery.matches,
+    });
+
+    updateMode();
+    textQuery.addEventListener("change", updateMode);
+    compactQuery.addEventListener("change", updateMode);
+
+    return () => {
+      textQuery.removeEventListener("change", updateMode);
+      compactQuery.removeEventListener("change", updateMode);
+    };
+  }, []);
+
+  return mode;
+};
 
 const getPaymentTableHeaders = () => [
   {
@@ -86,6 +161,9 @@ const CreateBudgetPayments = ({
   const [showErrors, setShowErrors] = useState(false);
   const [exceedAmountError, setExceedAmountError] = useState(false);
   const { data: paymentMethods, refetch } = useGetSetting(ENTITIES.GENERAL);
+  const { showText: showPaymentActionText, isCompactMobile } = usePaymentActionTextMode();
+  const paymentActionIconOnly = !showPaymentActionText;
+  const disablePaymentActionTooltip = showPaymentActionText || isCompactMobile;
 
   const paymentMethodOptions = useMemo(() => {
     return mapToDropdownOptions(paymentMethods?.paymentMethods || []);
@@ -138,7 +216,7 @@ const CreateBudgetPayments = ({
         <FlexColumn $rowGap="15px">
           {update && (
             <>
-              <FieldsContainer $rowGap="15px">
+              <PaymentFieldsContainer $rowGap="15px">
                 <FormField
                   flex="1"
                   selected={payment.date}
@@ -189,7 +267,7 @@ const CreateBudgetPayments = ({
                       onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
                     />
                   </FormField>
-                  <FormField $maxWidth={CONTENT_SIZES.MAX} flex="1">
+                  <FormField $width={CONTENT_SIZES.FIT} flex="0 0 auto">
                     <IconedButton
                       height="38px"
                       size={SIZES.SMALL}
@@ -198,6 +276,7 @@ const CreateBudgetPayments = ({
                       labelPosition="left"
                       color={payment.amount ? COLORS.ORANGE : COLORS.BLUE}
                       type="button"
+                      width={paymentActionIconOnly ? undefined : CONTENT_SIZES.FIT}
                       onClick={() => {
                         setPayment({
                           ...payment,
@@ -206,12 +285,13 @@ const CreateBudgetPayments = ({
                         setExceedAmountError(false);
                       }}
                       disabled={isTotalCovered}
-                      iconOnly
+                      iconOnly={paymentActionIconOnly}
+                      popupDisabled={disablePaymentActionTooltip}
                     />
                   </FormField>
                 </FormField>
-              </FieldsContainer>
-              <FieldsContainer $rowGap="15px">
+              </PaymentFieldsContainer>
+              <PaymentCommentsContainer $rowGap="15px">
                 <TextField
                   flex="1"
                   label={FIELD_LABELS.COMMENTS}
@@ -233,12 +313,14 @@ const CreateBudgetPayments = ({
                     color={COLORS.GREEN}
                     height="38px"
                     type="button"
+                    width={paymentActionIconOnly ? undefined : CONTENT_SIZES.FIT}
                     onClick={handleAddPayment}
                     disabled={isTotalCovered}
-                    iconOnly
+                    iconOnly={paymentActionIconOnly}
+                    popupDisabled={disablePaymentActionTooltip}
                   />
                 </FormField>
-              </FieldsContainer>
+              </PaymentCommentsContainer>
             </>
           )}
           <Flex width="100%">

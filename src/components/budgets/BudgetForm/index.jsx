@@ -34,6 +34,8 @@ import ModalProductUpdates from "../ModalProductUpdates";
 import ModalComment from "./ModalComment";
 import { BudgetFormActions, Container, VerticalDivider } from "./styles";
 
+const BUDGET_PRODUCT_ATTRIBUTES = LIST_ATTRIBUTES.filter(attribute => attribute !== "stockControl");
+
 const BudgetForm = ({
   onSubmit,
   products,
@@ -46,6 +48,8 @@ const BudgetForm = ({
   total,
   subtotal,
   subtotalAfterDiscount,
+  productUpdatesResolved = false,
+  onProductUpdatesResolved,
 }) => {
 
   const {
@@ -84,6 +88,7 @@ const BudgetForm = ({
     if (!isCloning) return;
     if (!Array.isArray(budget?.products)) return;
     if (!Array.isArray(products)) return;
+    if (productUpdatesResolved) return;
     if (!initialClonedProductsRef.current) {
       initialClonedProductsRef.current = budget.products;
     }
@@ -115,7 +120,7 @@ const BudgetForm = ({
       setShouldShowModal(true);
       hasShownModal.current = true;
     }
-  }, [isCloning, budget?.products, products, hasShownModal]);
+  }, [isCloning, budget?.products, products, productUpdatesResolved, hasShownModal]);
 
   const handleConfirmUpdate = () => {
     const currentProducts = Array.isArray(watchProducts) ? watchProducts : [];
@@ -132,7 +137,6 @@ const BudgetForm = ({
         quantity: Number(product.quantity ?? 1),
         discount: Number(product.discount ?? 0),
         editablePrice: base.editablePrice ?? product.editablePrice ?? false,
-        stockControl: base.stockControl ?? product.stockControl,
         state: base.state,
       };
       const fractionConfig = normalizeBudgetProductFractionConfig(product, {
@@ -158,6 +162,7 @@ const BudgetForm = ({
     });
     trigger("productsValidation");
 
+    onProductUpdatesResolved?.();
     setShouldShowModal(false);
     setIsTableLoading(false);
   };
@@ -175,6 +180,7 @@ const BudgetForm = ({
 
     setValue("expirationOffsetDays", "", { shouldDirty: false });
 
+    onProductUpdatesResolved?.();
     setShouldShowModal(false);
     setIsTableLoading(false);
   };
@@ -189,7 +195,7 @@ const BudgetForm = ({
         : undefined,
       products: data.products.map((product) =>
         removeNullish(
-          pick(product, ["rowId", ...LIST_ATTRIBUTES, "quantity", "discount", "dispatchComment", "tags",])
+          pick(product, ["rowId", ...BUDGET_PRODUCT_ATTRIBUTES, "quantity", "discount", "dispatchComment", "tags",])
         )
       ),
       total: Number(total.toFixed(2)),

@@ -1,8 +1,9 @@
 import { confirmReset, recoverPassword } from "@/api/login";
 import { getUserData } from "@/api/userData";
-import { Button, FlexColumn, Form, Message } from "@/common/components/custom";
-import { PasswordControlled, TextControlled } from "@/common/components/form";
+import { Button, FlexColumn, Form } from "@/common/components/custom";
+import { isPasswordConfirmationValid, PASSWORD_MATCH_REQUIREMENT, PasswordControlled, TextControlled } from "@/common/components/form";
 import { COLORS, ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES } from "@/common/constants";
+import AuthLayout, { AuthHelperText, AuthSecondaryLink } from "@/components/auth/AuthLayout";
 import { Loader } from "@/components/layout";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -77,7 +78,8 @@ const ChangePasswordForm = () => {
     },
   });
 
-  const newPassword = watch("newPassword");
+  const newPassword = watch("newPassword", "");
+  const confirmPassword = watch("confirmPassword", "");
 
   const handleConfirmReset = (data) => {
     const payload = {
@@ -89,20 +91,28 @@ const ChangePasswordForm = () => {
 
   return (
     <Loader active={false}>
-      <FlexColumn $alignItems="center" justifyContent="center" $marginTop="90px">
-        <FlexColumn width="350px">
+      <AuthLayout
+        maxWidth="460px"
+        variant="embedded"
+        showLogo={false}
+      >
+        <FlexColumn $rowGap="15px">
           <Button
-            color="blue"
+            color={COLORS.BLUE}
             width="100%"
+            height="42px"
+            $fontSize="15px"
+            padding="0 18px"
+            type="button"
             loading={isRequestCodePending}
             disabled={isRequestCodePending}
             onClick={() => requestCode()}
           >
             Solicitar código de validación
           </Button>
-          <Message style={{ color: "gray", textAlign: "center" }}>
-            Al solicitar el código, recibirás un enlace en tu correo para validar el cambio de contraseña.
-          </Message>
+          <AuthHelperText>
+            Te enviaremos por correo un enlace con el código necesario para cambiar tu contraseña.
+          </AuthHelperText>
           <FormProvider {...methods}>
             <Form onSubmit={handleSubmit(handleConfirmReset)}>
               <TextControlled
@@ -127,8 +137,10 @@ const ChangePasswordForm = () => {
                     );
                   },
                 }}
-                placeholder="Nuevo Contraseña"
+                placeholder="Nueva contraseña"
                 showPasswordRequirements
+                additionalPasswordRequirements={[PASSWORD_MATCH_REQUIREMENT]}
+                passwordRequirementsContext={{ confirmPassword }}
                 disabled={!isCodeRequested}
               />
               <PasswordControlled
@@ -137,7 +149,7 @@ const ChangePasswordForm = () => {
                 rules={{
                   ...RULES.REQUIRED,
                   validate: (value) =>
-                    value === newPassword || "Las contraseñas no coinciden",
+                    isPasswordConfirmationValid(newPassword, value) || "Las contraseñas no coinciden",
                 }}
                 disabled={!isCodeRequested}
               />
@@ -146,15 +158,22 @@ const ChangePasswordForm = () => {
                   loading={isOnConfirmResetPending}
                   disabled={isOnConfirmResetPending || isRequestCodePending || !isCodeRequested}
                   width="100%"
-                  color={COLORS.GREEN}
+                  height="42px"
+                  $fontSize="15px"
+                  padding="0 18px"
+                  type="submit"
+                  color={COLORS.BLUE}
                 >
                   Confirmar
                 </Button>
               </FlexColumn>
             </Form>
           </FormProvider>
+          <AuthSecondaryLink onClick={() => push(PAGES.LOGIN.BASE)}>
+            Volver al inicio de sesión
+          </AuthSecondaryLink>
         </FlexColumn>
-      </FlexColumn>
+      </AuthLayout>
     </Loader>
   );
 };
