@@ -433,7 +433,11 @@ const completeBudgetDeliveries = async (page: Page, timestamp: number) => {
   await page.getByTestId("budget-complete-all-deliveries-button").click();
   await page.getByTestId("modal-confirm").click();
 
-  await expect(page.getByText(/entrega registrada correctamente/i)).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator(".ui.modal")).not.toBeVisible({ timeout: 30_000 });
+  const deliveredProductRow = page.getByRole("row").filter({ hasText: `E2E Budget Product ${timestamp}` });
+
+  await expect(deliveredProductRow.getByRole("cell", { name: "2", exact: true })).toHaveCount(2, { timeout: 30_000 });
+  await expect(deliveredProductRow.getByRole("cell", { name: "0", exact: true })).toHaveCount(1);
   await expect(page.getByTestId("budget-open-delivery-modal-button")).toBeDisabled({ timeout: 30_000 });
 };
 
