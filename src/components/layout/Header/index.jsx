@@ -4,7 +4,7 @@ import { IconedButton } from "@/common/components/buttons";
 import { Icon } from "@/common/components/custom";
 import { KeyboardShortcuts, ModalUpdates } from "@/common/components/modals";
 import { StyledModalHeader } from "@/common/components/modals/ModalShortcuts/styles";
-import { CONTENT_SIZES, COLORS, ICONS, PAGES, POPUP_POSITIONS, SIZES, getNavigationItems } from "@/common/constants";
+import { COLORS, CONTENT_SIZES, ICONS, PAGES, POPUP_POSITIONS, SIZES, getNavigationItems } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks";
 import { RULES, isCallixtoUser } from "@/roles";
 import { getSelectedAccountId, setSelectedAccountId as saveSelectedAccountId } from "@/services/session";
@@ -152,7 +152,7 @@ const HeaderInfoMenu = ({ selectedAccountName, showAccount }) => {
                 <MenuAction type="button" onClick={() => handleMenuAction(openInfo)}>
                   <span>
                     <Icon $tooltip color={COLORS.BLUE} name={ICONS.INFO_CIRCLE} />
-                    Informativo
+                    Información sobre esta sección
                   </span>
                 </MenuAction>
               )}
