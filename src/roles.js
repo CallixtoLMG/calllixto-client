@@ -29,6 +29,15 @@ export const RULES = {
   canCreate: {
     ...ADMIN
   },
+  canManageUsers: {
+    ...SADMIN
+  },
+  canUpdateUserRole: {
+    ...SADMIN
+  },
+  canAccessPandora: {
+    ...SADMIN,
+  },
 }
 
 export function isCallixtoUser(role) {

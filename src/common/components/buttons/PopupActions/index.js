@@ -1,9 +1,10 @@
+import { POPUP_POSITIONS } from '@/common/constants';
 import { cloneElement } from 'react';
 import { Popup } from 'semantic-ui-react';
 import { IconedButton } from '../';
 import { ButtonsContainer, Flex } from '../../custom';
 
-const PopupActions = ({ width, title, color, buttons, icon, position = "bottom center", trigger, open, onOpen, onClose }) => {
+const PopupActions = ({ width, title, color, buttons, icon, position = POPUP_POSITIONS.BOTTOM_CENTER, trigger, open, onOpen, onClose }) => {
 
   return (
     <Popup

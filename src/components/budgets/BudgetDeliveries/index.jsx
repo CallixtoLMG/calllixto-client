@@ -1,18 +1,60 @@
+import { useListProducts } from "@/api/products";
 import { useConsumeStock } from "@/api/stock";
 import { IconedButton } from "@/common/components/buttons";
 import { Box, FieldsContainer, Flex, OverflowWrapper } from "@/common/components/custom";
 import { NumberField, TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import { Table } from "@/common/components/table";
-import { COLORS, ICONS } from "@/common/constants";
+import { CONTENT_SIZES, POPUP_POSITIONS, COLORS, ICONS } from "@/common/constants";
+import { showWarningToast } from "@/common/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
+import styled from "styled-components";
 import toast from "react-hot-toast";
 import { FlexColumn } from "../../../common/components/custom";
 import { Header } from "../../products/ProductStock/styles";
 import { ADJUST_DELIVERY, DELIVERY, buildBudgetDeliveriesColumns, getDeliveryStats, hasInvalidStockQuantities } from "../budgets.constants";
 import { isBudgetCancelled } from "../budgets.utils";
+import { useBudgetActionButtonMode } from "../useBudgetActionButtonMode";
+import { getConsumeStockErrorMessage, getConsumeStockWarningMessage, getStockControlDisabledProductIds, hasConsumeStockResponseError } from "./utils";
+
+const DeliveryNoteActions = styled(FieldsContainer)`
+  @media (min-width: 501px) and (max-width: 767px) {
+    && {
+      flex-wrap: nowrap;
+      align-items: flex-end !important;
+    }
+
+    && > .field:first-child {
+      flex: 1 1 auto !important;
+      width: auto !important;
+      min-width: 0 !important;
+      max-width: none !important;
+    }
+
+    && > div:last-child {
+      flex: 0 0 auto !important;
+      width: auto !important;
+      min-width: 0 !important;
+    }
+  }
+`;
+
+const DeliveriesToolbar = styled(Flex)`
+  @media (max-width: 767px) {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    row-gap: 10px;
+  }
+`;
+
+const DeliveriesActionsRow = styled(Flex)`
+  @media (max-width: 767px) {
+    justify-content: flex-start !important;
+    width: 100%;
+  }
+`;
 
 const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => {
   const consumeStock = useConsumeStock();
@@ -23,12 +65,19 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
   const [commentsByRow, setCommentsByRow] = useState({});
   const [deliveryNote, setDeliveryNote] = useState("");
   const [mode, setMode] = useState(null);
+  const { isMobile, showText } = useBudgetActionButtonMode();
+  const { data: currentProductsData } = useListProducts();
 
   const watchedProducts = useWatch({ control, name: "products" });
 
   const products = useMemo(
     () => watchedProducts ?? [],
     [watchedProducts]
+  );
+
+  const stockControlDisabledProductIds = useMemo(
+    () => new Set(getStockControlDisabledProductIds(currentProductsData?.products ?? [])),
+    [currentProductsData?.products]
   );
 
   const operableProducts = useMemo(() => {
@@ -57,13 +106,24 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
   const { mutate: consumeStockMutate, isPending } = useMutation({
 
     mutationFn: consumeStock,
-    onSuccess: () => {
+    onSuccess: (response) => {
+      if (hasConsumeStockResponseError(response)) {
+        toast.error(getConsumeStockErrorMessage(response));
+        return;
+      }
 
-      toast.success(
-        mode === DELIVERY
-          ? 'Entrega registrada correctamente'
-          : 'Entrega descontada correctamente'
-      );
+      const warningMessage = getConsumeStockWarningMessage(response);
+
+      if (warningMessage) {
+        showWarningToast(warningMessage);
+      } else {
+        toast.success(
+          mode === DELIVERY
+            ? 'Entrega registrada correctamente'
+            : 'Entrega descontada correctamente'
+        );
+      }
+
       onSuccess?.();
       resetModalState();
       setShowModal(false);
@@ -82,7 +142,6 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
         quantity: quantityByRow[p.rowId],
         comments: commentsByRow[p.rowId]?.trim() || undefined,
         date: new Date().toISOString(),
-        stockControl: p.stockControl === true,
       }));
 
   const handleConfirm = () => {
@@ -147,8 +206,9 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
     () => buildBudgetDeliveriesColumns({
       create: false,
       setValue,
+      stockControlDisabledProductIds,
     }),
-    [, setValue]
+    [setValue, stockControlDisabledProductIds]
   );
 
   const getRowTargetQuantity = useCallback((product) => {
@@ -317,9 +377,9 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
   return (
     <>
       <FlexColumn width="100%" $rowGap="15px" className="ui form">
-        <Flex $columnGap="15px" $justifyContent="space-between">
+        <DeliveriesToolbar $columnGap="15px" $justifyContent="space-between">
           <Header>Productos</Header>
-          <Flex>
+          <DeliveriesActionsRow $columnGap="15px" $rowGap="10px" wrap="wrap" $justifyContent="flex-end">
             <Box>
               <IconedButton
                 labelPosition="left"
@@ -331,21 +391,27 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
                   setMode(DELIVERY);
                   setShowModal(true);
                 }}
-                iconOnly
+                iconOnly={!showText}
+                popupDisabled={isMobile}
+                width={showText ? CONTENT_SIZES.FIT : undefined}
+                dataTestId="budget-open-delivery-modal-button"
               />
             </Box>
-            <Box $marginLeft="15px">
+            <Box>
               <IconedButton
                 labelPosition="left"
                 icon={ICONS.ARROW_DOWN}
+                text="Descontar entregas"
                 color={COLORS.ORANGE}
                 disabled={!canReturn}
                 onClick={() => {
                   setMode(ADJUST_DELIVERY);
                   setShowModal(true);
                 }}
-                iconOnly
-                popupPosition="top left"
+                iconOnly={!showText}
+                popupDisabled={isMobile}
+                width={showText ? CONTENT_SIZES.FIT : undefined}
+                popupPosition={POPUP_POSITIONS.TOP_LEFT}
                 popupContent={
                   <>
                     <strong><div>Descontar entregas</div></strong>
@@ -355,19 +421,21 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
               />
             </Box>
             {canPrint && (
-              <Box $marginLeft="15px">
+              <Box>
                 <IconedButton
                   icon={ICONS.PRINT}
                   color={COLORS.BLUE}
                   text="Imprimir entregas"
                   onClick={onPrint}
-                  iconOnly
-                  popupPosition="top left"
+                  iconOnly={!showText}
+                  popupDisabled={isMobile}
+                  width={showText ? CONTENT_SIZES.FIT : undefined}
+                  popupPosition={POPUP_POSITIONS.TOP_LEFT}
                 />
               </Box>
             )}
-          </Flex>
-        </Flex>
+          </DeliveriesActionsRow>
+        </DeliveriesToolbar>
         <Table
           mainKey="rowId"
           headers={budgetsDeliveriesHeaders}
@@ -388,46 +456,55 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
         noConfirmation
         size="large"
         bodyContent={
-          <FieldsContainer $justifyContent="space-between" $rowGap="14px">
-            <TextField
-              width="250px"
-              label="Remito"
-              placeholder="0001"
-              value={deliveryNote}
-              onChange={(e) =>
-                setDeliveryNote(e.target.value)
-              }
-            />
-            <Flex $columnGap="14px" $alignSelf="flex-end" >
-              <IconedButton
-                icon={areAllRowsCompleted ? ICONS.UNDO : ICONS.ADD}
-                color={areAllRowsCompleted ? COLORS.ORANGE : COLORS.BLUE}
-                text={
-                  areAllRowsCompleted
-                    ? (mode === DELIVERY ? "Limpiar todo" : "Limpiar descuento")
-                    : (mode === DELIVERY ? "Completar todas las entregas" : "Completar descuento")
+          <FlexColumn width="100%" $rowGap="14px">
+            <DeliveryNoteActions $justifyContent="space-between" $rowGap="14px">
+              <TextField
+                flex="1"
+                width="100%"
+                label="Remito"
+                placeholder="0001"
+                value={deliveryNote}
+                onChange={(e) =>
+                  setDeliveryNote(e.target.value)
                 }
-                onClick={handleToggleAll}
-                disabled={!operableProducts.length}
-                iconOnly
-                popupPosition="top left"
+                dataTestId="budget-delivery-note-field"
               />
-            </Flex>
-            <FlexColumn width="100%" >
-              <Table
-                mainKey="rowId"
-                headers={modalDeliveriesColumns}
-                elements={operableProducts}
-                actions={actions}
-                $actionButtonInside
-              />
-              <Flex $alignSelf="flex-end">
-                {mode === ADJUST_DELIVERY &&
-                  <small>Las cantidades ingresadas se restarán de las unidades entregadas actualmente.</small>
-                }
+              <Flex $columnGap="14px" $alignSelf="flex-end" >
+                <IconedButton
+                  icon={areAllRowsCompleted ? ICONS.UNDO : ICONS.ADD}
+                  color={areAllRowsCompleted ? COLORS.ORANGE : COLORS.BLUE}
+                  text={
+                    areAllRowsCompleted
+                      ? (mode === DELIVERY ? "Limpiar todo" : "Limpiar descuento")
+                      : (mode === DELIVERY ? "Completar todas las entregas" : "Completar descuento")
+                  }
+                  onClick={handleToggleAll}
+                  disabled={!operableProducts.length}
+                  iconOnly={!showText}
+                  popupDisabled={isMobile}
+                  width={showText ? CONTENT_SIZES.FIT : undefined}
+                  popupPosition={POPUP_POSITIONS.TOP_LEFT}
+                  dataTestId="budget-complete-all-deliveries-button"
+                />
               </Flex>
-            </FlexColumn>
-          </FieldsContainer>
+            </DeliveryNoteActions>
+            <FieldsContainer $justifyContent="space-between" $rowGap="14px">
+              <FlexColumn width="100%" >
+                <Table
+                  mainKey="rowId"
+                  headers={modalDeliveriesColumns}
+                  elements={operableProducts}
+                  actions={actions}
+                  $actionButtonInside
+                />
+                <Flex $alignSelf="flex-end">
+                  {mode === ADJUST_DELIVERY &&
+                    <small>Las cantidades ingresadas se restarán de las unidades entregadas actualmente.</small>
+                  }
+                </Flex>
+              </FlexColumn>
+            </FieldsContainer>
+          </FlexColumn>
         }
       />
     </>

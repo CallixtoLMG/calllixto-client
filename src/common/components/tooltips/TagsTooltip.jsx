@@ -1,4 +1,4 @@
-import { COLORS, ICONS, SIZES } from "@/common/constants";
+import { POPUP_POSITIONS, CONTENT_SIZES, COLORS, ICONS, SIZES } from "@/common/constants";
 import { Popup } from "semantic-ui-react";
 import { Flex, Icon, Label, OverflowWrapper } from "../custom";
 
@@ -11,14 +11,14 @@ export const TagsTooltip = ({ tags, tooltip, maxWidthOverflow, lineClamp }) => {
       <Popup
         size="mini"
         trigger={
-          <Label pointerEvents="auto" $ZIndex="2" width="fit-content" size={SIZES.TINY} color={validTags[0]?.color}>
-            <OverflowWrapper position="bottom center" maxWidth={maxWidthOverflow} $lineClamp={lineClamp} popupContent={validTags[0]?.name}>
+          <Label pointerEvents="auto" $ZIndex="2" width={CONTENT_SIZES.FIT} size={SIZES.TINY} color={validTags[0]?.color}>
+            <OverflowWrapper position={POPUP_POSITIONS.BOTTOM_CENTER} maxWidth={maxWidthOverflow} $lineClamp={lineClamp} popupContent={validTags[0]?.name}>
               {validTags[0]?.name}
             </OverflowWrapper>
           </Label>
         }
         content={validTags[0]?.description || "Sin comentarios"}
-        position="top center"
+        position={POPUP_POSITIONS.TOP_CENTER}
         disabled={!validTags[0]?.description}
       />
       {validTags.length > 1 && (
@@ -39,7 +39,7 @@ export const TagsTooltip = ({ tags, tooltip, maxWidthOverflow, lineClamp }) => {
                       </Label>
                     }
                     content={tag.description}
-                    position="top center"
+                    position={POPUP_POSITIONS.TOP_CENTER}
                   /> :
                   <Label key={tag?.name} size="mini" color={tag?.color}>
                     {tag?.name}
@@ -47,7 +47,7 @@ export const TagsTooltip = ({ tags, tooltip, maxWidthOverflow, lineClamp }) => {
               ))}
             </Flex>
           }
-          position="top center"
+          position={POPUP_POSITIONS.TOP_CENTER}
         />
       )}
     </Flex>

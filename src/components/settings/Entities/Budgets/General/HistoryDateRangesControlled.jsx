@@ -1,7 +1,7 @@
 import { IconedButton } from "@/common/components/buttons";
 import { FlexColumn, Icon } from "@/common/components/custom";
 import { DropdownField } from "@/common/components/form";
-import { BUTTON_TEXTS, COLORS, FIELD_LABELS, ICONS } from "@/common/constants";
+import { POPUP_POSITIONS, BUTTON_TEXTS, COLORS, FIELD_LABELS, ICONS } from "@/common/constants";
 import { formatCount, formatLastCount } from "@/common/utils/pluralization";
 import SettingsFieldLabel from "@/components/settings/Common/SettingsFieldLabel";
 import { BASE_HISTORY_RANGES, BUDGETS_RANGE_DATE_UNIT_CONFIG, BUDGETS_RANGE_DATE_UNIT_OPTIONS, SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
@@ -9,7 +9,7 @@ import { useMemo, useRef, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Form, Popup } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
-import { Label, List, ListItem } from "./styles";
+import { HistoryDateRangesContainer, Label, List, ListItem } from "./styles";
 
 const getRangeLabel = ({ value, unit }) => {
   if (!unit || !value) return "";
@@ -61,7 +61,7 @@ export const HistoryDateRangesControlled = () => {
   };
 
   return (
-    <FlexColumn width="50%" $rowGap="15px">
+    <HistoryDateRangesContainer width="50%" $rowGap="15px">
       <FlexColumn>
         <Label>
           <SettingsFieldLabel helpText={SETTINGS_HELP_TEXTS.BUDGET_HISTORY_DATE_RANGES}>
@@ -80,7 +80,7 @@ export const HistoryDateRangesControlled = () => {
             <ListItem key={range.id}>
               <List.Content floated="right">
                 <Icon
-                  pointer="true"
+                  $pointer
                   name={ICONS.TRASH}
                   color={COLORS.RED}
                   onClick={() => remove(index)}
@@ -104,7 +104,7 @@ export const HistoryDateRangesControlled = () => {
         }
         open={open}
         on="click"
-        position="top left"
+        position={POPUP_POSITIONS.TOP_LEFT}
         closeOnDocumentClick
         onClose={() => {
           setUnit(null);
@@ -145,6 +145,6 @@ export const HistoryDateRangesControlled = () => {
           </FlexColumn>
         </Form>
       </Popup>
-    </FlexColumn>
+    </HistoryDateRangesContainer>
   );
 };

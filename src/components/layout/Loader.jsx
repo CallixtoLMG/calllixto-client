@@ -8,14 +8,18 @@ const SLoader = styled(LoaderComp)`
     border-color: ${({ $greyColor }) => $greyColor && "#b2b0b2f5"} !important;
   };
     top: ${({ $marginTop }) => $marginTop && "70%"} !important;
+
+  @media (max-width: 767px) {
+    top: ${({ $tableArea }) => $tableArea && "50%"} !important;
+  }
 `;
 
-export const Loader = ({ children, active, message, $greyColor, $marginTop }) => {
+export const Loader = ({ children, active, message, $greyColor, $marginTop, $tableArea }) => {
   return (
     <>
       {active ? (
         <Box height="150px">
-          <SLoader $marginTop={$marginTop} $greyColor={$greyColor} active size={SIZES.LARGE}>{message && message}</SLoader>
+          <SLoader $marginTop={$marginTop} $tableArea={$tableArea} $greyColor={$greyColor} active size={SIZES.LARGE}>{message && message}</SLoader>
         </Box>
       ) : children}
     </>

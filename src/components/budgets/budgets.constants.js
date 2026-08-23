@@ -1,5 +1,5 @@
-import { Box, Flex, Icon, OverflowWrapper } from "@/common/components/custom";
-import { ALL, COLORS, DATE_FORMATS, FIELD_LABELS, ICONS, SELECT_ALL_OPTION, SORTING } from "@/common/constants";
+import { Box, Flex, OverflowWrapper } from "@/common/components/custom";
+import { ALL, COLORS, CONTENT_SIZES, DATE_FORMATS, FIELD_LABELS, ICONS, POPUP_POSITIONS, SELECT_ALL_OPTION, SORTING } from "@/common/constants";
 import { getLabelColor } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate, getStartOfUnit, now } from "@/common/utils/dates";
 import { formatLastCount } from "@/common/utils/pluralization";
@@ -7,7 +7,7 @@ import { parse } from "date-fns";
 import { Label, Popup } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 import { NumberField, PriceLabel, TextField } from "../../common/components/form";
-import { CommentTooltip } from "../../common/components/tooltips";
+import { CommentTooltip, IconTooltip } from "../../common/components/tooltips";
 import { PRODUCT_STATES } from "../products/products.constants";
 import { normalizeBudgetProductFractionConfig } from "../products/products.utils";
 import { getBudgetListPopupContent, isBudgetCancelled, isBudgetConfirmed } from "./budgets.utils";
@@ -99,7 +99,7 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
                     </Label>
                   }
                   content={getBudgetListPopupContent(budget)}
-                  position="right center"
+                  position={POPUP_POSITIONS.RIGHT_CENTER}
                   size="mini"
                 />
               ) : (
@@ -108,16 +108,18 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
                 </Label>
               )}
               {isPaid && (
-                <Popup
+                <IconTooltip
                   content="Pagado"
-                  position="right center"
+                  icon={ICONS.DOLLAR}
+                  color={COLORS.GREEN}
+                  position={POPUP_POSITIONS.RIGHT_CENTER}
                   size="mini"
-                  trigger={
-                    <Icon
-                      name={ICONS.DOLLAR}
-                      color={COLORS.GREEN}
-                    />
-                  }
+                  ariaLabel="Pagado"
+                  iconProps={{
+                    margin: undefined,
+                    $lineHeight: undefined,
+                    $pointer: false,
+                  }}
                 />
               )}
             </Flex>
@@ -287,7 +289,7 @@ export const PAYMENT_STATES_OPTIONS = [
       key: id,
       text: (
         <Flex $alignItems="center" $justifyContent="space-between">
-          {title}&nbsp;<Label width="fit-content" color={color} circular empty />
+          {title}&nbsp;<Label width={CONTENT_SIZES.FIT} color={color} circular empty />
         </Flex>
       ),
       value: id,
@@ -505,6 +507,7 @@ export const hasInvalidStockQuantities = ({
 export const buildBudgetDeliveriesColumns = ({
   create,
   setValue,
+  stockControlDisabledProductIds,
 }) => {
   const columns = [
     {
@@ -518,21 +521,19 @@ export const buildBudgetDeliveriesColumns = ({
           <Flex $columnGap="5px" $justifyContent="space-between">
             {product.id}
             {isCompleted && (
-              <Popup
-                trigger={
-                  <Flex $alignItems="center" >
-                    {isCompleted && (
-                      <Icon
-                        $lowTooltip
-                        name={ICONS.CHECK}
-                        color={COLORS.GREEN}
-                      />
-                    )}
-                  </Flex>
-                }
+              <IconTooltip
                 content="Entrega completa"
-                position="right center"
+                icon={ICONS.CHECK}
+                color={COLORS.GREEN}
+                position={POPUP_POSITIONS.RIGHT_CENTER}
                 size="mini"
+                ariaLabel="Entrega completa"
+                iconProps={{
+                  $lowTooltip: true,
+                  margin: undefined,
+                  $lineHeight: undefined,
+                  $pointer: false,
+                }}
               />
             )}
           </Flex>
@@ -547,9 +548,23 @@ export const buildBudgetDeliveriesColumns = ({
       title: "Producto",
       align: "left",
       value: (product) => (
-        <OverflowWrapper maxWidth="40vw" popupContent={product.name}>
-          {product.name}
-        </OverflowWrapper>
+        <Flex width="100%" $columnGap="8px" $alignItems="center" $justifyContent="space-between">
+          <Flex $flex="1 1 auto" $minWidth="0" $alignItems="center">
+            <OverflowWrapper maxWidth="100%" $alignSelf="center" popupContent={product.name}>
+              {product.name}
+            </OverflowWrapper>
+          </Flex>
+          {product.id && stockControlDisabledProductIds?.has?.(product.id) && (
+            <IconTooltip
+              content="Sin control de stock"
+              icon={ICONS.EXCLAMATION_CIRCLE}
+              color={COLORS.YELLOW}
+              position={POPUP_POSITIONS.TOP_CENTER}
+              ariaLabel="Sin control de stock"
+              iconProps={{ $lowTooltip: true }}
+            />
+          )}
+        </Flex>
       ),
       sortValue: (product) => product.name ?? "",
       width: 6,
@@ -640,7 +655,6 @@ export const buildConsumeStockFlows = (products = []) => {
       quantity: Number(p.delivered),
       comments: p.deliveryComment?.trim() || undefined,
       date: new Date().toISOString(),
-      stockControl: p.stockControl === true,
       dispatchComment: p.dispatchComment
     }));
 };

@@ -4,6 +4,7 @@ import { BUTTON_TEXTS, COLORS, ICONS, SIZES } from "@/common/constants";
 import { getFormatedPrice } from "@/common/utils";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { useEffect, useMemo, useRef } from "react";
+import { getBudgetProductChanges } from "../productUpdates.utils";
 import { Modal, Transition } from "semantic-ui-react";
 import { MessageHeader, MessageItem, ModalContent } from "./styles";
 const ModalProductUpdates = ({
@@ -28,54 +29,39 @@ const ModalProductUpdates = ({
   const messageItems = useMemo(() => (
     outdatedProducts.map(p => {
       const oldProduct = budget.products.find(op => op.id === p.id);
-      const priceChanged = oldProduct.price !== p.price;
-      const stateChanged = oldProduct.state !== p.state;
-      const nameChanged = oldProduct.name !== p.name;
-      const editablePriceBecameTrue = !oldProduct.editablePrice && p.editablePrice;
-      const editablePriceBecameFalse = oldProduct.editablePrice && !p.editablePrice;
-      const fractionConfigBecameActive = !oldProduct.fractionConfig?.active && p.fractionConfig?.active;
-      const fractionConfigBecameInactive = oldProduct.fractionConfig?.active && !p.fractionConfig?.active;
+      const changes = getBudgetProductChanges(oldProduct, p);
 
       return (
         <MessageItem key={p.id}>
           {`${p.id} | ${p.name} | `}
-          {nameChanged && (
+          {changes.price.changed && (
             <>
-              {' Nombre: '}
-              <span style={{ color: COLORS.RED }}>{oldProduct.name}</span>
+              <span style={{ color: COLORS.RED }}>{getFormatedPrice(changes.price.oldValue)}</span>
               {' -> '}
-              <span style={{ color: COLORS.GREEN }}>{p.name}</span>
-              {' | '}
+              <span style={{ color: COLORS.GREEN }}>{getFormatedPrice(changes.price.newValue)}</span>
             </>
           )}
-          {priceChanged && (
-            <>
-              <span style={{ color: COLORS.RED }}>{getFormatedPrice(oldProduct.price)}</span>
-              {' -> '}
-              <span style={{ color: COLORS.GREEN }}>{getFormatedPrice(p.price)}</span>
-            </>
-          )}
-          {stateChanged && (
+          {changes.state.changed && (
             <>
               {' Estado: '}
-              <span style={{ color: PRODUCT_STATES[oldProduct.state].color }}>{PRODUCT_STATES[oldProduct.state].singularTitle}</span>
+              <span style={{ color: PRODUCT_STATES[changes.state.oldValue].color }}>{PRODUCT_STATES[changes.state.oldValue].singularTitle}</span>
               {' -> '}
-              <span style={{ color: PRODUCT_STATES[p.state].color }}>{PRODUCT_STATES[p.state].singularTitle}</span>
+              <span style={{ color: PRODUCT_STATES[changes.state.newValue].color }}>{PRODUCT_STATES[changes.state.newValue].singularTitle}</span>
             </>
           )}
-          {editablePriceBecameTrue && (
+          {changes.editablePrice.changed && changes.editablePrice.newValue && (
             <>
               {' | '}
               <span style={{ color: COLORS.GREY }}>Ahora el precio es editable</span>
             </>
           )}
-          {editablePriceBecameFalse && (
+          {changes.editablePrice.changed && !changes.editablePrice.newValue && (
             <>
               {' | '}
               <span style={{ color: COLORS.GREY }}>El precio ya no es editable</span>
             </>
           )}
-          {fractionConfigBecameActive && p.fractionConfig?.active && (
+          {changes.fractionConfigActive.changed && changes.fractionConfigActive.newValue && (
             <>
               {' | '}
               <span style={{ color: COLORS.GREY }}>
@@ -83,7 +69,7 @@ const ModalProductUpdates = ({
               </span>
             </>
           )}
-          {fractionConfigBecameInactive && (
+          {changes.fractionConfigActive.changed && !changes.fractionConfigActive.newValue && (
             <>
               {' | '}
               <span style={{ color: COLORS.GREY }}>Este producto ya no usa medidas.</span>
@@ -96,7 +82,13 @@ const ModalProductUpdates = ({
 
   return (
     <Transition visible={shouldShowModal} animation='scale' duration={500}>
-      <Modal closeOnDimmerClick={false} open={shouldShowModal} onClose={onCancel} size={SIZES.LARGE}>
+      <Modal
+        closeOnDimmerClick={false}
+        open={shouldShowModal}
+        onClose={onCancel}
+        size={SIZES.LARGE}
+        data-testid="budget-product-updates-modal"
+      >
         <Modal.Header>¿Le gustaría actualizar el presupuesto debido a las recientes modificaciones en algunos productos?</Modal.Header>
         <Message margin="10px 21px 0 21px" size="mini" >Confirmar esta acción solo actualizará el <strong>PRECIO</strong> de los productos, de lo contrario mantendrán el precio anterior.<Icon name={ICONS.INFO_CIRCLE}/></Message>
         <ModalContent>
@@ -126,6 +118,7 @@ const ModalProductUpdates = ({
               icon={ICONS.CANCEL}
               color={COLORS.RED}
               onClick={onCancel}
+              dataTestId="budget-product-updates-keep-previous-button"
             />
             <IconedButton
               text="Confirmar"
@@ -133,6 +126,7 @@ const ModalProductUpdates = ({
               color={COLORS.GREEN}
               onClick={onConfirm}
               ref={confirmButtonRef}
+              dataTestId="budget-product-updates-apply-current-button"
             />
           </ButtonsContainer>
         </Modal.Actions>

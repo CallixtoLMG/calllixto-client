@@ -1,7 +1,7 @@
 import { Box, Flex, Icon, Label, OverflowWrapper } from '@/common/components/custom';
 import { PriceLabel } from '@/common/components/form';
 import { CommentTooltip } from "@/common/components/tooltips";
-import { ALL, COLORS, DATE_FORMATS, FIELD_LABELS, ICONS, IN, OUT, SELECT_ALL_OPTION, SIZES } from '@/common/constants';
+import { POPUP_POSITIONS, CONTENT_SIZES, ALL, COLORS, DATE_FORMATS, FIELD_LABELS, ICONS, IN, OUT, SELECT_ALL_OPTION, SIZES } from '@/common/constants';
 import { getFormatedDate } from '@/common/utils/dates';
 import { Popup } from 'semantic-ui-react';
 
@@ -47,7 +47,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
                 <Box>{`Fecha: ${getFormatedDate(cashBalance?.createdAt, DATE_FORMATS.DATE_WITH_TIME)}`}</Box>
               </>
             }
-            position="right center"
+            position={POPUP_POSITIONS.RIGHT_CENTER}
             size="mini"
           />
         </Box>
@@ -101,7 +101,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
 
         if (!methods.length) {
           return (
-            <Label color={COLORS.BLUE} width="fit-content" size={SIZES.TINY}>
+            <Label color={COLORS.BLUE} width={CONTENT_SIZES.FIT} size={SIZES.TINY}>
               Todos los métodos
             </Label>
           );
@@ -113,7 +113,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
         return (
           <Flex $wrap $columnGap="5px" $rowGap="5px" $alignItems="center">
             {visible.map((method, index) => (
-              <Label color={COLORS.BLUE} width="fit-content" key={index} size={SIZES.TINY}>
+              <Label color={COLORS.BLUE} width={CONTENT_SIZES.FIT} key={index} size={SIZES.TINY}>
                 {method}
               </Label>
             ))}
@@ -132,13 +132,13 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
                 content={
                   <Flex $columnGap="5px" $wrap>
                     {hidden.map((method, index) => (
-                      <Label color={COLORS.BLUE} width="fit-content" key={index} size="mini">
+                      <Label color={COLORS.BLUE} width={CONTENT_SIZES.FIT} key={index} size="mini">
                         {method}
                       </Label>
                     ))}
                   </Flex>
                 }
-                position="top left"
+                position={POPUP_POSITIONS.TOP_LEFT}
               />
             )}
           </Flex>
@@ -176,7 +176,7 @@ export const CASH_BALANCE_STATES_OPTIONS = Object.values(CASH_BALANCE_STATES)
     key: id,
     text: (
       <Flex $alignItems="center" $justifyContent="space-between">
-        {title}&nbsp;<Label width="fit-content" color={color} circular empty />
+        {title}&nbsp;<Label width={CONTENT_SIZES.FIT} color={color} circular empty />
       </Flex>
     ),
     value: id
@@ -187,7 +187,7 @@ export const CASH_BALANCE_PAYMENT_METHODS_OPTIONS = Object.values(CASH_BALANCE_S
     key: id,
     text: (
       <Flex $alignItems="center" $justifyContent="space-between">
-        {title}&nbsp;<Label width="fit-content" color={color} circular empty />
+        {title}&nbsp;<Label width={CONTENT_SIZES.FIT} color={color} circular empty />
       </Flex>
     ),
     value: id
@@ -258,7 +258,7 @@ export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
     sortValue: (element) => element.date ?? "",
     value: (element) => (
       <Flex $alignItems="center">
-        <Label ribbon width="fit-content" color={element.quantity < 0 ? COLORS.RED : COLORS.GREEN}>
+        <Label ribbon width={CONTENT_SIZES.FIT} color={element.quantity < 0 ? COLORS.RED : COLORS.GREEN}>
           <Icon inverted name={element.quantity < 0 ? ICONS.ARROW_UP : ICONS.ARROW_DOWN} />
         </Label>
         <Box width="100%">

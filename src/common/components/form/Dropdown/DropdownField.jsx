@@ -16,7 +16,8 @@ export const DropdownField = ({
   search,
   selection,
   height = "38px",
-  dropdownHeight
+  dropdownHeight,
+  dataTestId
 }) => {
 
   return (
@@ -40,6 +41,7 @@ export const DropdownField = ({
       disabled={disabled}
       control={Dropdown}
       error={error}
+      data-testid={dataTestId}
     />
   );
 };

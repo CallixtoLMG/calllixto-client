@@ -1,10 +1,10 @@
-import { Box, Button, Flex } from "@/common/components/custom";
+import { Box, Button } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { BUTTON_TEXTS, COLORS, DELETE, ICONS, SIZES, TOOLTIPS } from "@/common/constants";
+import { POPUP_POSITIONS, BUTTON_TEXTS, COLORS, DELETE, ICONS, SIZES, TOOLTIPS } from "@/common/constants";
 import { createPriorityKeyDownHandler } from "@/common/utils";
 import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordionTitle";
-import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
+import { AnimatedContent, AnimatedInner, SettingsAddRow } from "@/components/settings/Common/styles";
 import { SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
@@ -116,6 +116,7 @@ const Blacklist = () => {
           active={isAccordionOpen}
           helpText={SETTINGS_HELP_TEXTS.BLACKLIST}
           onClick={toggleAccordion}
+          dataTestId="settings-blocked-products-accordion"
         >
           Productos bloqueados
         </SettingsAccordionTitle>
@@ -123,7 +124,7 @@ const Blacklist = () => {
           <AnimatedContent $active={isAccordionOpen}>
             <AnimatedInner>
               <Box>
-                <Flex width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
+                <SettingsAddRow width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
                   <TextField
                     width="50%"
                     label="Id(s)"
@@ -135,9 +136,10 @@ const Blacklist = () => {
                     }}
                     onKeyDown={handleBlacklistKeyDown}
                     error={error}
+                    dataTestId="settings-blocked-product-field"
                     showPopup
                     iconLabel
-                    popupPosition="top right"
+                    popupPosition={POPUP_POSITIONS.TOP_RIGHT}
                     popupContent={
                       <div>
                         <p>* Para añadir un id nuevo a la lista, anótelo y luego pulse &quot;enter&quot; o haz click en el boton Agregar.</p>
@@ -154,8 +156,9 @@ const Blacklist = () => {
                     type="button"
                     onClick={handleAddBlacklist}
                     $marginTop="25px"
+                    data-testid="settings-blocked-product-add-button"
                   />
-                </Flex>
+                </SettingsAddRow>
                 <Table
                   isLoading={false}
                   headers={headers}

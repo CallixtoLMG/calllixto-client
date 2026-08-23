@@ -1,15 +1,15 @@
 import { IconedButton } from "@/common/components/buttons";
-import { Flex, FlexColumn, Icon } from "@/common/components/custom";
+import { Flex, FlexColumn } from "@/common/components/custom";
 import { NumberField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { COLORS, ICONS } from "@/common/constants";
+import { IconTooltip } from "@/common/components/tooltips";
+import { POPUP_POSITIONS, COLORS, ICONS } from "@/common/constants";
 import { useMemo } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
-import { Popup } from "semantic-ui-react";
 import { Header } from "../../products/ProductStock/styles";
 import { getDeliveryStats } from "../budgets.constants";
 
-const CreateBudgetDeliveriesForm = () => {
+const CreateBudgetDeliveriesForm = ({ dataTestIdPrefix = "budget-create-delivery" }) => {
   const { control, setValue } = useFormContext();
 
   const watchedProducts = useWatch({ control, name: "products" });
@@ -43,21 +43,19 @@ const CreateBudgetDeliveriesForm = () => {
           <Flex $columnGap="10px" $justifyContent="space-between">
             {product.id}
             {isCompleted && (
-              <Popup
-                trigger={
-                  <Flex $alignItems="center" >
-                    {isCompleted && (
-                      <Icon
-                        $lowTooltip
-                        name={ICONS.CHECK}
-                        color={COLORS.GREEN}
-                      />
-                    )}
-                  </Flex>
-                }
+              <IconTooltip
                 content="Entrega completa"
-                position="right center"
+                icon={ICONS.CHECK}
+                color={COLORS.GREEN}
+                position={POPUP_POSITIONS.RIGHT_CENTER}
                 size="mini"
+                ariaLabel="Entrega completa"
+                iconProps={{
+                  $lowTooltip: true,
+                  margin: undefined,
+                  $lineHeight: undefined,
+                  $pointer: false,
+                }}
               />
             )}
           </Flex>
@@ -89,6 +87,7 @@ const CreateBudgetDeliveriesForm = () => {
               padding="9.5px 14px"
               min={0}
               max={pending}
+              dataTestId={`${dataTestIdPrefix}-product-${index}-quantity-field`}
               error={
                 Number(product.delivered ?? 0) > Number(product.quantity ?? 0)
                   ? "No puede ser mayor que la cantidad vendida"
@@ -131,6 +130,7 @@ const CreateBudgetDeliveriesForm = () => {
         <TextField
           width="100%"
           placeholder="Entrega parcial"
+          dataTestId={`${dataTestIdPrefix}-product-${index}-comment-field`}
           value={product.deliveryComment ?? ""}
           onChange={(e) =>
             setValue(
@@ -143,7 +143,7 @@ const CreateBudgetDeliveriesForm = () => {
       ),
       width: 4,
     },
-  ], [setValue]);
+  ], [dataTestIdPrefix, setValue]);
 
   const handleCompleteAll = () => {
     products.forEach((product, index) => {
@@ -233,6 +233,7 @@ const CreateBudgetDeliveriesForm = () => {
             width="250px"
             label="Remito"
             placeholder="0001"
+            dataTestId={`${dataTestIdPrefix}-note-field`}
             value={deliveryNote ?? ""}
             onChange={(e) =>
               setValue("deliveryNote", e.target.value, {
@@ -249,7 +250,8 @@ const CreateBudgetDeliveriesForm = () => {
             disabled={!hasPendingDeliveries && !hasAnyDelivered}
             height="38px"
             iconOnly
-            popupPosition="top left"
+            popupPosition={POPUP_POSITIONS.TOP_LEFT}
+            dataTestId={`${dataTestIdPrefix}-complete-all-button`}
           />
         </Flex>
       </Flex>

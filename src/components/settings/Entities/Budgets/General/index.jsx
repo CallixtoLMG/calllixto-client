@@ -1,13 +1,21 @@
 import { Box, FlexColumn } from "@/common/components/custom";
 import { DropdownControlled } from "@/common/components/form";
-import { ERROR_MESSAGES } from "@/common/constants";
+import { CONTENT_SIZES, ERROR_MESSAGES } from "@/common/constants";
 import SettingsFieldLabel from "@/components/settings/Common/SettingsFieldLabel";
 import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordionTitle";
 import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
 import { BUDGET_RANGE_DATE_MONTH_OPTIONS, SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useState } from "react";
-import { Accordion, } from "semantic-ui-react";
+import { Controller } from "react-hook-form";
+import { Accordion, Checkbox } from "semantic-ui-react";
+import styled from "styled-components";
 import { HistoryDateRangesControlled } from "./HistoryDateRangesControlled";
+
+const PublicBudgetCheckbox = styled(Checkbox)`
+  &&& label {
+    font-weight: normal !important;
+  }
+`;
 
 const General = () => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
@@ -34,12 +42,28 @@ const General = () => {
                       Rango de fechas por defecto Ventas
                     </SettingsFieldLabel>
                   }
-                  width="fit-content"
+                  width={CONTENT_SIZES.FIT}
                   placeholder="Seleccione un rango"
                   options={BUDGET_RANGE_DATE_MONTH_OPTIONS}
                   rules={{
                     required: ERROR_MESSAGES.REQUIRED_FIELD_SHORT,
                   }}
+                />
+                <Controller
+                  name="publicEnabled"
+                  defaultValue={false}
+                  render={({ field: { onChange, value } }) => (
+                    <FlexColumn $rowGap="5px">
+                      <SettingsFieldLabel helpText={SETTINGS_HELP_TEXTS.BUDGET_PUBLIC_ENABLED}>
+                        Presupuesto público
+                      </SettingsFieldLabel>
+                      <PublicBudgetCheckbox
+                        checked={!!value}
+                        label={value ? "Habilitado" : "Deshabilitado"}
+                        onChange={(_, data) => onChange(Boolean(data.checked))}
+                      />
+                    </FlexColumn>
+                  )}
                 />
                 <HistoryDateRangesControlled />
               </FlexColumn>

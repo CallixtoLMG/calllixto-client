@@ -1,6 +1,5 @@
-import { Icon } from "@/common/components/custom";
-import { COLORS, ICONS, SIZES } from "@/common/constants";
-import { Popup } from "semantic-ui-react";
+import { IconTooltip } from "@/common/components/tooltips";
+import { POPUP_POSITIONS, COLORS, ICONS, SIZES } from "@/common/constants";
 
 const SettingsInfoIcon = ({ content }) => {
   if (!content) return null;
@@ -11,26 +10,18 @@ const SettingsInfoIcon = ({ content }) => {
   };
 
   return (
-    <Popup
+    <IconTooltip
       content={content}
-      position="top center"
+      icon={ICONS.INFO_CIRCLE}
+      color={COLORS.BLUE}
       size={SIZES.TINY}
-      trigger={
-        <span
-          aria-label="Ayuda"
-          onClick={stopAccordionToggle}
-          onMouseDown={stopAccordionToggle}
-          role="button"
-          tabIndex={0}
-        >
-          <Icon
-            name={ICONS.INFO_CIRCLE}
-            color={COLORS.BLUE}
-            margin="0 0 0 8px"
-            $pointer
-          />
-        </span>
-      }
+      position={POPUP_POSITIONS.TOP_CENTER}
+      ariaLabel="Ayuda"
+      iconProps={{ margin: "0 0 0 8px" }}
+      triggerProps={{
+        onClick: stopAccordionToggle,
+        onMouseDown: stopAccordionToggle,
+      }}
     />
   );
 };

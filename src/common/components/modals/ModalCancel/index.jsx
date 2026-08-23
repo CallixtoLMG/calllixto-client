@@ -26,7 +26,7 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id, header })
         </ModalContent>
         <Modal.Actions>
           <ButtonsContainer width="100%" $marginTop="10px">
-            <IconedButton text={BUTTON_TEXTS.CANCEL} icon={ICONS.CANCEL} color={COLORS.RED} onClick={() => onClose(false)} disabled={isLoading} />
+            <IconedButton text={BUTTON_TEXTS.CANCEL} icon={ICONS.CANCEL} color={COLORS.RED} onClick={() => onClose(false)} disabled={isLoading} dataTestId="modal-cancel" />
             <IconedButton
               text="Anular"
               icon={ICONS.BAN}
@@ -35,6 +35,7 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id, header })
               disabled={!cancelReason || isLoading}
               loading={isLoading}
               basic
+              dataTestId="modal-void"
             />
           </ButtonsContainer>
         </Modal.Actions>

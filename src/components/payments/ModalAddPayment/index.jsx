@@ -8,6 +8,7 @@ import { BUTTON_TEXTS, COLORS, ENTITIES, FIELD_LABELS, ICONS, RULES, SIZES } fro
 import { handleEnterKeyDown, mapToDropdownOptions } from "@/common/utils";
 import { useEffect, useMemo, useState } from "react";
 import { Modal, Transition } from "semantic-ui-react";
+import { ModalContent } from "./styles";
 
 const EMPTY_PAYMENT = () => ({
   method: '',
@@ -82,7 +83,7 @@ export const ModalAddPayment = ({
     <Transition visible={open} animation='scale' duration={500}>
       <Modal open={open} onClose={handleClose} >
         <Modal.Header>Agregar pago</Modal.Header>
-        <Modal.Content>
+        <ModalContent>
           <Form>
             <FieldsContainer $justifyContent="space-between" $rowGap="15px" $columnGap="15px">
               <FormField
@@ -105,6 +106,7 @@ export const ModalAddPayment = ({
                   onChange={(e, { value }) => setPayment({ ...payment, method: value })}
                   disabled={isTotalCovered}
                   error={showErrors && !payment.method ? RULES.REQUIRED.required : undefined}
+                  dataTestId="budget-payment-method-dropdown"
                   required
                 />
               </FormField>
@@ -119,6 +121,7 @@ export const ModalAddPayment = ({
                     setExceedAmountError(false);
                   }}
                   disabled={isTotalCovered}
+                  dataTestId="budget-payment-amount-field"
                   error={
                     showErrors && !payment.amount
                       ? RULES.REQUIRED.required
@@ -146,6 +149,7 @@ export const ModalAddPayment = ({
                 }}
                 disabled={isTotalCovered}
                 iconOnly
+                dataTestId="budget-payment-complete-amount-button"
               />
             </FieldsContainer>
             <FieldsContainer>
@@ -155,11 +159,12 @@ export const ModalAddPayment = ({
                 placeholder="Primer pago"
                 onChange={e => setPayment({ ...payment, comments: e.target.value })}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
+                dataTestId="budget-payment-comments-field"
               />
             </FieldsContainer>
             <TotalList readOnly items={totalListItem} />
           </Form>
-        </Modal.Content>
+        </ModalContent>
         <Modal.Actions>
           <ButtonsContainer>
             <IconedButton
@@ -180,6 +185,7 @@ export const ModalAddPayment = ({
               disabled={isTotalCovered || isLoading}
               loading={isLoading}
               submit
+              dataTestId="budget-payment-submit-button"
             />
           </ButtonsContainer>
         </Modal.Actions>

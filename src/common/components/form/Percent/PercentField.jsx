@@ -15,6 +15,7 @@ export const PercentField = forwardRef(({
   justifyItems,
   onBlur,
   $minWidth,
+  dataTestId,
 }, ref) => {
 
   return (
@@ -27,6 +28,7 @@ export const PercentField = forwardRef(({
       disabled={disabled}
       error={error}
       $minWidth={$minWidth}
+      data-testid={dataTestId}
     >
       <Input
         $minWidth={$minWidth}

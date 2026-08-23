@@ -65,6 +65,7 @@ const BrandForm = forwardRef(({
               name="name"
               label={FIELD_LABELS.NAME}
               placeholder="CallixtoGLM"
+              dataTestId="brand-name-field"
               rules={RULES.REQUIRED}
               disabled={view && !isUpdating}
               required

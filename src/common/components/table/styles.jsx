@@ -2,6 +2,11 @@ import { Flex } from '@/common/components/custom';
 import { Pagination as SPagination, Segment as SSegment, Table as STable } from "semantic-ui-react";
 import styled from "styled-components";
 
+const MOBILE_BREAKPOINT = 767;
+const NARROW_FILTER_ACTIONS_BREAKPOINT = 400;
+const RIBBON_SAFE_AREA = "22px";
+const TABLE_TOP_SAFE_AREA = "3px";
+
 const Cell = styled(STable.Cell)`
   height: 37px!important;
   padding: 2px 7px!important;
@@ -14,11 +19,18 @@ const Cell = styled(STable.Cell)`
 
 const Container = styled(Flex)`
   flex-direction: column;
+  row-gap: 15px;
+  box-sizing: border-box;
   width: 100% !important;
-  max-height: ${({ $tableHeight = 'none' }) => `${$tableHeight}!important`};
-  overflow-y: ${({ $tableHeight }) => $tableHeight && "auto"} !important;
-  overflow-x: ${({ $tableHeight }) => $tableHeight && "auto"} !important;
-  padding: 2px 0;
+  max-width: 100%;
+  min-width: 0;
+  overflow: visible !important;
+  padding: ${({ $ribbonOverflow }) => $ribbonOverflow ? "2px 0 8px" : "2px 0"};
+
+  @media print {
+    max-height: none !important;
+    overflow: visible !important;
+  }
 `;
 
 const Pagination = styled(SPagination)`
@@ -28,19 +40,70 @@ const Pagination = styled(SPagination)`
 const PaginationContainer = styled(Flex)`
   width:100%;
   align-items: center;
-  position: relative; 
+  position: sticky;
+  left: 0;
+  z-index: 1;
   align-self: center;
   max-height: ${({ height = 'none' }) => `${height}!important`};
   flex-direction: row;
   justify-content: ${({ $justifyContent = "flex-end" }) => $justifyContent && $justifyContent}!important;
   column-gap: 10px;
   justify-content: center;
+
+  > .ui.label {
+    white-space: nowrap;
+  }
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    max-width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: 6px;
+    row-gap: 6px;
+    align-items: center;
+    justify-content: space-between !important;
+
+    > * {
+      flex: 0 0 auto;
+      min-width: 0;
+    }
+
+    > .ui.pagination {
+      flex: 1 1 auto;
+    }
+
+    > .ui.label {
+      padding-left: 0.6em !important;
+      padding-right: 0.6em !important;
+    }
+  }
 `;
 
 const FiltersContainer = styled(Flex)`
   column-gap: 10px;
+  row-gap: 10px;
   align-items: center;
   flex-direction: row!important;
+  min-width: 0;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: wrap;
+    align-items: stretch;
+
+    > .field {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      flex: 1 1 100% !important;
+    }
+
+    > button {
+      flex: 0 0 auto;
+      align-self: flex-start !important;
+    }
+  }
 `;
 
 const Segment = styled(SSegment)`
@@ -50,10 +113,112 @@ const Segment = styled(SSegment)`
 `;
 
 const Table = styled(STable)`
+  width: max-content!important;
+  min-width: 100%!important;
   max-height: ${({ $tableHeight = "none" }) => `${$tableHeight}!important`};
-  overflow-y: auto!important;
-  overflow-x: hidden!important;
+  overflow-y: visible!important;
+  overflow-x: visible!important;
   border: 1px solid black;
+
+  @media print {
+    width: 100%!important;
+    min-width: 0!important;
+    max-height: none!important;
+    overflow: visible!important;
+  }
+`;
+
+const TableOuterWrapper = styled.div`
+  position: relative;
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: visible;
+`;
+
+const TableScrollContainer = styled.div`
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: auto;
+  max-height: ${({ $hasTableHeight, $tableHeight }) => $hasTableHeight ? `${$tableHeight}!important` : "none!important"};
+  overflow-x: auto !important;
+  overflow-y: ${({ $hasTableHeight }) => $hasTableHeight ? "auto" : "hidden"} !important;
+  padding-top: ${({ $hasTableHeight }) => $hasTableHeight ? "0" : TABLE_TOP_SAFE_AREA};
+  padding-left: ${({ $ribbonOverflow }) => $ribbonOverflow ? RIBBON_SAFE_AREA : "0"};
+
+  @media print {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+`;
+
+const TableLoaderArea = styled.div`
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+
+  ${({ $hasPagination }) => $hasPagination && `
+    > .ui.table {
+      margin-top: 0!important;
+    }
+  `}
+`;
+
+const SelectionActionsBar = styled(Flex)`
+  display: none;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid #d4d4d5;
+  border-radius: 4px;
+  background-color: #f7f7f7;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 10px;
+
+    > .ui.button {
+      flex: 0 0 auto;
+    }
+  }
+`;
+
+const SelectionActionsCount = styled.span`
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: bold;
+`;
+
+const BatchGearDesktop = styled.div`
+  display: none;
+
+  @media (min-width: ${MOBILE_BREAKPOINT + 1}px) {
+    display: flex;
+    position: absolute;
+    top: 2px;
+    right: calc(100% + 4px);
+    z-index: 2;
+    padding: 8px 5px;
+    border: 1px solid #d4d4d5;
+    border-radius: 10px 0 0 10px;
+    background-color: #f7f7f7;
+  }
 `;
 
 const TableHeader = styled(STable.Header)`
@@ -66,40 +231,46 @@ const HeaderCell = styled(STable.HeaderCell)`
   width: ${({ $width }) => $width}!important;
   padding: ${({ padding }) => padding}!important;
   max-height: ${({ maxhHeight }) => maxhHeight}!important;
+  cursor: ${({ $cursor }) => $cursor}!important;
+
 `;
 
 const ActionsContainer = styled.td`
-  position: absolute;
-  right: ${({ $header }) => $header ? "auto" : "0"};
+  position: ${({ $header }) => $header ? "absolute" : "static"};
   left: ${({ $header }) => $header ? "-100px" : "auto"};
-  top: ${({ $header }) => $header ? "0px" : "50%"};
-  transform: ${({ $actionButtonInside, $header }) => {
-    if ($actionButtonInside) return 'translateY(-50%)';
-    return $header ? 'translateX(calc(100%))' : "translateY(-50%) translateX(calc(100%))";
-  }} !important;
-  transition: all 0.1s ease-in-out!important;
-  opacity: ${({ $header, $open }) => $header || $open ? "1" : "0"};
-  visibility: ${({ $header, $open, $stillShow }) => $header || $open && $stillShow ? "visible" : "hidden"};
-  border: none!important;
-  padding: ${({ $header }) => $header && "0!important"};
-  padding-left: 5px !important;
+  top: ${({ $header }) => $header ? "0" : "auto"};
+  transform: ${({ $header }) => $header ? 'translateX(calc(100%))' : "none"} !important;
+  width: ${({ $header }) => $header ? "auto" : "52px"} !important;
+  min-width: ${({ $header }) => $header ? "auto" : "52px"} !important;
+  max-width: ${({ $header }) => $header ? "none" : "52px"} !important;
+  height: ${({ $header }) => $header ? "auto" : "37px"} !important;
+  border: ${({ $header }) => $header ? "none!important" : undefined};
+  padding: ${({ $header }) => $header ? "0 0 0 5px" : "2px"} !important;
+  text-align: center !important;
+  vertical-align: middle !important;
 `;
 
 const InnerActionsContainer = styled(Flex)`
-  border: ${({ $actionButtonInside }) => $actionButtonInside ? 'none' : "1px solid #d4d4d5"} !important;
-  background-color: ${({ $actionButtonInside }) => $actionButtonInside ? 'none' : "#f7f7f7"} !important;
-  padding: ${({ $actionButtonInside, $header }) => {
-    if ($actionButtonInside) return '0';
-    return $header ? '8px 5px' : '5px';
-  }} !important;
-  border-radius: ${({ $header }) => $header ? "10px 0 0 10px" : "0 10px 10px 0"};
+  justify-content: center;
+  border: ${({ $header }) => $header ? "1px solid #d4d4d5" : "none"} !important;
+  background-color: ${({ $header }) => $header ? "#f7f7f7" : "transparent"} !important;
+  padding: ${({ $header }) => $header ? "8px 5px" : "0"} !important;
+  border-radius: ${({ $header }) => $header ? "10px 0 0 10px" : "0"};
   column-gap: 3px;
+  transition: opacity 0.1s ease-in-out!important;
+  opacity: ${({ $header, $open }) => $header || $open ? "1" : "0"};
+  visibility: ${({ $header, $open }) => $header || $open ? "visible" : "hidden"};
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    opacity: 1;
+    visibility: visible;
+  }
 `;
 
 const TableRow = styled(STable.Row)`
   position: relative;
 
-  &:hover ${ActionsContainer} {
+  &:hover ${InnerActionsContainer} {
     opacity: 0.8;
     visibility: visible;
   }
@@ -112,11 +283,6 @@ const LinkCell = styled(STable.Cell)`
   position: relative;
   white-space: ${({ $whiteSpace }) => `${$whiteSpace}!important`};
   text-align: ${({ align }) => `${align}!important`};
-
-  &:hover ${ActionsContainer} {
-    opacity: 0.8;
-    visibility: visible;
-  }
 `;
 
 const LinkOverlay = styled.a`
@@ -134,6 +300,12 @@ const LinkContent = styled.div`
 
 const MainContainer = styled(Flex)`
   column-gap: 10px;
+  min-width: 0;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    width: 100%;
+    max-width: 100%;
+  }
 `;
 
 const HeaderSegment = styled(SSegment)`
@@ -142,9 +314,91 @@ const HeaderSegment = styled(SSegment)`
   padding: 5px 10px !important;
   margin: 0 !important;
   column-gap: 10px;
+  row-gap: 10px;
   align-content: center;
   justify-content: space-between;
+  min-width: 0;
+  max-width: 100%;
+  overflow: visible;
+  box-sizing: border-box;
 `;
 
-export { ActionsContainer, Cell, Container, FiltersContainer, HeaderCell, HeaderSegment, InnerActionsContainer, LinkCell, LinkContent, LinkOverlay, MainContainer, Pagination, PaginationContainer, Segment, Table, TableHeader, TableRow };
+const FiltersActions = styled(Flex)`
+  min-width: 0;
 
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: 8px;
+
+    .ui.dropdown.button {
+      max-width: 100%;
+    }
+  }
+`;
+
+const DesktopRestoreAction = styled.div`
+  display: contents;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    display: none;
+  }
+`;
+
+const MobileRestoreAction = styled.div`
+  display: none;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    display: contents;
+  }
+`;
+
+const WideRestoreAction = styled.div`
+  display: contents;
+
+  @media (max-width: ${NARROW_FILTER_ACTIONS_BREAKPOINT}px) {
+    display: none;
+  }
+`;
+
+const NarrowRestoreAction = styled.div`
+  display: none;
+
+  @media (max-width: ${NARROW_FILTER_ACTIONS_BREAKPOINT}px) {
+    display: contents;
+  }
+`;
+
+const FiltersSearchActions = styled.div`
+  display: contents;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    display: flex;
+    flex: 0 0 auto;
+    max-width: 100%;
+    column-gap: 10px;
+    justify-content: flex-end;
+    order: 2;
+  }
+`;
+
+const RefetchAction = styled.div`
+  display: contents;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    display: flex;
+    order: 1;
+  }
+`;
+
+const ResponsiveHeaderSegment = styled(HeaderSegment)`
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+`;
+
+export { ActionsContainer, BatchGearDesktop, Cell, Container, DesktopRestoreAction, FiltersActions, FiltersContainer, FiltersSearchActions, HeaderCell, ResponsiveHeaderSegment as HeaderSegment, InnerActionsContainer, LinkCell, LinkContent, LinkOverlay, MainContainer, MobileRestoreAction, NarrowRestoreAction, Pagination, PaginationContainer, RefetchAction, Segment, SelectionActionsBar, SelectionActionsCount, Table, TableHeader, TableLoaderArea, TableOuterWrapper, TableRow, TableScrollContainer, WideRestoreAction };

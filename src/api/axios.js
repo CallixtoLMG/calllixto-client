@@ -1,7 +1,6 @@
-import { PAGES } from "@/common/constants";
+import { LOGIN_PAGE } from "@/common/constants/routes";
 import { expireSession, getSelectedAccountId, getToken, getUserData } from "@/services/session";
 import axios from 'axios';
-import { isCallixtoUser } from "../roles";
 
 const getAccountId = () => {
   if (typeof window === 'undefined') return null;
@@ -9,13 +8,7 @@ const getAccountId = () => {
   const userData = getUserData();
   if (!userData) return null;
 
-  const accountId = userData.accountId;
-
-  if (isCallixtoUser(accountId)) {
-    return getSelectedAccountId();
-  }
-
-  return accountId;
+  return getSelectedAccountId(userData);
 };
 
 let axiosInstance = null;
@@ -49,8 +42,8 @@ export const getInstance = () => {
         if ([401, 403].includes(status) && typeof window !== "undefined") {
           expireSession();
 
-          if (window.location.pathname !== PAGES.LOGIN.BASE) {
-            window.location.replace(PAGES.LOGIN.BASE);
+          if (window.location.pathname !== LOGIN_PAGE) {
+            window.location.replace(LOGIN_PAGE);
           }
         }
 

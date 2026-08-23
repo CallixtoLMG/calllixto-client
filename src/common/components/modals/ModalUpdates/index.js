@@ -1,5 +1,5 @@
 'use client';
-import { COLORS, ICONS, SIZES } from '@/common/constants';
+import { COLORS, ICONS, POPUP_POSITIONS, SIZES } from '@/common/constants';
 import { isDateBefore } from '@/common/utils/dates';
 import { useState } from 'react';
 import { List, ListItem, Modal, Popup, Transition } from 'semantic-ui-react';
@@ -18,44 +18,51 @@ const StyledModal = styled(Modal)`
   overflow: auto;
 `;
 
-const ModalUpdates = () => {
-  const activeVersion = '2026-05-20';
+const ModalUpdates = ({ trigger }) => {
+  const activeVersion = '2026-09-21';
   const latestNews = typeof window !== 'undefined' ? window.localStorage.getItem('latestNews') : activeVersion;
   const [open, setOpen] = useState(!latestNews || isDateBefore(latestNews, activeVersion));
+  const handleOpen = () => setOpen(true);
 
   return (
     <>
-      <Popup
-        content="Últimas novedades"
-        trigger={
-          <Icon
-            margin="0"
-            pointer="true"
-            size={SIZES.LARGE}
-            name={ICONS.BULLHORN}
-            color={COLORS.BLUE}
-            onClick={() => setOpen(true)}
-          />
-        }
-        position="bottom right"
-        size={SIZES.TINY}
-      />
+      {trigger ? trigger(handleOpen) : (
+        <Popup
+          content="Últimas novedades"
+          trigger={
+            <Icon
+              $cursor
+              margin="0"
+              $pointer
+              size={SIZES.LARGE}
+              name={ICONS.BULLHORN}
+              color={COLORS.BLUE}
+              onClick={handleOpen}
+            />
+          }
+          position={POPUP_POSITIONS.BOTTOM_RIGHT}
+          size={SIZES.TINY}
+        />
+      )}
       <Transition visible={open} animation="scale" duration={500}>
         <StyledModal open={open} onClose={() => setOpen(false)}>
-          <StyledModalHeader icon={ICONS.BULLHORN} content="Últimas novedades - 20 - 05 - 2026" />
+          <StyledModalHeader icon={ICONS.BULLHORN} content="Últimas novedades - 21 - 08 - 2026" />
           <StyledModalContent>
             <StyledListHeader>
               <Icon name={ICONS.ADD} color={COLORS.BLUE} />Nuevo
             </StyledListHeader>
             <List relaxed bulleted as="ol">
               <ListItem>
-                Se incorporó una pantalla de <Accent>mantenimiento</Accent> para informar cuando la web no esté disponible temporalmente.
+                <Accent>Presupuestos públicos</Accent>: ahora podés compartir un presupuesto mediante una vista pública para que el cliente lo consulte desde un enlace.
               </ListItem>
               <ListItem>
-                Los usuarios con rol <Accent>Super Admin</Accent> ahora pueden crear nuevos usuarios.
+                <Accent>Acceso a Pandora</Accent>: agregamos la entrada desde el menú de Callixto. Pandora es nuestra herramienta complementaria para limpiar, ordenar y preparar archivos Excel y CSV.
               </ListItem>
               <ListItem>
-                Se agregó un botón para <Accent>imprimir las entregas</Accent> registradas en una venta.
+                <Accent>Barra lateral de acciones</Accent>: renovamos el acceso a las acciones de cada pantalla para encontrar opciones frecuentes de forma más rápida y ordenada.
+              </ListItem>
+              <ListItem>
+                <Accent>Limpieza automática</Accent>: los presupuestos anulados se eliminan automáticamente después de 3 meses, ayudando a mantener el historial más ordenado.
               </ListItem>
             </List>
             <StyledListHeader>
@@ -64,10 +71,16 @@ const ModalUpdates = () => {
             </StyledListHeader>
             <List relaxed bulleted as="ol">
               <ListItem>
-                Se agregó información adicional en <Accent>Configuración</Accent> para explicar mejor el uso de cada propiedad.
+                <Accent>Anulación de presupuestos</Accent>: al anular o eliminar un presupuesto, Callixto ahora revierte correctamente los movimientos de stock y pagos asociados.
               </ListItem>
               <ListItem>
-                Ahora, al salir de la creación de un elemento con <Accent>cambios sin guardar</Accent>, se mostrará una confirmación antes de descartar la información.
+                <Accent>Pantallas más chicas</Accent>: mejoramos la adaptación de formularios, tablas, acciones y modales para facilitar el uso desde notebooks y dispositivos móviles.
+              </ListItem>
+              <ListItem>
+                <Accent>Tablas y acciones</Accent>: ajustamos filtros, selección de elementos, paginación y accesos rápidos para trabajar con listas de forma más clara.
+              </ListItem>
+              <ListItem>
+                <Accent>Contraseñas</Accent>: ordenamos las pantallas de inicio de sesión, recuperación y cambio de contraseña para que el flujo sea más claro.
               </ListItem>
             </List>
           </StyledModalContent>

@@ -1,4 +1,4 @@
-import { Box, Button, Flex } from "@/common/components/custom";
+import { Box, Button } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { BUTTON_TEXTS, COLORS, DELETE, ICONS, SIZES, TOOLTIPS } from "@/common/constants";
@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Accordion } from "semantic-ui-react";
 import SettingsAccordionTitle from "../SettingsAccordionTitle";
-import { AnimatedContent, AnimatedInner } from "../styles";
+import { AnimatedContent, AnimatedInner, SettingsAddRow } from "../styles";
 
 const EMPTY_INPUT = "";
 
@@ -89,6 +89,7 @@ const PaymentMethods = () => {
           active={isAccordionOpen}
           helpText={SETTINGS_HELP_TEXTS.PAYMENT_METHODS}
           onClick={toggleAccordion}
+          dataTestId="settings-payment-methods-accordion"
         >
           Métodos de pago
         </SettingsAccordionTitle>
@@ -96,7 +97,7 @@ const PaymentMethods = () => {
           <AnimatedContent $active={isAccordionOpen}>
             <AnimatedInner>
               <Box>
-                <Flex width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
+                <SettingsAddRow width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
                   <TextField
                     width="50%"
                     label="Método"
@@ -108,6 +109,7 @@ const PaymentMethods = () => {
                     }}
                     onKeyDown={handleMethodKeyDown}
                     error={error}
+                    dataTestId="settings-payment-method-field"
                   />
                   <Button
                     size={SIZES.SMALL}
@@ -118,8 +120,9 @@ const PaymentMethods = () => {
                     type="button"
                     onClick={handleAddPaymentMethods}
                     $marginTop="25px"
+                    data-testid="settings-payment-method-add-button"
                   />
-                </Flex>
+                </SettingsAddRow>
                 <Table
                   isLoading={false}
                   headers={headers}

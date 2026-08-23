@@ -1,6 +1,6 @@
 import { Box, FlexColumn } from "@/common/components/custom";
 import { GroupedButtonsControlled, NumberControlled, SearchControlled } from "@/common/components/form";
-import { COLORS, ICONS } from "@/common/constants";
+import { CONTENT_SIZES, COLORS, ICONS } from "@/common/constants";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordionTitle";
 import SettingsFieldLabel from "@/components/settings/Common/SettingsFieldLabel";
@@ -39,7 +39,7 @@ const OnCreate = ({ customerOptions, isLoading }) => {
                   //   </SettingsFieldLabel>
                   // }
                   name="defaultsCreate.state"
-                  width="fit-content"
+                  width={CONTENT_SIZES.FIT}
                   color={defaultsCreate?.state === BUDGET_STATES.CONFIRMED.id ? COLORS.GREEN : COLORS.ORANGE}
                   buttons={[
                     { text: 'Confirmado', icon: ICONS.CHECK, value: BUDGET_STATES.CONFIRMED.id },
@@ -52,7 +52,7 @@ const OnCreate = ({ customerOptions, isLoading }) => {
                       Entrega por defecto
                     </SettingsFieldLabel>
                   }
-                  width="fit-content"
+                  width={CONTENT_SIZES.FIT}
                   color={COLORS.BLUE}
                   name="defaultsCreate.pickUpInStore"
                   buttons={[
@@ -89,7 +89,7 @@ const OnCreate = ({ customerOptions, isLoading }) => {
                       Días para el vencimiento por defecto
                     </SettingsFieldLabel>
                   }
-                  width="fit-content"
+                  width={CONTENT_SIZES.FIT}
                   placeholder="15"
                 />
               </FlexColumn>

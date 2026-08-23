@@ -1,6 +1,6 @@
 import { Button as CustomButton, DropdownItem, Flex, Label } from '@/common/components/custom';
 import ModalAction from '@/common/components/modals/ModalAction';
-import { BUTTON_TEXTS, COLORS, ENTITIES, ICONS, PAGES, SIZES } from "@/common/constants";
+import { POPUP_POSITIONS, CONTENT_SIZES, BUTTON_TEXTS, COLORS, ENTITIES, ICONS, PAGES, SIZES } from "@/common/constants";
 import { LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
 import { LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
 import { LIST_CASH_BALANCES_QUERY_KEY } from '@/components/cashBalances/cashBalances.constants';
@@ -14,9 +14,9 @@ import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Dropdown, Icon, Popup } from 'semantic-ui-react';
 import { IconedButton } from '../buttons';
-import { FiltersContainer, HeaderSegment, MainContainer } from './styles';
+import { DesktopRestoreAction, FiltersActions, FiltersContainer, FiltersSearchActions, HeaderSegment, MainContainer, MobileRestoreAction, NarrowRestoreAction, RefetchAction, WideRestoreAction } from './styles';
 
-const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, hydrated }) => {
+const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, hydrated, showRefetchAction = true }) => {
   const ENTITY_MAPPING = {
     [ENTITIES.CUSTOMERS]: { queryKey: LIST_CUSTOMERS_QUERY_KEY, text: PAGES.CUSTOMERS.NAME },
     [ENTITIES.PRODUCTS]: { queryKey: LIST_PRODUCTS_QUERY_KEY, text: PAGES.PRODUCTS.NAME },
@@ -62,49 +62,74 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
     <MainContainer>
       <HeaderSegment flex="1">
         <FiltersContainer>
-          <Popup
-            content="Restaurar filtros"
-            position="top center"
-            size={SIZES.TINY}
-            trigger={(
-              <CustomButton $marginBottom="2px" $alignSelf="flex-end" width="fit-content" $fontSize="14px" $paddingLeft="11px" padding="11px" circular icon type="button" onClick={onRestoreFilters}>
-                <Icon name={ICONS.UNDO} />
-              </CustomButton>
-            )}
-          />
+          <DesktopRestoreAction>
+            <Popup
+              content="Restaurar filtros"
+              position={POPUP_POSITIONS.TOP_CENTER}
+              size={SIZES.TINY}
+              trigger={(
+                <CustomButton $marginBottom="2px" $alignSelf="flex-end" width={CONTENT_SIZES.FIT} $fontSize="14px" $paddingLeft="11px" padding="11px" circular icon type="button" onClick={onRestoreFilters}>
+                  <Icon name={ICONS.UNDO} />
+                </CustomButton>
+              )}
+            />
+          </DesktopRestoreAction>
           {children}
         </FiltersContainer>
-        <Flex $columnGap="10px" $marginBottom="2px" $alignSelf="flex-end">
+        <FiltersActions $columnGap="10px" $marginBottom="2px" $alignSelf="flex-end">
           {hydrated && appliedCount > 0 && (
             <Popup
               content="Filtros activos"
-              position="top center"
+              position={POPUP_POSITIONS.TOP_CENTER}
               size={SIZES.TINY}
               trigger={
-                <Label $alignSelf="center" width="fit-content" circular color={COLORS.BLUE}>{appliedCount}</Label>
+                <Label $alignSelf="center" width={CONTENT_SIZES.FIT} circular color={COLORS.BLUE}>{appliedCount}</Label>
               }
             />
           )}
-          <IconedButton
-            text="Buscar"
-            icon={ICONS.SEARCH}
-            submit
-            color={isDirty ? COLORS.BLUE : undefined}
-            iconOnly
-          />
-          {onRefetch &&
-            <Dropdown width="130px" pointing as={CustomButton} text={BUTTON_TEXTS.UPDATE} icon={ICONS.REFRESH} floating labeled button className='icon'>
-              <Dropdown.Menu>
-                <DropdownItem onClick={onRefetch}>
-                  <Icon color={COLORS.BLUE} name={ICONS.DOWNLOAD} />Actualización rápida
-                </DropdownItem>
-                <DropdownItem onClick={handleHardUpdate}>
-                  <Icon color={COLORS.RED} name={ICONS.DOWNLOAD} />Actualización completa
-                </DropdownItem>
-              </Dropdown.Menu>
-            </Dropdown>
+          <FiltersSearchActions>
+            <MobileRestoreAction>
+              <WideRestoreAction>
+                <IconedButton
+                  text="Restaurar filtros"
+                  icon={ICONS.UNDO}
+                  onClick={onRestoreFilters}
+                  width="160px"
+                  minWidth="160px"
+                />
+              </WideRestoreAction>
+              <NarrowRestoreAction>
+                <IconedButton
+                  text="Restaurar filtros"
+                  icon={ICONS.UNDO}
+                  onClick={onRestoreFilters}
+                  iconOnly
+                  popupContent="Restaurar filtros"
+                />
+              </NarrowRestoreAction>
+            </MobileRestoreAction>
+            <IconedButton
+              text="Buscar"
+              icon={ICONS.SEARCH}
+              submit
+              color={isDirty ? COLORS.BLUE : undefined}
+            />
+          </FiltersSearchActions>
+          {showRefetchAction && onRefetch &&
+            <RefetchAction>
+              <Dropdown width="130px" pointing as={CustomButton} text={BUTTON_TEXTS.UPDATE} icon={ICONS.REFRESH} floating labeled button className='icon'>
+                <Dropdown.Menu>
+                  <DropdownItem onClick={onRefetch}>
+                    <Icon color={COLORS.BLUE} name={ICONS.BOLT} />Actualización rápida
+                  </DropdownItem>
+                  <DropdownItem onClick={handleHardUpdate}>
+                    <Icon color={COLORS.RED} name={ICONS.CLOUD_DOWNLOAD} />Actualización completa
+                  </DropdownItem>
+                </Dropdown.Menu>
+              </Dropdown>
+            </RefetchAction>
           }
-        </Flex>
+        </FiltersActions>
       </HeaderSegment>
       <ModalAction
         title={`¿Quieres realizar una actualización completa de ${text} ?  `}

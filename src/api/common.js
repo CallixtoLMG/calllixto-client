@@ -1,7 +1,7 @@
 import { ALL, DATE_FORMATS, HARD_DELETED, LAST_UPDATED_AT } from "@/common/constants";
 import { getDefaultAttributes } from "@/common/utils";
 import { getDateWithOffset, getDayDifference, now } from "@/common/utils/dates";
-import { bulkAddStorageItems, clearStorageTable, getAllStorageItems, getStorageItem, removeStorageItem, removeStorageItemById, updateOrCreateStorageItem } from "@/db";
+import { bulkPutStorageItems, clearStorageTable, getAllStorageItems, getStorageItem, removeStorageItem, removeStorageItemById, updateOrCreateStorageItem } from "@/db";
 import { useQueryClient } from "@tanstack/react-query";
 import { pick } from 'lodash';
 import { getInstance } from './axios';
@@ -64,7 +64,7 @@ export async function listItems({ entity, url, params = {} }) {
     await clearStorageTable(entity);
     const data = await entityList({ entity, url, params });
     if (!!data.length) {
-      await bulkAddStorageItems({ entity, values: data.filter(element => element.state !== HARD_DELETED) });
+      await bulkPutStorageItems({ entity, values: data.filter(element => element.state !== HARD_DELETED) });
     }
 
     if (lastHardReset !== activeVersion) {

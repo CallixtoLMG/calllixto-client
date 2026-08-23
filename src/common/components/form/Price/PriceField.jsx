@@ -16,7 +16,8 @@ export const PriceField = ({
   justifyItems,
   required,
   readOnly,
-  maxLength
+  maxLength,
+  dataTestId
 }) => {
   const isUserTyping = useRef(false);
   const [formattedValue, setFormattedValue] = useState(getNumberFormated(value ?? 0)[0]);
@@ -41,6 +42,7 @@ export const PriceField = ({
       control={Input}
       error={error}
       required={required}
+      data-testid={dataTestId}
     >
       <Input
         width="inherit"

@@ -1,22 +1,27 @@
 "use client";
-import { useUserContext } from "@/User";
 import { getUserData } from "@/api/userData";
-import { ICONS, PAGES, RULES, SIZES } from "@/common/constants";
+import { Button } from "@/common/components/custom";
+import { COLORS, ICONS, PAGES, RULES, SIZES } from "@/common/constants";
+import AuthLayout, { AuthSecondaryLink } from "@/components/auth/AuthLayout";
 import { Loader } from "@/components/layout";
 import { useMutation } from "@tanstack/react-query";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Form } from "../../common/components/custom";
 import { PasswordControlled, TextControlled } from "../../common/components/form";
-import { ModButton, ModGrid, ModGridColumn, ModHeader, PasswordLink, Text } from "./styles";
 
 const LoginForm = ({ onSubmit }) => {
-  const { setUserData } = useUserContext();
   const { push } = useRouter();
   const methods = useForm();
   const { handleSubmit } = methods;
+  const [isMounted, setIsMounted] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const { mutate: login, isPending } = useMutation({
     mutationFn: async (dataLogin) => {
@@ -30,6 +35,7 @@ const LoginForm = ({ onSubmit }) => {
     },
     onSuccess: (result) => {
       if (result?.nextStep?.signInStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED") {
+        setIsRedirecting(true);
         toast.success("Código correcto! Ahora debes cambiar tu contrasena para completar el ingreso.");
         push(`${PAGES.RESTORE_PASSWORD.BASE}?primerIngreso=true`);
         return;
@@ -37,7 +43,7 @@ const LoginForm = ({ onSubmit }) => {
 
       const userData = result?.userData;
       if (userData) {
-        setUserData(userData);
+        setIsRedirecting(true);
         toast.success("Ingreso exitoso!");
         push(PAGES.BUDGETS.BASE);
       } else {
@@ -50,51 +56,45 @@ const LoginForm = ({ onSubmit }) => {
   });
 
   return (
-    <Loader active={isPending}>
-      <ModGrid>
-        <ModGridColumn>
-          <ModHeader as="h3">
-            <div>
-              <Image
-                src="/Callixto.png"
-                alt="Callixto.png Logo"
-                width={300}
-                height={100}
-                priority
-              />
-              <Text>Ingresa a tu cuenta</Text>
-            </div>
-          </ModHeader>
-          <FormProvider {...methods}>
-            <Form onSubmit={handleSubmit(login)} size={SIZES.LARGE}>
-              <TextControlled
-                name="username"
-                rules={{
-                  ...RULES.REQUIRED,
-                  pattern: {
-                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: "El correo electrónico no es válido",
-                  },
-                }}
-                placeholder="Correo electrónico"
-                icon={ICONS.USER}
-                iconPosition="left"
-              />
-              <PasswordControlled
-                name="password"
-                rules={RULES.REQUIRED}
-                placeholder="Contraseña"
-              />
-              <ModButton $fluid size={SIZES.LARGE}>
-                Ingresar
-              </ModButton>
-              <PasswordLink onClick={() => push(PAGES.RESTORE_PASSWORD.BASE)}>
-                ¿Olvidaste tu contraseña?
-              </PasswordLink>
-            </Form>
-          </FormProvider>
-        </ModGridColumn>
-      </ModGrid>
+    <Loader active={isPending || isRedirecting}>
+      <AuthLayout title="Iniciar sesión">
+        <FormProvider {...methods}>
+          <Form onSubmit={handleSubmit(login)} size={SIZES.LARGE}>
+            <TextControlled
+              name="username"
+              rules={{
+                ...RULES.REQUIRED,
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "El correo electrónico no es válido",
+                },
+              }}
+              placeholder="Correo electrónico"
+              icon={ICONS.USER}
+              iconPosition="left"
+            />
+            <PasswordControlled
+              name="password"
+              rules={RULES.REQUIRED}
+              placeholder="Contraseña"
+            />
+            <Button
+              color={COLORS.BLUE}
+              width="100%"
+              height="42px"
+              $fontSize="15px"
+              padding="0 18px"
+              type="submit"
+              disabled={!isMounted || isPending || isRedirecting}
+            >
+              Ingresar
+            </Button>
+            <AuthSecondaryLink onClick={() => push(PAGES.RESTORE_PASSWORD.BASE)}>
+              ¿Olvidaste tu contraseña?
+            </AuthSecondaryLink>
+          </Form>
+        </FormProvider>
+      </AuthLayout>
     </Loader>
   );
 };

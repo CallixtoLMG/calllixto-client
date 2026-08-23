@@ -1,0 +1,56 @@
+"use client";
+import { useListCustomers } from "@/api/customers";
+import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { downloadExcel, getFormatedPhone } from "@/common/utils";
+import CustomersPage from "@/components/customers/CustomersPage";
+import { CUSTOMER_STATES } from "@/components/customers/customers.constants";
+import { useBreadcrumContext } from "@/components/layout";
+import { useKeyboardShortcuts } from "@/hooks";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo } from "react";
+
+const Customers = () => {
+  const { data, isLoading, isRefetching, refetch } = useListCustomers();
+  const { setLabels } = useBreadcrumContext();
+  const { push } = useRouter();
+
+  useEffect(() => {
+    setLabels([{ name: PAGES.CUSTOMERS.NAME }]);
+  }, [setLabels]);
+
+  const customers = useMemo(() => data?.customers, [data]);
+  const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
+
+  const handleDownloadExcel = useCallback((elements) => {
+    if (!elements?.length) return;
+    const headers = ['Nombre', 'Estado', 'Dirección', 'Teléfono'];
+    const mappedCustomers = elements.map(customer => {
+      const customerState = CUSTOMER_STATES[customer.state]?.singularTitle || customer.state;
+      return [
+        customer.name,
+        customerState,
+        customer.addresses?.map(address => `${address.ref ? `${address.ref}: ` : ''}${address.address}`).join(' , '),
+        customer.phoneNumbers?.map(phone => `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`).join(' , ')
+      ];
+    });
+    downloadExcel([headers, ...mappedCustomers], "Lista de Clientes");
+  }, []);
+
+  const sideActions = useMemo(() => [
+      {
+        id: 1,
+        icon: ICONS.ADD,
+        color: COLORS.GREEN,
+        onClick: () => { push(PAGES.CUSTOMERS.CREATE) },
+        text: 'Crear cliente',
+      }
+    ], [push]);
+
+  useKeyboardShortcuts(() => push(PAGES.CUSTOMERS.CREATE), SHORTKEYS.ENTER);
+
+  return (
+    <CustomersPage onRefetch={refetch} isLoading={loading} customers={loading ? [] : customers} onDownloadExcel={handleDownloadExcel} sideActions={sideActions} />
+  );
+};
+
+export default Customers;

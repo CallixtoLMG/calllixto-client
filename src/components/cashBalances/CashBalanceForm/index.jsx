@@ -2,7 +2,7 @@ import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, FlexColumn, Form, FormField } from "@/common/components/custom";
 import { DropdownControlled, PriceControlled, PriceField, TextAreaControlled, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { COLORS, DATE_FORMATS, ENTITIES, ICONS, SHORTKEYS } from "@/common/constants";
+import { CONTENT_SIZES, COLORS, DATE_FORMATS, ENTITIES, ICONS, SHORTKEYS } from "@/common/constants";
 import { mapToDropdownOptions } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import { BillDetails } from "@/components/cashBalances/BillsDetails";
@@ -165,7 +165,7 @@ const CashBalanceForm = forwardRef(({
                       shouldDirty: true,
                     })}
                     height="38px"
-                    width="fit-content"
+                    width={CONTENT_SIZES.FIT}
                   />
                 )}
               </FormField>

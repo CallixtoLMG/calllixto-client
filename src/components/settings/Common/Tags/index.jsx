@@ -1,4 +1,4 @@
-import { Box, Button, FieldsContainer, OverflowWrapper } from "@/common/components/custom";
+import { Box, Button, OverflowWrapper } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { BUTTON_TEXTS, COLORS, DELETE, FIELD_LABELS, ICONS, SEMANTIC_COLORS, SIZES, TOOLTIPS } from "@/common/constants";
@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Accordion, Label } from "semantic-ui-react";
 import SettingsAccordionTitle from "../SettingsAccordionTitle";
-import { AnimatedContent, AnimatedInner } from "../styles";
+import { AnimatedContent, AnimatedInner, SettingsAddRow } from "../styles";
 
 const EMPTY_TAG = {
   name: "",
@@ -120,6 +120,7 @@ const Tags = () => {
           active={isAccordionOpen}
           helpText={SETTINGS_HELP_TEXTS.TAGS}
           onClick={toggleAccordion}
+          dataTestId="settings-tags-accordion"
         >
           Etiquetas
         </SettingsAccordionTitle>
@@ -127,7 +128,7 @@ const Tags = () => {
           <AnimatedContent $active={isAccordionOpen}>
             <AnimatedInner $active={isAccordionOpen}>
               <Box>
-                <FieldsContainer padding="0 10px 10px 10px!important" >
+                <SettingsAddRow padding="0 10px 10px 10px!important" $columnGap="15px" $rowGap="15px">
                   <TextField
                     flex="1"
                     label={FIELD_LABELS.NAME}
@@ -136,6 +137,7 @@ const Tags = () => {
                     onChange={handleNameChange}
                     onKeyDown={handleTagKeyDown}
                     error={errors?.name}
+                    dataTestId="settings-tag-name-field"
                     required
                   />
                   <DropdownField
@@ -145,6 +147,7 @@ const Tags = () => {
                     options={SEMANTIC_COLORS}
                     value={tagToAdd.color}
                     onChange={(e, { value }) => setTagToAdd({ ...tagToAdd, color: value })}
+                    dataTestId="settings-tag-color-dropdown"
                   />
                   <TextField
                     flex="1"
@@ -154,6 +157,7 @@ const Tags = () => {
                     onChange={(e) => setTagToAdd({ ...tagToAdd, description: e.target.value })}
                     onKeyDown={(e) => handleEnterKeyDown(e, handleAddTag)}
                     error={errors?.description}
+                    dataTestId="settings-tag-description-field"
                   />
                   <Button
                     size={SIZES.SMALL}
@@ -164,8 +168,9 @@ const Tags = () => {
                     type="button"
                     onClick={handleAddTag}
                     $marginTop="25px"
+                    data-testid="settings-tag-add-button"
                   />
-                </FieldsContainer>
+                </SettingsAddRow>
                 <Table
                   isLoading={false}
                   headers={headers}

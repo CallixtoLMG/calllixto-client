@@ -3,6 +3,74 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-08-21
+
+### Changed
+
+- Private layout: Refined the mobile action rail gutter so closed actions reserve only the collapsed rail width plus the existing gap, while expanded actions remain an overlay.
+- Private layout: Increased the mobile expanded action rail width and allowed long action labels and subactions to wrap instead of relying on touch tooltips.
+- Header: Replaced separate mobile header shortcuts with a single informational menu and moved the current account label into that menu for `callixto` users.
+- Tables: Updated mobile filter actions so restore and search stay grouped, with restore switching to icon-only only on very narrow screens.
+- Tables: Reworked batch-selection actions so desktop uses a lateral yellow gear outside the scroll container, while mobile uses a contextual "N seleccionados" action bar.
+- Budgets: Improved responsive action-button discoverability in delivery and post-confirmation discount flows, showing icon plus text when mobile/tablet space allows.
+
+### Fixed
+
+- Private layout: Removed redundant mobile action tooltips for touch interactions and preserved desktop hover tooltips.
+- Private layout: Adjusted closed mobile and desktop action rail edge spacing independently so mobile keeps the compact gap and desktop keeps a small right margin.
+- Tables: Centered loading indicators within the table area and restored consistent spacing between pagination and table content.
+- Tables: Prevented batch-selection action triggers from being clipped by horizontal table overflow.
+- Modals: Restored mobile padding for unsaved-changes and action-confirmation modals, and added an explicit close button to the unsaved-changes guard.
+- Sales: Aligned confirmation and delivery option controls in the sale form without changing their behavior.
+
+## 2026-08-20
+
+### Fixed
+
+- Sales: Fixed clone product-change detection so historical missing boolean flags (`editablePrice`, `fractionConfig.active`) are treated like disabled flags instead of showing empty product-change rows.
+
+## 2026-08-19
+
+### Changed
+
+- Budgets: Migrated the dispatch comment truck tooltip in budget details to the shared `IconTooltip`, preserving the existing icon, color, position, and content behavior.
+
+## 2026-08-18
+
+### Changed
+
+- Responsive layout: Added the first mobile baseline for the private shell, reducing structural mobile padding, allowing the workspace to use the available viewport width, and keeping the action rail from permanently reserving content width on small screens.
+- Tables: Updated shared list controls for mobile by making filters, table overflow, and pagination adapt within the content width while preserving desktop behavior.
+- Forms: Improved shared form controls for mobile, including responsive search results and a one-column mobile policy for `FieldsContainer` / `FormField`.
+- Modals: Improved responsive behavior for common modal actions, multi-delete confirmations, open-cash-balance, add-payment, budget confirmation, and batch-import flows.
+- Contact popups: Added mobile-safe popup sizing so contact phone, email, and address editors stay within the viewport.
+- Settings: Improved responsive behavior in configuration tabs and setting sections, including payment methods, blocked products, categories, and sales-history date ranges.
+
+### Fixed
+
+- Settings: Fixed narrow mobile layouts caused by local percentage widths in configuration sections.
+- Forms: Fixed compressed mobile fields caused by `flex="1"` rows staying horizontal below the mobile breakpoint.
+- Tables: Prevented wide tables from expanding the document by containing horizontal scroll inside the table wrapper.
+- Pagination: Prevented pagination controls from overflowing the content width on small screens.
+
+## 2026-08-17
+
+### Added
+
+- Auth: Added a shared `AuthLayout` for the public login and password-recovery card layout, reusing the existing Callixto background, logo, inputs, buttons, and validation styles.
+- Auth: Added the password confirmation requirement to `PasswordRequirements`, showing `Las contraseñas coinciden.` in both password recovery and authenticated password change flows.
+
+### Changed
+
+- Auth: Updated login and password recovery to use centered white cards on the shared light-gray background while preserving the existing logo and form behavior.
+- Auth: Moved `/cambiar-contrasena` into the authenticated route group while keeping the same URL, restoring the private Header and breadcrumb context.
+- Auth: Moved the `Cambiar contraseña` title to the breadcrumb, removed the duplicate logo/title from the card, and placed the explanatory reset-code text below the validation-code request button.
+
+### Fixed
+
+- Auth: Kept `/recuperar-contrasena` public without the authenticated Header while preserving `/cambiar-contrasena` access protection for unauthenticated users.
+- Auth: Fixed the authenticated change-password workspace background so the shared gray fills the content area below the Header without adding unnecessary scroll.
+
 ## 2026-08-04
 
 ### Added
@@ -12,6 +80,107 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - Products: Aligned the batch recover confirmation modal visually with the existing batch delete modal.
+- Sidebar actions: Refined expanded and collapsed tooltip behavior, keeping redundant tooltips hidden unless text is truncated, disabled, or explicitly opted in.
+- Sidebar actions: Added explicit expanded tooltip support for Excel downloads, supplier updates, product stock/barcode actions, sale PDF/send actions, and settings updates.
+- Products: Updated the stock action label to describe the resulting state, using "Actualizar a sin stock" or "Actualizar a con stock".
+
+## 2026-08-03
+
+### Changed
+
+- Public budgets: Replaced the localStorage mock with the real public backend endpoint using `accountId` and `budget.publicHash`.
+- Sales: Enabled public link generation for newly created budgets with `publicEnabled: true` and disabled link copying for older budgets without a public hash.
+- Public budgets: Updated the public loading state to use the standard Callixto loader.
+
+## 2026-07-28
+
+### Added
+
+- Sales: Added a mocked public budget link action from sale detail, with local snapshot storage and an unauthenticated public budget view.
+- Settings: Moved the global Update action into the shared page actions sidebar.
+
+### Changed
+
+- Public budgets: Masked customer personal data and hid payment details in the public budget view.
+- Sidebar: Updated page actions to the lighter white-item variant with colored icons, subtle borders, and consistent subactions.
+- Navigation: Added an "Enlaces externos" section label above the Pandora link in the main sidebar.
+- Actions: Unified quick and full update icons across migrated action sidebars.
+- Help: Unified contextual messages to point page actions to the right sidebar.
+- Sidebar: Added smooth open/close transitions to action groups.
+- Tables: Made the pagination page-size selector more compact and aligned.
+
+## 2026-07-24
+
+### Changed
+
+- Navigation: Moved Pandora access from the header to the main sidebar menu for authorized users.
+- Help: Updated contextual information to describe page actions in the right sidebar, including Sales History.
+- Sidebar: Added open/close transitions to action groups using the main menu timing.
+- Sales History: Added the global actions sidebar with Update and Download Excel actions.
+- Sales History: Moved the Excel export out of the table footer while preserving filtered and sorted export data.
+- Tables: Made the pagination page-size selector more compact and aligned.
+
+## 2026-07-22
+
+### Added
+
+- Header: Added a Pandora shortcut for `callixto` and `sadmin` users to open the Excel sanitizer in a new tab.
+
+## 2026-05-24
+
+### Changed
+
+- Tables: Moved row actions into a reserved final column with a visible actions header indicator, avoiding overlap with row content.
+
+- Products: Fixed batch-selection actions changing the table column layout when products are selected.
+
+- Settings: Kept configuration tabs in a stable order, independently of the last updated setting returned by the backend.
+
+- Common: Centralized repeated intrinsic content sizes and popup positions into shared constants.
+
+- Entity details: Converted customer, supplier, brand, product, expense, cash balance, and budget dynamic detail pages to server-first routes with dedicated `page.client.jsx` interactive components.
+
+- Data loading: Centralized authenticated server-side entity detail loading and redirects, refreshing server data after client mutations while preserving auxiliary client-side queries.
+
+- Navigation: Moved the root `/` redirect to `/ventas` into Next.js configuration.
+
+## 2026-05-23
+
+### Changed
+
+- Auth routes: Separated public and private App Router layouts, keeping login and password recovery/change flows outside authenticated validation.
+
+- Public links: Prepared the public routing structure for future shared budget links without changing existing visible URLs.
+
+- Products: Unified product and stock bulk import flows around a reusable `BatchImport` component while preserving their specific validation and submission behavior.
+
+- Products: Added stock control changes to the product history display and corrected stock control parsing from the product import template.
+
+## 2026-05-20
+
+### Added
+
+- E2E: Added the initial Playwright setup with npm scripts, environment-based configuration, and documentation in `docs/playwright/e2e-tests.md`.
+
+- E2E: Added login smoke and real-login tests using local environment variables without committing credentials.
+
+- E2E: Added CRUD and main-flow coverage for customers, suppliers, brands, expenses, and products, including extended customer data, activation/deactivation flows, expense voiding/cloning, product stock movements, and product soft/permanent deletion.
+
+- E2E: Added Playwright coverage for budget actions, including voiding a confirmed budget and cloning a confirmed budget when product prices changed.
+
+- E2E: Added cash balance movement coverage, validating movements generated by a paid budget and a paid expense in an open cash balance.
+
+- E2E: Added dedicated tests for settings, cash balances, Excel exports, supplier actions, product actions, and expense payments.
+
+### Changed
+
+- E2E: Added shared Playwright helpers for authentication, entity navigation, form interactions, cleanup, and environment validation.
+
+- E2E: Improved customer, supplier, brand, and product tests to use more stable navigation and detail-page waits after create actions.
+
+- E2E: Improved settings coverage to verify that updated labels, categories, blocked products, and payment methods are available in the forms that consume them.
+
+- E2E: Added minimal stable test IDs where needed for modal actions, table row actions, budget product prices, and product update flows.
 
 ## 2026-05-16
 

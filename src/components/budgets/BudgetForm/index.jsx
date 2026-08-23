@@ -1,5 +1,5 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
-import { Button, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
+import { Button, FieldsContainer, Flex, Form, FormField, Input, Label, OverflowWrapper } from "@/common/components/custom";
 import {
   GroupedButtonsControlled,
   NumberControlled,
@@ -13,12 +13,13 @@ import {
 } from "@/common/components/form";
 import { SearchResultContent, SearchResultDescription, SearchResultTitle } from "@/common/components/form/Search/styles";
 import { Table, Total } from "@/common/components/table";
-import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { COLORS, DATE_FORMATS, ERROR_MESSAGES, FIELD_LABELS, ICONS, RULES, SHORTKEYS, SIZES, TOOLTIPS } from "@/common/constants";
+import { AddressesTooltip, CommentTooltip, IconTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
+import { POPUP_POSITIONS, CONTENT_SIZES, COLORS, DATE_FORMATS, ERROR_MESSAGES, FIELD_LABELS, ICONS, RULES, SHORTKEYS, SIZES, TOOLTIPS } from "@/common/constants";
 import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay, removeNullish } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
+import { getBudgetProductChanges } from "@/components/budgets/productUpdates.utils";
 import { Loader } from "@/components/layout";
 import { LIST_ATTRIBUTES, PRODUCT_STATES, getProductSearchDescription, getProductSearchTitle } from "@/components/products/products.constants";
 import { getBrandId, getPrice, getProductId, getSupplierId, getTotal, isProductOOS, normalizeBudgetProductFractionConfig } from "@/components/products/products.utils";
@@ -32,7 +33,9 @@ import { CUSTOMER_STATES, getCustomerSearchDescription, getCustomerSearchTitle }
 import ModalCreateCustomer from "../ModalCreateCustomer";
 import ModalProductUpdates from "../ModalProductUpdates";
 import ModalComment from "./ModalComment";
-import { Container, VerticalDivider } from "./styles";
+import { BudgetFormActions, Container, VerticalDivider } from "./styles";
+
+const BUDGET_PRODUCT_ATTRIBUTES = LIST_ATTRIBUTES.filter(attribute => attribute !== "stockControl");
 
 const BudgetForm = ({
   onSubmit,
@@ -46,6 +49,8 @@ const BudgetForm = ({
   total,
   subtotal,
   subtotalAfterDiscount,
+  productUpdatesResolved = false,
+  onProductUpdatesResolved,
 }) => {
 
   const {
@@ -84,6 +89,7 @@ const BudgetForm = ({
     if (!isCloning) return;
     if (!Array.isArray(budget?.products)) return;
     if (!Array.isArray(products)) return;
+    if (productUpdatesResolved) return;
     if (!initialClonedProductsRef.current) {
       initialClonedProductsRef.current = budget.products;
     }
@@ -101,12 +107,7 @@ const BudgetForm = ({
       const original = budgetProducts.find(budgetProducts => budgetProducts.id === product.id);
       if (!original) return false;
 
-      return (
-        original.price !== product.price ||
-        original.state !== product.state ||
-        original.editablePrice !== product.editablePrice ||
-        original.fractionConfig?.active !== product.fractionConfig?.active
-      );
+      return getBudgetProductChanges(original, product).hasChanges;
     });
 
     if (outdated.length || removed.length) {
@@ -115,7 +116,7 @@ const BudgetForm = ({
       setShouldShowModal(true);
       hasShownModal.current = true;
     }
-  }, [isCloning, budget?.products, products, hasShownModal]);
+  }, [isCloning, budget?.products, products, productUpdatesResolved, hasShownModal]);
 
   const handleConfirmUpdate = () => {
     const currentProducts = Array.isArray(watchProducts) ? watchProducts : [];
@@ -132,7 +133,6 @@ const BudgetForm = ({
         quantity: Number(product.quantity ?? 1),
         discount: Number(product.discount ?? 0),
         editablePrice: base.editablePrice ?? product.editablePrice ?? false,
-        stockControl: base.stockControl ?? product.stockControl,
         state: base.state,
       };
       const fractionConfig = normalizeBudgetProductFractionConfig(product, {
@@ -158,6 +158,7 @@ const BudgetForm = ({
     });
     trigger("productsValidation");
 
+    onProductUpdatesResolved?.();
     setShouldShowModal(false);
     setIsTableLoading(false);
   };
@@ -175,6 +176,7 @@ const BudgetForm = ({
 
     setValue("expirationOffsetDays", "", { shouldDirty: false });
 
+    onProductUpdatesResolved?.();
     setShouldShowModal(false);
     setIsTableLoading(false);
   };
@@ -189,7 +191,7 @@ const BudgetForm = ({
         : undefined,
       products: data.products.map((product) =>
         removeNullish(
-          pick(product, ["rowId", ...LIST_ATTRIBUTES, "quantity", "discount", "dispatchComment", "tags",])
+          pick(product, ["rowId", ...BUDGET_PRODUCT_ATTRIBUTES, "quantity", "discount", "dispatchComment", "tags",])
         )
       ),
       total: Number(total.toFixed(2)),
@@ -280,7 +282,7 @@ const BudgetForm = ({
           <Popup
             size={SIZES.TINY}
             trigger={<span>{getSupplierId(product.id)}</span>}
-            position="top center"
+            position={POPUP_POSITIONS.TOP_CENTER}
             on="hover"
             content={product.supplierName}
           />
@@ -288,7 +290,7 @@ const BudgetForm = ({
           <Popup
             size={SIZES.TINY}
             trigger={<span>{getBrandId(product.id)}</span>}
-            position="top center"
+            position={POPUP_POSITIONS.TOP_CENTER}
             on="hover"
             content={product.brandName}
           />
@@ -308,6 +310,7 @@ const BudgetForm = ({
           width="80px"
           name={`products[${index}].quantity`}
           disabled={isProductOOS(product.state)}
+          data-testid={`budget-product-${index}-quantity-field`}
           allowsDecimal
         />
       ),
@@ -326,7 +329,20 @@ const BudgetForm = ({
             {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
             {product.comments && <CommentTooltip tooltip="true" comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
-              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon lineHeight="normal" name={ICONS.TRUCK} color={COLORS.BLUE} />} />
+              <IconTooltip
+                size="mini"
+                content={product.dispatchComment || product?.dispatch?.comment}
+                icon={ICONS.TRUCK}
+                color={COLORS.BLUE}
+                position={POPUP_POSITIONS.TOP_CENTER}
+                ariaLabel="Comentario de despacho"
+                iconProps={{
+                  lineHeight: "normal",
+                  $lineHeight: "normal",
+                  margin: undefined,
+                  $pointer: false,
+                }}
+              />
             )}
           </Flex>
         </Container>
@@ -377,9 +393,14 @@ const BudgetForm = ({
                 });
               }}
               justifyItems="right"
+              dataTestId={`budget-product-${index}-price-field`}
             />
           )
-          : <PriceLabel width="100%" value={getPrice(product)} />
+          : (
+            <div data-testid={`budget-product-${index}-price-label`}>
+              <PriceLabel width="100%" value={getPrice(product)} />
+            </div>
+          )
       },
       width: 2
     },
@@ -393,6 +414,7 @@ const BudgetForm = ({
             name={`products[${index}].discount`}
             defaultValue={product.discount ?? 0}
             disabled={isProductOOS(product.state)}
+            dataTestId={`budget-product-${index}-discount-field`}
             handleChange={(v) => {
               setValue(`products.${index}.discount`, Number(v ?? 0), {
                 shouldDirty: true,
@@ -471,14 +493,16 @@ const BudgetForm = ({
         onConfirm={handleConfirmUpdate}
       />
       <Form onSubmit={handleSubmit(handleConfirm)}>
-        <FieldsContainer $justifyContent="space-between">
-          <FormField $width="300px">
+        <FieldsContainer $rowGap="15px" $justifyContent="space-between">
+          <FormField $alignItems="flex-end" $width={CONTENT_SIZES.FIT} $maxWidth="100%">
             <ButtonGroup size={SIZES.SMALL}>
               <IconedButton
                 text="Confirmado"
                 icon={ICONS.CHECK}
+                width={CONTENT_SIZES.FIT}
                 basic={!isConfirmed}
                 color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
+                dataTestId="budget-state-confirmed-button"
                 onClick={() => setValue("state", BUDGET_STATES.CONFIRMED.id, {
                   shouldDirty: true,
                   shouldTouch: true,
@@ -487,8 +511,10 @@ const BudgetForm = ({
               <IconedButton
                 text="Pendiente"
                 icon={ICONS.HOURGLASS_HALF}
+                width={CONTENT_SIZES.FIT}
                 basic={isConfirmed}
                 color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
+                dataTestId="budget-state-pending-button"
                 onClick={() => setValue("state", BUDGET_STATES.PENDING.id, {
                   shouldDirty: true,
                   shouldTouch: true,
@@ -499,7 +525,7 @@ const BudgetForm = ({
           <GroupedButtonsControlled
             $alignItems="flex-end"
             name="pickUpInStore"
-            width="fit-content"
+            width={CONTENT_SIZES.FIT}
             color={COLORS.BLUE}
             buttons={[
               { text: PICK_UP_IN_STORE, icon: ICONS.WAREHOUSE, value: true },
@@ -543,6 +569,7 @@ const BudgetForm = ({
               maxLength={3}
               label="Dias para el vencimiento"
               placeholder="3"
+              data-testid="budget-expiration-days-field"
               required
             />
           </FormField>
@@ -568,6 +595,7 @@ const BudgetForm = ({
                 label="Cliente"
                 required
                 clearable
+                dataTestId="budget-customer-search"
                 placeholder="Martín Bueno"
                 rules={{
                   validate: {
@@ -608,7 +636,7 @@ const BudgetForm = ({
                 persistSelection={true}
               />
             </FormField>
-            <FormField $maxWidth="max-content" $alignItems="flex-end" $flexDirection="row" flex="1">
+            <FormField $maxWidth={CONTENT_SIZES.MAX} $alignItems="flex-end" $flexDirection="row" flex="1">
               <IconedButton
                 type="button"
                 text="Agregar cliente"
@@ -682,6 +710,7 @@ const BudgetForm = ({
               label="Producto"
               required
               clearAfterSelect
+              dataTestId="budget-product-search"
               placeholder="Televisor 100”"
               externalError={
                 errors.productsValidation && {
@@ -759,7 +788,7 @@ const BudgetForm = ({
                 <Flex $columnGap="5px" wrap="wrap" $rowGap="5px">
                   <Button
                     padding="0 18px"
-                    width="fit-content"
+                    width={CONTENT_SIZES.FIT}
                     type="button"
                     basic={value?.length !== paymentMethods?.length}
                     color={COLORS.BLUE}
@@ -777,7 +806,7 @@ const BudgetForm = ({
                   {paymentMethods?.map(({ key, text, value: methodValue }) => (
                     <Button
                       padding="0 18px"
-                      width="fit-content"
+                      width={CONTENT_SIZES.FIT}
                       key={key}
                       basic={!value?.includes(methodValue)}
                       color={COLORS.BLUE}
@@ -799,33 +828,37 @@ const BudgetForm = ({
           />
         </FieldsContainer>
         <TextAreaControlled name="comments" label={FIELD_LABELS.COMMENTS} placeholder="Pago con billetes de 100" />
-        <SubmitAndRestore
-          canSubmitWithoutChanges={canSubmit}
-          isLoading={isLoading && !isBudgetDraft(watchState)}
-          disabled={isLoading}
-          isDirty={isDirty}
-          isUpdating={draft || isCloning}
-          onReset={handleTryReset}
-          color={currentState.color}
-          onSubmit={handleSubmit(handleConfirm)}
-          icon={currentState.icon}
-          text={currentState.singularTitle}
-          submit
-          extraButton={
-            <IconedButton
-              icon={BUDGET_STATES.DRAFT.icon}
-              labelPosition="left"
-              disabled={isLoading || !isDirty}
-              loading={isLoading && isBudgetDraft(watchState)}
-              type="button"
-              onClick={handleSubmit(handleDraft)}
-              color={BUDGET_STATES.DRAFT.color}
-              width="fit-content"
-              text={BUDGET_STATES.DRAFT.singularTitle}
-            >
-            </IconedButton>
-          }
-        />
+        <BudgetFormActions>
+          <SubmitAndRestore
+            canSubmitWithoutChanges={canSubmit}
+            isLoading={isLoading && !isBudgetDraft(watchState)}
+            disabled={isLoading}
+            isDirty={isDirty}
+            isUpdating={draft || isCloning}
+            onReset={handleTryReset}
+            color={currentState.color}
+            onSubmit={handleSubmit(handleConfirm)}
+            icon={currentState.icon}
+            text={currentState.singularTitle}
+            submit
+            submitDataTestId="budget-submit-current-state-button"
+            extraButton={
+              <IconedButton
+                icon={BUDGET_STATES.DRAFT.icon}
+                labelPosition="left"
+                disabled={isLoading || !isDirty}
+                loading={isLoading && isBudgetDraft(watchState)}
+                type="button"
+                onClick={handleSubmit(handleDraft)}
+                color={BUDGET_STATES.DRAFT.color}
+                width={CONTENT_SIZES.FIT}
+                text={BUDGET_STATES.DRAFT.singularTitle}
+                dataTestId="budget-submit-draft-button"
+              >
+              </IconedButton>
+            }
+          />
+        </BudgetFormActions>
       </Form >
     </>
   );

@@ -1,0 +1,588 @@
+import { expect, test, type Locator, type Page } from "@playwright/test";
+import {
+  expectSuccessfulApiResponse,
+  getE2EAccountApiUrl,
+  getE2EApiHeaders,
+  getE2EApiJson,
+  isApiResponse,
+} from "./support/api";
+import { loginAsE2EUser } from "./support/auth";
+import { E2E_ACCOUNTS } from "./support/env";
+import {
+  deleteEntityIfPresent,
+  dismissUnsavedChangesIfVisible,
+  expectEntityDeletedFromActiveList,
+  filterByName,
+  selectInactiveFilter,
+  waitForEntityDetailAfterSubmit,
+  waitForEntityDetailUrl,
+} from "./support/entities";
+
+type ProductFixture = {
+  localId: string;
+  name: string;
+  cost: string;
+  price: string;
+  comments: string;
+  tagsCount?: number;
+};
+
+type ProductDependencies = {
+  supplier: { id: string; name: string; url: string };
+  brand: { id: string; name: string; url: string };
+};
+
+type OpenCreatePageOptions = {
+  createActionTestId: string;
+  createUrl: RegExp;
+  listPath: string;
+  listUrl: RegExp;
+  readyLocator: (page: Page) => Locator;
+};
+
+const productsListUrl = /\/productos(?:\?|$)/;
+const suppliersListUrl = /\/proveedores(?:\?|$)/;
+const brandsListUrl = /\/marcas(?:\?|$)/;
+
+const twoDigitId = (seed: number) => (seed % 1296).toString(36).padStart(2, "0").toUpperCase();
+const twoDigitIdWithAttempt = (seed: number, attempt: number) => twoDigitId(seed + attempt * 97);
+const productLocalId = (seed: number) => (seed % 1_679_616).toString(36).padStart(4, "0").toUpperCase();
+
+const getAvailableSupplierId = async (page: Page, timestamp: number, attemptOffset = 0) => {
+  const body = await getE2EApiJson<{ statusOk?: boolean; suppliers?: { id?: string }[] }>(
+    page,
+    "suppliers?attributes=%5B%22id%22%5D",
+  );
+  expect(body.statusOk, JSON.stringify(body)).toBe(true);
+
+  const usedIds = new Set((body.suppliers ?? []).map((supplier) => supplier.id).filter(Boolean));
+
+  for (let attempt = 0; attempt < 1296; attempt += 1) {
+    const candidateId = twoDigitIdWithAttempt(timestamp, attempt + attemptOffset * 16);
+    if (!usedIds.has(candidateId)) return candidateId;
+  }
+
+  throw new Error("No available two-character supplier id for the E2E account");
+};
+
+const isBrandIdAvailable = async (page: Page, id: string) => {
+  const response = await page.request.get(getE2EAccountApiUrl(`brands/${id}`), {
+    headers: await getE2EApiHeaders(page),
+  });
+
+  if (response.status() === 404) return true;
+  if (!response.ok()) return false;
+
+  const body = await response.json().catch(() => ({}));
+  return !body.brand;
+};
+
+const getAvailableBrandId = async (page: Page, timestamp: number, attemptOffset = 0) => {
+  for (let attempt = 0; attempt < 1296; attempt += 1) {
+    const candidateId = twoDigitIdWithAttempt(timestamp + 37, attempt + attemptOffset * 16);
+    if (await isBrandIdAvailable(page, candidateId)) return candidateId;
+  }
+
+  throw new Error("No available two-character brand id for the E2E account");
+};
+
+const fillTestIdInput = async (page: Page, testId: string, value: string) => {
+  await page.getByTestId(testId).locator("input").fill(value);
+};
+
+const openProductsList = async (page: Page) => {
+  await page.goto("/productos");
+  await expect(page).toHaveURL(productsListUrl);
+  const createAction = await getCreateProductAction(page);
+  await expectActionReady(createAction);
+};
+
+const getPageActionsRail = (page: Page) => page.getByTestId("page-actions-aside");
+
+const expectActionReady = async (action: Locator) => {
+  await expect(action).toBeVisible();
+  await expect(action).toBeEnabled();
+  await action.click({ trial: true });
+};
+
+const expandPageActionsRail = async (page: Page) => {
+  const rail = getPageActionsRail(page);
+  await expect(rail).toBeAttached();
+
+  const railToggle = rail.getByTestId("page-actions-rail-toggle");
+
+  if (await railToggle.getAttribute("aria-expanded") === "false") {
+    await railToggle.click();
+    await expect(railToggle).toHaveAttribute("aria-expanded", "true");
+  }
+
+  return rail;
+};
+
+const getActionFromRail = async (page: Page, testId: string) => {
+  const rail = await expandPageActionsRail(page);
+  return rail.getByTestId(testId);
+};
+
+const getCreateProductAction = async (page: Page) => getActionFromRail(page, "nav-action-crear producto");
+
+const openCreatePageFromList = async (page: Page, options: OpenCreatePageOptions) => {
+  await page.goto(options.listPath);
+  await expect(page).toHaveURL(options.listUrl);
+
+  const createAction = await getActionFromRail(page, options.createActionTestId);
+  await expectActionReady(createAction);
+  await createAction.click();
+
+  await expect(page).toHaveURL(options.createUrl);
+  await expect(options.readyLocator(page)).toBeVisible({ timeout: 30_000 });
+};
+
+const createSupplier = async (page: Page, timestamp: number, attempt = 0) => {
+  const supplier = {
+    id: await getAvailableSupplierId(page, timestamp, attempt),
+    name: `E2E Product Supplier ${timestamp}`,
+    comment: `Comentario E2E product supplier ${timestamp}`,
+  };
+
+  await openCreatePageFromList(page, {
+    createActionTestId: "nav-action-crear proveedor",
+    createUrl: /\/proveedores\/crear(?:\?|$)/,
+    listPath: "/proveedores",
+    listUrl: suppliersListUrl,
+    readyLocator: (currentPage) => currentPage.locator('input[name="id"]'),
+  });
+
+  await page.locator('input[name="id"]').fill(supplier.id);
+  await page.locator('input[name="name"]').fill(supplier.name);
+  await page.getByPlaceholder("Siempre demora en los pedidos").fill(supplier.comment);
+
+  const responsePromise = page.waitForResponse((response) => isApiResponse(response, "POST", "suppliers"));
+  await page.locator("form").getByRole("button", { name: /crear/i }).click();
+  const body = await expectSuccessfulApiResponse(await responsePromise, {
+    responseEntity: "supplier",
+    expectedId: supplier.id,
+  });
+  await dismissUnsavedChangesIfVisible(page);
+  await waitForEntityDetailAfterSubmit(page, "proveedores");
+  await expect(page).toHaveURL(new RegExp(`/proveedores/${body.supplier.id}(?:\\?|$)`));
+
+  return { ...supplier, url: page.url() };
+};
+
+const createBrand = async (page: Page, timestamp: number, attempt = 0) => {
+  const brand = {
+    id: await getAvailableBrandId(page, timestamp, attempt),
+    name: `E2E Product Brand ${timestamp}`,
+    comment: `Comentario E2E product brand ${timestamp}`,
+  };
+
+  await openCreatePageFromList(page, {
+    createActionTestId: "nav-action-crear marca",
+    createUrl: /\/marcas\/crear(?:\?|$)/,
+    listPath: "/marcas",
+    listUrl: brandsListUrl,
+    readyLocator: (currentPage) => currentPage.locator('input[name="id"]'),
+  });
+
+  await page.locator('input[name="id"]').fill(brand.id);
+  await page.locator('input[name="name"]').fill(brand.name);
+  await page.getByPlaceholder("Una marca macanuda").fill(brand.comment);
+
+  const responsePromise = page.waitForResponse((response) => isApiResponse(response, "POST", "brands"));
+  await page.locator("form").getByRole("button", { name: /crear/i }).click();
+  const body = await expectSuccessfulApiResponse(await responsePromise, {
+    responseEntity: "brand",
+    expectedId: brand.id,
+  });
+  await dismissUnsavedChangesIfVisible(page);
+  await waitForEntityDetailAfterSubmit(page, "marcas");
+  await expect(page).toHaveURL(new RegExp(`/marcas/${body.brand.id}(?:\\?|$)`));
+
+  return { ...brand, url: page.url() };
+};
+
+const cleanupDependencies = async (page: Page, dependencies: ProductDependencies | null) => {
+  if (!dependencies) return;
+
+  await deleteEntityIfPresent(page, dependencies.brand.url, brandsListUrl, "nav-action-eliminar marca");
+  await deleteEntityIfPresent(page, dependencies.supplier.url, suppliersListUrl, "nav-action-eliminar proveedor");
+};
+
+const cleanupPartialDependencies = async (
+  page: Page,
+  supplier: ProductDependencies["supplier"] | null,
+  brand: ProductDependencies["brand"] | null,
+) => {
+  if (brand) {
+    await deleteEntityIfPresent(page, brand.url, brandsListUrl, "nav-action-eliminar marca");
+  }
+
+  if (supplier) {
+    await deleteEntityIfPresent(page, supplier.url, suppliersListUrl, "nav-action-eliminar proveedor");
+  }
+};
+
+const createDependencies = async (page: Page, timestamp: number): Promise<ProductDependencies> => {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    const attemptTimestamp = timestamp + attempt;
+    let supplier: ProductDependencies["supplier"] | null = null;
+    let brand: ProductDependencies["brand"] | null = null;
+
+    try {
+      supplier = await createSupplier(page, attemptTimestamp, attempt);
+      brand = await createBrand(page, attemptTimestamp, attempt);
+      return { supplier, brand };
+    } catch (error) {
+      lastError = error;
+      await cleanupPartialDependencies(page, supplier, brand);
+    }
+  }
+
+  throw lastError;
+};
+
+const selectSearchOption = async (page: Page, testId: string, text: string) => {
+  const field = page.getByTestId(testId);
+
+  await field.locator("input").fill(text);
+  await page.getByText(text).first().click();
+  await expect(field.locator("input")).toHaveValue(text);
+};
+
+const selectAvailableTags = async (page: Page, requestedCount = 2) => {
+  const selectedTags: string[] = [];
+  const tagsDropdown = page.getByTestId("dropdown-tags");
+
+  if (!(await tagsDropdown.isVisible({ timeout: 5_000 }).catch(() => false))) {
+    return selectedTags;
+  }
+
+  await tagsDropdown.click();
+
+  const options = () => page
+    .locator('[role="option"]')
+    .filter({ visible: true })
+    .filter({ hasNotText: /todos|no hay|no se encontraron/i });
+
+  if (!(await options().count())) {
+    await page.keyboard.press("Escape");
+    return selectedTags;
+  }
+
+  for (let index = 0; index < requestedCount; index += 1) {
+    const currentOptions = options();
+    if (!(await currentOptions.count())) break;
+
+    const option = currentOptions.nth(0);
+    const text = (await option.innerText()).trim();
+    selectedTags.push(text);
+    await option.click();
+  }
+
+  return selectedTags;
+};
+
+const fillProductForm = async (page: Page, product: ProductFixture, dependencies: ProductDependencies) => {
+  await selectSearchOption(page, "product-supplier-search", dependencies.supplier.name);
+  await selectSearchOption(page, "product-brand-search", dependencies.brand.name);
+  await fillTestIdInput(page, "product-id-field", product.localId);
+  await page.locator('input[name="name"]').fill(product.name);
+
+  await page.getByTestId("product-stock-control-toggle").click();
+  await fillTestIdInput(page, "product-cost-field", product.cost);
+  await fillTestIdInput(page, "product-price-field", product.price);
+
+  await page.getByTestId("product-fraction-toggle").click();
+  await page.getByTestId("product-unit-dropdown").click();
+  await page.getByRole("option", { name: /metros/i }).click();
+
+  const selectedTags = product.tagsCount ? await selectAvailableTags(page, product.tagsCount) : [];
+  await page.getByPlaceholder("Realmente son muchas pulgadas").fill(product.comments);
+
+  return { selectedTags };
+};
+
+const createProduct = async (page: Page, product: ProductFixture, dependencies: ProductDependencies) => {
+  await openCreatePageFromList(page, {
+    createActionTestId: "nav-action-crear producto",
+    createUrl: /\/productos\/crear(?:\?|$)/,
+    listPath: "/productos",
+    listUrl: productsListUrl,
+    readyLocator: (currentPage) => currentPage.getByTestId("product-supplier-search"),
+  });
+
+  const selectedData = await fillProductForm(page, product, dependencies);
+
+  await page.locator("form").getByRole("button", { name: /crear/i }).click();
+  await dismissUnsavedChangesIfVisible(page);
+  await waitForEntityDetailAfterSubmit(page, "productos");
+
+  return {
+    url: page.url(),
+    fullId: `${dependencies.supplier.id}${dependencies.brand.id}${product.localId}`,
+    ...selectedData,
+  };
+};
+
+const expectProductName = async (page: Page, name: string) => {
+  await expect(page.getByTestId("product-name-field")).toContainText(name, { timeout: 30_000 });
+};
+
+const expectPriceField = async (page: Page, testId: string, value: string) => {
+  await expect(page.getByTestId(testId).locator("input")).toHaveValue(value, { timeout: 30_000 });
+};
+
+const confirmDelete = async (page: Page) => {
+  await page.getByTestId("modal-confirmation-input").locator("input").fill("eliminar");
+  await page.getByTestId("modal-confirm").click();
+};
+
+const softDeleteCurrentProduct = async (page: Page) => {
+  await page.getByTestId("nav-action-eliminar producto").click();
+  await confirmDelete(page);
+  await expect(page.getByTestId("nav-action-recuperar producto")).toBeVisible({ timeout: 30_000 });
+};
+
+const permanentlyDeleteCurrentProduct = async (page: Page) => {
+  await page.getByTestId("nav-action-eliminar producto").click();
+  await confirmDelete(page);
+  await expect(page).toHaveURL(productsListUrl, { timeout: 30_000 });
+};
+
+const deleteProductPermanentlyIfPresent = async (page: Page, productUrl: string | null) => {
+  if (!productUrl) return;
+
+  try {
+    await page.goto(productUrl);
+
+    const recoverButton = page.getByTestId("nav-action-recuperar producto");
+    const deleteButton = page.getByTestId("nav-action-eliminar producto");
+
+    if (!(await recoverButton.isVisible({ timeout: 5_000 }).catch(() => false))) {
+      if (!(await deleteButton.isVisible({ timeout: 5_000 }).catch(() => false))) return;
+      await softDeleteCurrentProduct(page);
+    }
+
+    if (await deleteButton.isVisible({ timeout: 5_000 }).catch(() => false)) {
+      await permanentlyDeleteCurrentProduct(page);
+    }
+  } catch {
+    // Best-effort cleanup: keep the original test failure as the useful signal.
+  }
+};
+
+const selectProductState = async (page: Page, stateName: RegExp) => {
+  await page.getByTestId("dropdown-state").click();
+  await page.getByRole("option", { name: stateName }).click();
+};
+
+const selectDeletedFilter = async (page: Page) => {
+  await selectProductState(page, /eliminados/i);
+};
+
+const openProductFromList = async (page: Page, productName: string) => {
+  await page.getByText(productName).first().click();
+  await waitForEntityDetailUrl(page, "productos");
+};
+
+const addStockMovement = async (page: Page, type: "add" | "remove", quantity: string, comment: string) => {
+  const productId = new URL(page.url()).pathname.split("/")[2];
+
+  await page.getByTestId(type === "add" ? "stock-add-button" : "stock-remove-button").click();
+  await fillTestIdInput(page, "stock-quantity-field", quantity);
+  await fillTestIdInput(page, "stock-comments-field", comment);
+
+  const responsePromise = page.waitForResponse((response) => isApiResponse(response, "POST", `stock-flows/${productId}`));
+  await Promise.all([
+    responsePromise,
+    page.getByTestId("modal-confirm").click(),
+  ]);
+  await expectSuccessfulApiResponse(await responsePromise, { responseEntity: "stockFlow" });
+
+  const row = page.getByTestId("table-row").filter({ hasText: comment });
+  await expect(row).toBeVisible({ timeout: 30_000 });
+  await expect(row.getByTestId("table-cell-quantity").getByText(quantity, { exact: true })).toBeVisible();
+};
+
+test.describe("products", () => {
+  test.beforeEach(async ({ page }) => {
+    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
+  });
+
+  test("creates and updates a product", async ({ page }) => {
+    test.setTimeout(180_000);
+
+    const timestamp = Date.now();
+    const product = {
+      localId: productLocalId(timestamp),
+      name: `E2E Product Test ${timestamp}`,
+      cost: "1000",
+      price: "1500",
+      comments: `Comentario E2E producto ${timestamp}`,
+      tagsCount: 2,
+    };
+    const updatedName = `E2E Product Test ${timestamp} Updated`;
+    const updatedComment = `Comentario E2E producto actualizado ${timestamp}`;
+    let dependencies: ProductDependencies | null = null;
+    let productUrl: string | null = null;
+
+    try {
+      dependencies = await createDependencies(page, timestamp);
+      const createdProduct = await createProduct(page, product, dependencies);
+      productUrl = createdProduct.url;
+
+      await expectProductName(page, product.name);
+      await expect(page.getByText(dependencies.supplier.name)).toBeVisible();
+      await expect(page.getByText(dependencies.brand.name)).toBeVisible();
+      await expectPriceField(page, "product-cost-field", "1,000");
+      await expectPriceField(page, "product-price-field", "1,500");
+      await expect(page.getByPlaceholder("Realmente son muchas pulgadas")).toHaveValue(product.comments);
+
+      for (const tag of createdProduct.selectedTags) {
+        await expect(page.getByText(tag)).toBeVisible();
+      }
+
+      await page.getByRole("button", { name: /^actualizar$/i }).click();
+      await page.locator('input[name="name"]').fill(updatedName);
+      await fillTestIdInput(page, "product-cost-field", "1200");
+      await fillTestIdInput(page, "product-price-field", "1800");
+      await page.getByPlaceholder("Realmente son muchas pulgadas").fill(updatedComment);
+      await page.locator("form").getByRole("button", { name: /actualizar/i }).click();
+
+      await expectProductName(page, updatedName);
+      await expectPriceField(page, "product-cost-field", "1,200");
+      await expectPriceField(page, "product-price-field", "1,800");
+      await expect(page.getByPlaceholder("Realmente son muchas pulgadas")).toHaveValue(updatedComment);
+
+      await deleteProductPermanentlyIfPresent(page, productUrl);
+      productUrl = null;
+    } finally {
+      await deleteProductPermanentlyIfPresent(page, productUrl);
+      await cleanupDependencies(page, dependencies);
+    }
+  });
+
+  test("deactivates and reactivates a product", async ({ page }) => {
+    test.setTimeout(180_000);
+
+    const timestamp = Date.now();
+    const productName = `E2E Product Test ${timestamp}`;
+    const inactiveReason = `Motivo E2E product ${timestamp}`;
+    let dependencies: ProductDependencies | null = null;
+    let productUrl: string | null = null;
+
+    try {
+      dependencies = await createDependencies(page, timestamp);
+      const createdProduct = await createProduct(page, {
+        localId: productLocalId(timestamp),
+        name: productName,
+        cost: "1000",
+        price: "1500",
+        comments: `Comentario E2E producto ${timestamp}`,
+      }, dependencies);
+      productUrl = createdProduct.url;
+
+      await page.getByTestId("nav-action-desactivar producto").click();
+      await page.getByPlaceholder(/motivo/i).fill(inactiveReason);
+      await page.getByTestId("modal-confirm").click();
+      await expect(page.getByText(inactiveReason)).toBeVisible({ timeout: 30_000 });
+      await expect(page.getByTestId("nav-action-activar producto")).toBeVisible();
+
+      await openProductsList(page);
+      await selectInactiveFilter(page);
+      await filterByName(page, productName);
+      await expect(page.getByText(productName)).toBeVisible();
+
+      await openProductFromList(page, productName);
+      await page.getByTestId("nav-action-activar producto").click();
+      await page.getByTestId("modal-confirm").click();
+      await expect(page.getByTestId("nav-action-desactivar producto")).toBeVisible({ timeout: 30_000 });
+
+      await deleteProductPermanentlyIfPresent(page, productUrl);
+      productUrl = null;
+    } finally {
+      await deleteProductPermanentlyIfPresent(page, productUrl);
+      await cleanupDependencies(page, dependencies);
+    }
+  });
+
+  test("adds and removes stock for a stock-controlled product", async ({ page }) => {
+    test.setTimeout(180_000);
+
+    const timestamp = Date.now();
+    const productName = `E2E Product Test ${timestamp}`;
+    const addComment = `Ingreso stock E2E product ${timestamp}`;
+    const removeComment = `Egreso stock E2E product ${timestamp}`;
+    let dependencies: ProductDependencies | null = null;
+    let productUrl: string | null = null;
+
+    try {
+      dependencies = await createDependencies(page, timestamp);
+      const createdProduct = await createProduct(page, {
+        localId: productLocalId(timestamp),
+        name: productName,
+        cost: "1000",
+        price: "1500",
+        comments: `Comentario E2E producto ${timestamp}`,
+      }, dependencies);
+      productUrl = createdProduct.url;
+
+      await page.getByText("Control de stock").click();
+      await expect(page.getByText(/movimientos de stock/i)).toBeVisible();
+
+      await addStockMovement(page, "add", "10", addComment);
+      await expect(page.getByText(/Stock:\s*10/i)).toBeVisible({ timeout: 30_000 });
+
+      await addStockMovement(page, "remove", "3", removeComment);
+      await expect(page.getByText(/Stock:\s*7/i)).toBeVisible({ timeout: 30_000 });
+      await expect(page.getByTestId("table-cell-quantity").getByText("3", { exact: true })).toBeVisible();
+
+      await deleteProductPermanentlyIfPresent(page, productUrl);
+      productUrl = null;
+    } finally {
+      await deleteProductPermanentlyIfPresent(page, productUrl);
+      await cleanupDependencies(page, dependencies);
+    }
+  });
+
+  test("soft deletes and permanently deletes a product", async ({ page }) => {
+    test.setTimeout(180_000);
+
+    const timestamp = Date.now();
+    const productName = `E2E Product Test ${timestamp}`;
+    let dependencies: ProductDependencies | null = null;
+    let productUrl: string | null = null;
+
+    try {
+      dependencies = await createDependencies(page, timestamp);
+      const createdProduct = await createProduct(page, {
+        localId: productLocalId(timestamp),
+        name: productName,
+        cost: "1000",
+        price: "1500",
+        comments: `Comentario E2E producto ${timestamp}`,
+      }, dependencies);
+      productUrl = createdProduct.url;
+
+      await softDeleteCurrentProduct(page);
+
+      await openProductsList(page);
+      await selectDeletedFilter(page);
+      await filterByName(page, productName);
+      await expect(page.getByText(productName)).toBeVisible();
+
+      await openProductFromList(page, productName);
+      await permanentlyDeleteCurrentProduct(page);
+      productUrl = null;
+
+      await selectDeletedFilter(page);
+      await expectEntityDeletedFromActiveList(page, productName);
+    } finally {
+      await deleteProductPermanentlyIfPresent(page, productUrl);
+      await cleanupDependencies(page, dependencies);
+    }
+  });
+});

@@ -1,6 +1,6 @@
 import { Flex, Label, OverflowWrapper } from '@/common/components/custom';
 import { CommentTooltip } from '@/common/components/tooltips';
-import { DATE_FORMATS } from '@/common/constants';
+import { POPUP_POSITIONS, CONTENT_SIZES, DATE_FORMATS } from '@/common/constants';
 import { getFormatedPhone } from '@/common/utils';
 import { getFormatedDate } from '@/common/utils/dates';
 import { ROLES } from '@/roles';
@@ -22,7 +22,7 @@ export const USER_COLUMNS = [
     value: (user) =>
       <Flex $justifyContent="space-between">
         <>
-          < OverflowWrapper position="top left" maxWidth="23vw" popupContent={user.username} >
+          < OverflowWrapper position={POPUP_POSITIONS.TOP_LEFT} maxWidth="23vw" popupContent={user.username} >
             {user.username}
           </OverflowWrapper >
         </>
@@ -111,7 +111,7 @@ export const USER_STATE_OPTIONS = Object.values(USER_STATES)
     key: id,
     text: (
       <Flex $alignItems="center" $justifyContent="space-between">
-        {title}&nbsp;<Label width="fit-content" color={color} circular empty />
+        {title}&nbsp;<Label width={CONTENT_SIZES.FIT} color={color} circular empty />
       </Flex>
     ),
     value: id

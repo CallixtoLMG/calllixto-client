@@ -50,12 +50,33 @@ export const ENTITY_MAPPER = {
   GENERAL: { name: "General" },
 };
 
+export const SETTINGS_ENTITY_ORDER = [
+  "GENERAL",
+  "CUSTOMER",
+  "SUPPLIER",
+  "BRAND",
+  "PRODUCT",
+  "BUDGET",
+  "EXPENSE",
+];
+
+const SETTINGS_ENTITY_POSITION = new Map(
+  SETTINGS_ENTITY_ORDER.map((entity, index) => [entity, index])
+);
+
+export const sortSettingsByEntityOrder = (settings) => [...settings].sort((left, right) => {
+  const leftPosition = SETTINGS_ENTITY_POSITION.get(left.entity) ?? Number.MAX_SAFE_INTEGER;
+  const rightPosition = SETTINGS_ENTITY_POSITION.get(right.entity) ?? Number.MAX_SAFE_INTEGER;
+
+  return leftPosition - rightPosition;
+});
+
 export const SUPPORTED_SETTINGS = {
   PRODUCT: ['tags', 'blacklist'],
   CUSTOMER: ['tags'],
   GENERAL: ['paymentMethods'],
   EXPENSE: ['tags', 'categories'],
-  BUDGET: ['allowConfirmExpired', 'allowCreateWithIncompleteCustomer', 'defaultPageDateRange', 'defaultsCreate', 'defaultsPDF', 'historyDateRanges'],
+  BUDGET: ['allowConfirmExpired', 'allowCreateWithIncompleteCustomer', 'publicEnabled', 'defaultPageDateRange', 'defaultsCreate', 'defaultsPDF', 'historyDateRanges'],
 };
 
 export const SETTINGS_HELP_TEXTS = {
@@ -64,6 +85,7 @@ export const SETTINGS_HELP_TEXTS = {
   BLACKLIST: "Permite bloquear productos especificos para evitar que se utilicen en determinadas operaciones.",
   CATEGORIES: "Permite organizar gastos o productos en grupos para facilitar el analisis y la gestion.",
   BUDGET_GENERAL: "Permite configurar valores generales para consultar y revisar ventas.",
+  BUDGET_PUBLIC_ENABLED: "Habilita la posibilidad de compartir un presupuesto mediante enlaces públicos.",
   BUDGET_ON_CREATE: "Permite definir valores predeterminados que se completan al crear una venta.",
   BUDGET_ON_PRINT: "Permite configurar como se muestra e imprime el PDF de una venta.",
   BUDGET_DEFAULT_PAGE_DATE_RANGE: "Define el rango de fechas que se muestra por defecto al entrar al listado de ventas.",

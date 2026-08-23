@@ -1,10 +1,12 @@
-import { DEFAULT_SELECTED_ACCOUNT, USER_DATA_KEY } from "@/common/constants";
+import {
+  SELECTED_ACCOUNT_KEY,
+  SESSION_ENDED_NOTIFICATION_KEY,
+  SESSION_EXPIRATION_KEY,
+  TOKEN_KEY,
+  USER_DATA_KEY,
+} from "@/common/constants/session";
+import { isCallixtoUser } from "@/roles";
 
-export const TOKEN_KEY = "token";
-export const SELECTED_ACCOUNT_KEY = "selectedAccountId";
-export const SESSION_ENDED_NOTIFICATION_KEY = "sessionEndedNotification";
-
-const SESSION_EXPIRATION_KEY = "sessionExpiration";
 const DEFAULT_SESSION_DURATION_MS = 8 * 60 * 60 * 1000;
 const COOKIE_PATH = "/";
 
@@ -112,15 +114,30 @@ export const setUserData = (userData) => {
   setCookie(USER_DATA_KEY, encodeJson(userData), getDefaultExpiration());
 };
 
-export const getSelectedAccountId = () => {
-  const selectedAccountId = getCookie(SELECTED_ACCOUNT_KEY);
-  if (selectedAccountId) return selectedAccountId;
+export const getSavedSelectedAccountId = () => getCookie(SELECTED_ACCOUNT_KEY);
 
-  return DEFAULT_SELECTED_ACCOUNT;
+const getFirstAvailableAccountId = (userData) => {
+  const accounts = userData?.accounts?.items ?? [];
+  return accounts[0]?.id ?? null;
+};
+
+export const getSelectedAccountId = (userData = getUserData()) => {
+  const role = userData?.role ?? userData?.roles?.[0];
+
+  if (isCallixtoUser(role)) {
+    return getSavedSelectedAccountId() || getFirstAvailableAccountId(userData);
+  }
+
+  return userData?.accountId ?? null;
 };
 
 export const setSelectedAccountId = (accountId) => {
-  setCookie(SELECTED_ACCOUNT_KEY, accountId || DEFAULT_SELECTED_ACCOUNT, getDefaultExpiration());
+  if (accountId) {
+    setCookie(SELECTED_ACCOUNT_KEY, accountId, getDefaultExpiration());
+    return;
+  }
+
+  removeCookie(SELECTED_ACCOUNT_KEY);
 };
 
 export const clearSession = () => {

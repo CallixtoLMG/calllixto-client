@@ -13,7 +13,9 @@ export const IconedButtonControlled = forwardRef(({
   disabled,
   color,
   $maxWidth,
+  minWidth,
   iconOnly,
+  dataTestId,
 }, ref) => {
   return (
     <Controller
@@ -23,8 +25,10 @@ export const IconedButtonControlled = forwardRef(({
           {...rest}
           $maxWidth={$maxWidth}
           $width={width}
+          $minWidth={minWidth}
           height={height}
           width={width}
+          minWidth={minWidth}
           label={label}
           text={text}
           icon={icon}
@@ -34,6 +38,7 @@ export const IconedButtonControlled = forwardRef(({
           basic={!value}
           disabled={disabled}
           color={color}
+          dataTestId={dataTestId}
           ref={ref}
         />
       )}

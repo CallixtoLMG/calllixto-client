@@ -1,18 +1,26 @@
 import { NextResponse } from "next/server";
 import { MAINTENANCE_MODE, MAINTENANCE_PAGE } from "./common/constants/maintenance";
-
-const TOKEN_KEY = "token";
-const SESSION_ENDED_NOTIFICATION_KEY = "sessionEndedNotification";
-const LOGIN_PAGE = "/login";
+import { LOGIN_PAGE, PUBLIC_BUDGETS_PAGE, RESTORE_PASSWORD_PAGE } from "./common/constants/routes";
+import { SESSION_ENDED_NOTIFICATION_KEY, TOKEN_KEY } from "./common/constants/session";
 
 const PUBLIC_ROUTES_WHEN_AVAILABLE = [
   LOGIN_PAGE,
-  "/recuperar-contrasena",
-  "/cambiar-contrasena",
+  RESTORE_PASSWORD_PAGE,
   MAINTENANCE_PAGE.BASE,
 ];
 
-const isPublicRoute = (pathname) => PUBLIC_ROUTES_WHEN_AVAILABLE.includes(pathname);
+const isPublicBudgetRoute = (pathname) => {
+  const prefix = `${PUBLIC_BUDGETS_PAGE}/`;
+
+  if (!pathname.startsWith(prefix)) return false;
+
+  const segments = pathname.slice(prefix.length).split("/");
+  return segments.length === 2 && segments.every(Boolean);
+};
+
+const isPublicRoute = (pathname) =>
+  PUBLIC_ROUTES_WHEN_AVAILABLE.includes(pathname) ||
+  isPublicBudgetRoute(pathname);
 
 export function middleware(request) {
   const { pathname } = request.nextUrl;

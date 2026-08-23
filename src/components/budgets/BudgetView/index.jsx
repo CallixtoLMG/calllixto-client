@@ -193,7 +193,11 @@ const BudgetView = ({
   }, [budget, methods]);
 
   const panes = modules.map((mod) => ({
-    menuItem: mod.label,
+    menuItem: {
+      key: mod.key,
+      content: mod.label,
+      "data-testid": `budget-detail-tab-${mod.key}`,
+    },
     render: () => <Tab.Pane>{mod.component}</Tab.Pane>,
   }));
 

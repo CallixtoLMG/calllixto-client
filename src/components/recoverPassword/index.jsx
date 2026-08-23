@@ -1,26 +1,24 @@
 "use client";
-import { useUserContext } from "@/User";
 import { confirmNewPasswordRequired, confirmReset, recoverPassword } from "@/api/login";
 import { getUserData } from "@/api/userData";
-import { Form } from "@/common/components/custom";
-import { PasswordControlled, TextControlled } from "@/common/components/form";
-import { ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES, SIZES } from "@/common/constants";
+import { Button, Form } from "@/common/components/custom";
+import { isPasswordConfirmationValid, PASSWORD_MATCH_REQUIREMENT, PasswordControlled, TextControlled } from "@/common/components/form";
+import { COLORS, ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES, SIZES } from "@/common/constants";
+import AuthLayout, { AuthSecondaryLink } from "@/components/auth/AuthLayout";
 import { useMutation } from "@tanstack/react-query";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { ModButton, ModGrid, ModGridColumn, ModHeader, RedirectLink, Text } from "./styles";
 
 const RecoverPasswordForm = ({ isFirstLogin = false }) => {
   const { push } = useRouter();
-  const { setUserData } = useUserContext();
   const methods = useForm();
   const { handleSubmit, reset, watch } = methods;
   const [isCodeSent, setIsCodeSent] = useState(isFirstLogin);
 
   const newPassword = watch("newPassword", "");
+  const confirmPassword = watch("confirmPassword", "");
 
   useEffect(() => {
     if (!isCodeSent && !isFirstLogin) {
@@ -82,7 +80,6 @@ const RecoverPasswordForm = ({ isFirstLogin = false }) => {
     },
     onSuccess: (userData) => {
       if (userData) {
-        setUserData(userData);
         toast.success("Contrasena cambiada con exito.");
         push(PAGES.BUDGETS.BASE);
       } else {
@@ -105,101 +102,97 @@ const RecoverPasswordForm = ({ isFirstLogin = false }) => {
     : isCodeSent
       ? isConfirmResetPending
       : isRecoverPasswordPending;
+  const title = isCodeSent ? "Cambiar contraseña" : "Recuperar contraseña";
+  const helperText = isCodeSent
+    ? "Ingresá el código recibido y elegí tu nueva contraseña."
+    : "Ingresá tu correo electrónico y te enviaremos las instrucciones de recuperación.";
 
   return (
-    <ModGrid>
-      <ModGridColumn>
-        <ModHeader as="h3">
-          <div>
-            <Image
-              src="/Callixto.png"
-              alt="Callixto.png Logo"
-              width={300}
-              height={100}
-              priority
+    <AuthLayout title={title} helperText={helperText}>
+      <FormProvider {...methods}>
+        <Form
+          onSubmit={handleSubmit((data) => {
+            if (isFirstLogin) {
+              onConfirmFirstLogin(data);
+            } else {
+              isCodeSent ? onConfirmReset(data) : onRecoverPassword(data);
+            }
+          })}
+          size={SIZES.LARGE}
+        >
+          {!isChangingPassword ? (
+            <TextControlled
+              name="username"
+              rules={{
+                ...RULES.REQUIRED,
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "El correo electrónico no es válido",
+                },
+              }}
+              placeholder="Correo electrónico"
+              icon={ICONS.USER}
+              iconPosition="left"
             />
-            <Text>{isCodeSent ? "Cambiar contraseña" : "Recuperar contraseña"}</Text>
-          </div>
-        </ModHeader>
-        <FormProvider {...methods}>
-          <Form
-            onSubmit={handleSubmit((data) => {
-              if (isFirstLogin) {
-                onConfirmFirstLogin(data);
-              } else {
-                isCodeSent ? onConfirmReset(data) : onRecoverPassword(data);
-              }
-            })}
-            size={SIZES.LARGE}
-          >
-            {!isChangingPassword ? (
-              <TextControlled
-                name="username"
+          ) : (
+            <>
+              {!isFirstLogin && (
+                <TextControlled
+                  name="confirmationCode"
+                  rules={RULES.REQUIRED}
+                  placeholder="Código de recuperación"
+                  icon={ICONS.MAIL_SQUARE}
+                  iconPosition="left"
+                />
+              )}
+              <PasswordControlled
+                name="newPassword"
                 rules={{
                   ...RULES.REQUIRED,
-                  pattern: {
-                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: "El correo electrónico no es válido",
+                  validate: (value) => {
+                    const failedRequirements = PASSWORD_REQUIREMENTS.filter(
+                      (req) => !req.test.test(value)
+                    );
+                    return (
+                      failedRequirements.length === 0 ||
+                      "La contraseña no cumple con los requisitos."
+                    );
                   },
                 }}
-                placeholder="Correo electrónico"
-                icon={ICONS.USER}
-                iconPosition="left"
+                placeholder="Nueva contraseña"
+                showPasswordRequirements
+                additionalPasswordRequirements={[PASSWORD_MATCH_REQUIREMENT]}
+                passwordRequirementsContext={{ confirmPassword }}
               />
-            ) : (
-              <>
-                {!isFirstLogin && (
-                  <TextControlled
-                    name="confirmationCode"
-                    rules={RULES.REQUIRED}
-                  placeholder="Código de recuperación"
-                    icon={ICONS.MAIL_SQUARE}
-                    iconPosition="left"
-                  />
-                )}
-                <PasswordControlled
-                  name="newPassword"
-                  rules={{
-                    ...RULES.REQUIRED,
-                    validate: (value) => {
-                      const failedRequirements = PASSWORD_REQUIREMENTS.filter(
-                        (req) => !req.test.test(value)
-                      );
-                      return (
-                        failedRequirements.length === 0 ||
-                        "La contraseña no cumple con los requisitos."
-                      );
-                    },
-                  }}
-                  placeholder="Nuevo contraseña"
-                  showPasswordRequirements
-                />
-                <PasswordControlled
-                  name="confirmPassword"
-                  placeholder="Confirmar nueva contraseña"
+              <PasswordControlled
+                name="confirmPassword"
+                placeholder="Confirmar nueva contraseña"
                   rules={{
                     ...RULES.REQUIRED,
                     validate: (value) =>
-                      value === newPassword || "Las contraseñas no coinciden",
+                      isPasswordConfirmationValid(newPassword, value) || "Las contraseñas no coinciden",
                   }}
                 />
-              </>
-            )}
-            <ModButton
-              loading={isSubmitPending}
-              fluid="true"
-              size={SIZES.LARGE}
-              disabled={isSubmitPending}
-            >
-              {isCodeSent ? "Cambiar contraseña" : "Enviar"}
-            </ModButton>
-            <RedirectLink onClick={() => push(PAGES.LOGIN.BASE)}>
-              Volver al inicio de sesión
-            </RedirectLink>
-          </Form>
-        </FormProvider>
-      </ModGridColumn>
-    </ModGrid>
+            </>
+          )}
+          <Button
+            color={COLORS.BLUE}
+            width="100%"
+            height="42px"
+            $fontSize="15px"
+            padding="0 18px"
+            type="submit"
+            loading={isSubmitPending}
+            disabled={isSubmitPending}
+          >
+            {isCodeSent ? "Cambiar contraseña" : "Enviar"}
+          </Button>
+          <AuthSecondaryLink onClick={() => push(PAGES.LOGIN.BASE)}>
+            Volver al inicio de sesión
+          </AuthSecondaryLink>
+        </Form>
+      </FormProvider>
+    </AuthLayout>
   );
 };
 

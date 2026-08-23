@@ -1,9 +1,9 @@
 import { IconedButton } from "@/common/components/buttons";
-import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, OverflowWrapper, TextArea, ViewContainer } from "@/common/components/custom";
+import { Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label, OverflowWrapper, TextArea, ViewContainer } from "@/common/components/custom";
 import { DropdownField, PriceControlled, PriceLabel } from "@/common/components/form";
 import { Table, Total, TotalList } from "@/common/components/table";
-import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { COLORS, DATE_FORMATS, ICONS, SIZES } from "@/common/constants";
+import { CommentTooltip, IconTooltip, TagsTooltip } from "@/common/components/tooltips";
+import { COLORS, CONTENT_SIZES, DATE_FORMATS, ICONS, POPUP_POSITIONS, SIZES } from "@/common/constants";
 import { getFormatedPercentage, getFormatedPhone } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
@@ -13,12 +13,14 @@ import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { PICK_UP_IN_STORE } from "../../budgets.constants";
 import { getBudgetState, isBudgetCancelled, isBudgetConfirmed } from "../../budgets.utils";
+import { useBudgetActionButtonMode } from "../../useBudgetActionButtonMode";
 import { Container } from "./../styles";
 
 const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact, onConfirmBudgetDiscount, isLoading }) => {
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const budgetState = getBudgetState(budget);
   const [initializedContact, setInitializedContact] = useState(false);
+  const { isMobile, showText } = useBudgetActionButtonMode();
   const totalPending = (
     (total ?? 0) -
     (budget?.paidAmount ?? 0) -
@@ -89,7 +91,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
             <Popup
               size={SIZES.TINY}
               trigger={<span>{getSupplierId(product.id)}</span>}
-              position="top center"
+              position={POPUP_POSITIONS.TOP_CENTER}
               on="hover"
               content={product.supplierName}
             />
@@ -97,7 +99,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
             <Popup
               size={SIZES.TINY}
               trigger={<span>{getBrandId(product.id)}</span>}
-              position="top center"
+              position={POPUP_POSITIONS.TOP_CENTER}
               on="hover"
               content={product.brandName}
             />
@@ -131,11 +133,18 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                 {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
                 {product.comments && <CommentTooltip lineHeight="normal" comment={product.comments} />}
                 {product.dispatchComment && (
-                  <Popup
+                  <IconTooltip
                     size="mini"
                     content={product.dispatchComment}
-                    position="top center"
-                    trigger={<Icon name={ICONS.TRUCK} color={COLORS.ORANGE} />}
+                    position={POPUP_POSITIONS.TOP_CENTER}
+                    icon={ICONS.TRUCK}
+                    color={COLORS.ORANGE}
+                    ariaLabel="Comentario de despacho"
+                    iconProps={{
+                      margin: undefined,
+                      $lineHeight: undefined,
+                      $pointer: false,
+                    }}
                   />
                 )}
               </Flex>
@@ -302,18 +311,21 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
             <>
               <TotalList items={TOTAL_LIST_ITEMS} />
               <Flex $alignSelf="flex-end" $rowGap="15px">
-                <Popup
-                  trigger={
-                    <Icon
-                      fontSize="larger"
-                      name={ICONS.INFO_CIRCLE}
-                      color={COLORS.BLUE} />
-                  }
+                <IconTooltip
                   content="Permite aplicar un descuento una vez confirmada la venta"
-                  position="left center"
+                  icon={ICONS.INFO_CIRCLE}
+                  color={COLORS.BLUE}
+                  position={POPUP_POSITIONS.LEFT_CENTER}
                   size="mini"
+                  ariaLabel="Información sobre descuento"
+                  iconProps={{
+                    fontSize: "larger",
+                    margin: undefined,
+                    $lineHeight: undefined,
+                    $pointer: false,
+                  }}
                 />
-                <Flex width="250px" $alignSelf="flex-end" $alignItems="flex-end" $columnGap="10px">
+                <Flex width={showText ? CONTENT_SIZES.FIT : "250px"} $alignSelf="flex-end" $alignItems="flex-end" $columnGap="10px" $rowGap="10px" wrap="wrap">
                   <PriceControlled
                     key={budget?.postConfirmDiscount ?? 'no-discount'}
                     width="160px"
@@ -346,7 +358,9 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                     alignSelf="start"
                     height="38px"
                     disabled={isLoading}
-                    iconOnly
+                    iconOnly={!showText}
+                    popupDisabled={isMobile}
+                    width={showText ? CONTENT_SIZES.FIT : undefined}
                   />
                   <IconedButton
                     text="Aplicar descuento"

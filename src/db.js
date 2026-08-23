@@ -6,7 +6,8 @@ import Dexie from 'dexie';
 let db;
 
 if (typeof window !== "undefined") {
-  db = new Dexie(`${config.APP_ENV}-Callixto-${getSelectedAccountId()}`);
+  const accountStorageKey = getSelectedAccountId() || "no-account";
+  db = new Dexie(`${config.APP_ENV}-Callixto-${accountStorageKey}`);
   db.version(1).stores({
     [ENTITIES.CUSTOMERS]: 'id, updatedAt',
     [ENTITIES.BRANDS]: 'id, updatedAt',
@@ -25,6 +26,10 @@ export { db };
 
 export async function bulkAddStorageItems({ entity, values }) {
   await db[entity].bulkAdd(values);
+};
+
+export async function bulkPutStorageItems({ entity, values }) {
+  await db[entity].bulkPut(values);
 };
 
 export function getStorageItem({ entity, id }) {

@@ -1,6 +1,3 @@
-import { IconedButton } from "@/common/components/buttons";
-import { FlexColumn } from "@/common/components/custom";
-import { BUTTON_TEXTS, COLORS, ICONS } from "@/common/constants";
 import { Tab } from "semantic-ui-react";
 import BrandsModule from "./Entities/Brands";
 import BudgetsModule from "./Entities/Budgets";
@@ -9,12 +6,11 @@ import ExpensesModule from "./Entities/Expenses";
 import GeneralModule from "./Entities/General";
 import ProductsModule from "./Entities/Products";
 import SuppliersModule from "./Entities/Suppliers";
+import { SettingsTabsContainer } from "./styles";
 
 const SettingsTabs = ({
   onEntityChange,
   settings = [],
-  onRefresh,
-  isLoading,
   onBeforeView,
   activeIndex,
   onActiveIndexChange,
@@ -48,24 +44,13 @@ const SettingsTabs = ({
   };
 
   return (
-    <FlexColumn>
-      <IconedButton
-        icon={ICONS.REFRESH}
-        text={BUTTON_TEXTS.UPDATE}
-        color={COLORS.BLUE}
-        onClick={onRefresh}
-        position="absolute"
-        alignSelf="flex-end"
-        disabled={isLoading}
-        loading={isLoading}
-        width="fit-content"
-      />
+    <SettingsTabsContainer>
       <Tab
         panes={panes}
         activeIndex={activeIndex}
         onTabChange={handleTabChange}
       />
-    </FlexColumn>
+    </SettingsTabsContainer>
   );
 };
 

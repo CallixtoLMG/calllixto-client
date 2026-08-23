@@ -1,21 +1,24 @@
-import { COLORS, ICONS, SIZES } from '@/common/constants';
+import { COLORS, ICONS, POPUP_POSITIONS, SIZES } from '@/common/constants';
 import { useState } from 'react';
 import { List, Modal, Popup, Transition } from 'semantic-ui-react';
 import { IconedButton } from '../../buttons';
 import { Icon } from '../../custom';
 import { StyledListContent, StyledListHeader, StyledListIcon, StyledModalContent, StyledModalHeader } from "./styles";
 
-const KeyboardShortcuts = () => {
+const KeyboardShortcuts = ({ trigger }) => {
   const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
 
   return (
     <>
-      <Popup
-        content='Accesos rápidos'
-        trigger={<Icon margin="0" pointer="true" size={SIZES.LARGE} name={ICONS.KEYBOARD} color={COLORS.BLUE} onClick={() => setOpen(true)} />}
-        position='bottom right'
-        size={SIZES.TINY}
-      />
+      {trigger ? trigger(handleOpen) : (
+        <Popup
+          content='Accesos rápidos'
+          trigger={<Icon $pointer margin="0" size={SIZES.LARGE} name={ICONS.KEYBOARD} color={COLORS.BLUE} onClick={handleOpen} />}
+          position={POPUP_POSITIONS.BOTTOM_RIGHT}
+          size={SIZES.TINY}
+        />
+      )}
       <Transition visible={open} animation='scale' duration={500}>
         <Modal open={open} onClose={() => setOpen(false)}>
           <StyledModalHeader icon={ICONS.KEYBOARD} content='Accesos rápidos del teclado' />

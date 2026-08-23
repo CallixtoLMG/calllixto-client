@@ -1,6 +1,7 @@
 import { Box, Flex, FlexColumn } from "@/common/components/custom";
 import { PriceLabel } from "@/common/components/form";
 import { Table, Total, TotalList } from '@/common/components/table';
+import { CONTENT_SIZES } from "@/common/constants";
 import { getFormatedPhone, getFormatedPrice } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate, getSortedPaymentsByDate } from "@/common/utils/dates";
 import { BUDGET_PDF_FORMAT, BUDGET_STATES } from "@/components/budgets/budgets.constants";
@@ -16,18 +17,22 @@ import {
   SectionContainer,
   Title
 } from "./styles";
+import { resolveAccountBudgetLogo } from "./accountBudgetBranding";
 
-const Field = ({ label, value, width = "80px", $justifyContent, ...rest }) => (
+const Field = ({ label, value, width = "90px", $justifyContent, ...rest }) => (
   <Flex $columnGap="5px" $minWidth="300px" $justifyContent={$justifyContent} {...rest}>
     <Title as="h4" width={width} $textAlign="left" $slim>{label} </Title>
     <Title as="h4">| {value?.toUpperCase() || '-'}</Title>
   </Flex>
 );
 
-const PDFfile = forwardRef(({ budget, account, printPdfMode, dolarExchangeRate = 0, subtotal, subtotalAfterDiscount, total, selectedContact, showPrices, customPDFDisclaimer }, ref) => {
+
+const PDFfile = forwardRef(({ budget, account, printPdfMode, dolarExchangeRate = 0, subtotal, subtotalAfterDiscount, total, selectedContact, showPrices, customPDFDisclaimer, hideSensitiveData = false }, ref) => {
   const customerPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CUSTOMER.key, [printPdfMode]);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH.key, [printPdfMode]);
   const internal = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.INTERNAL.key, [printPdfMode]);
+  // Future backend logo field should be passed here as logoUrl once contract is confirmed.
+  const accountBudgetLogo = useMemo(() => resolveAccountBudgetLogo({ accountId: account?.id }), [account?.id]);
   const filteredColumns = useMemo(() => getProductsColumns(dispatchPdf, budget, showPrices), [budget, dispatchPdf, showPrices]);
   const comments = useMemo(() => budget?.products?.filter(product => product.dispatchComment || product?.dispatch?.comment)
     .map(product => `${product.name} - ${product.dispatchComment || product?.dispatch?.comment}`), [budget?.products]);
@@ -94,7 +99,14 @@ const PDFfile = forwardRef(({ budget, account, printPdfMode, dolarExchangeRate =
             {internal && <Title as="h2">INTERNO</Title>}
           </FlexColumn>
           <Box width="150px">
-            {customerPdf && <Image src={`/accounts/${account?.id}.png`} alt="Logo empresa" />}
+            {customerPdf && accountBudgetLogo && (
+              <Image
+                src={accountBudgetLogo.src}
+                alt={accountBudgetLogo.alt}
+                width={accountBudgetLogo.width}
+                height={accountBudgetLogo.height}
+              />
+            )}
           </Box>
         </Flex>
         <Divider />
@@ -108,17 +120,21 @@ const PDFfile = forwardRef(({ budget, account, printPdfMode, dolarExchangeRate =
             <Field $justifyContent="flex-end" label="Válido hasta" value={getDateWithOffset({ date: budget?.createdAt, offset: budget?.expirationOffsetDays })} />
           </Flex>
         </SectionContainer>
-        <Divider />
-        <SectionContainer $alignItems="left" $flexDirection="column" $minHeight="50px">
-          <Flex >
-            <Field label="Cliente" value={(get(budget, "customer.name", ""))} />
-          </Flex>
-          <Flex $justifyContent="space-between">
-            <Field flex="1" label="Dirección" value={selectedContact?.address} />
-            <Field width="fit-content" $justifyContent="flex-end" label="Teléfono" value={selectedContact?.phone} />
-          </Flex>
-        </SectionContainer>
-        <Divider />
+        {!hideSensitiveData && (
+          <>
+            <Divider />
+            <SectionContainer $alignItems="left" $flexDirection="column" $minHeight="50px">
+              <Flex >
+                <Field label="Cliente" value={get(budget, "customer.name", "")} />
+              </Flex>
+              <Flex $justifyContent="space-between">
+                <Field flex="1" label="Dirección" value={selectedContact?.address} />
+                <Field width={CONTENT_SIZES.FIT} $justifyContent="flex-end" label="Teléfono" value={selectedContact?.phone} />
+              </Flex>
+            </SectionContainer>
+            <Divider />
+          </>
+        )}
       </Box>
       <Table
         mainKey="key"
@@ -139,13 +155,13 @@ const PDFfile = forwardRef(({ budget, account, printPdfMode, dolarExchangeRate =
           />
         )
       }
-      {account?.id === 'maderera-las-tapias' && (
+      {accountBudgetLogo?.showCustomPDFDisclaimer && (
         <Box width="100%">
           {customerPdf && customPDFDisclaimer}
         </Box>
       )}
       <FlexColumn $rowGap="15px">
-        {!dispatchPdf &&
+        {!dispatchPdf && !hideSensitiveData &&
           <>
             <DataContainer width="100%">
               <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Detalles de pago</Title>
@@ -156,7 +172,7 @@ const PDFfile = forwardRef(({ budget, account, printPdfMode, dolarExchangeRate =
               <DataContainer width="100%">
                 <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Cotización en USD a tasa de cambio: <b>{getFormatedPrice(dolarExchangeRate)}</b></Title>
                 <Divider />
-                <Title as="h4" $alignSelf="left" width="fit-content" $minHeight="30px">
+                <Title as="h4" $alignSelf="left" width={CONTENT_SIZES.FIT} $minHeight="30px">
                   <PriceLabel value={total / parseInt(dolarExchangeRate)} />
                 </Title>
               </DataContainer>

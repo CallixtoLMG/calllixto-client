@@ -1,16 +1,18 @@
-import { COLORS, DEFAULT_PAGE_SIZE, ICONS, SHORTKEYS, SORTING } from "@/common/constants";
-import { preventSend } from "@/common/utils";
+import { POPUP_POSITIONS, CONTENT_SIZES, COLORS, DEFAULT_PAGE_SIZE, ICONS, SHORTKEYS, SIZES, SORTING } from "@/common/constants";
+import { formatCount, preventSend } from "@/common/utils";
 import { Loader } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
+import { Button, Checkbox, Header, Popup } from "semantic-ui-react";
 import { IconedButton, PopupActions } from "../buttons";
-import { CenteredFlex, Flex } from "../custom";
+import { CenteredFlex, Flex, Icon } from "../custom";
 import Actions from "./Actions";
 import Pagination from "./Pagination";
-import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, LinkContent, LinkOverlay, Table, TableHeader, TableRow } from "./styles";
+
+import { ActionsContainer, BatchGearDesktop, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, LinkContent, LinkOverlay, SelectionActionsBar, SelectionActionsCount, Table, TableHeader, TableLoaderArea, TableOuterWrapper, TableRow, TableScrollContainer } from "./styles";
 const { ASC, DESC } = SORTING;
+const MOBILE_TABLE_ACTIONS_QUERY = "(max-width: 767px)";
 
 const CustomTable = ({
   isLoading,
@@ -20,7 +22,6 @@ const CustomTable = ({
   actions = [],
   mainKey = 'id',
   $tableHeight,
-  $actionButtonInside,
   color,
   selection = {},
   onSelectionChange,
@@ -34,7 +35,9 @@ const CustomTable = ({
   setFilters = () => { },
   onFilter = () => true,
   onDownloadExcel,
+  onFilteredElementsChange,
   disableDefaultPageLink = false,
+  $ribbonOverflow = false,
 }) => {
 
   const { push } = useRouter();
@@ -44,8 +47,11 @@ const CustomTable = ({
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupOpenId, setPopupOpenId] = useState(null);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
   const tableRef = useRef(null);
+  const lastFilteredElementsRef = useRef([]);
   const [sortConfig, setSortConfig] = useState(filters?.sorting ?? { key: mainKey, direction: ASC });
+  const selectedCount = useMemo(() => Object.keys(selection).length, [selection]);
 
   const handleSort = (columnKey) => {
     let newSorting = { key: columnKey, direction: ASC };
@@ -108,6 +114,30 @@ const CustomTable = ({
   useEffect(() => {
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    const mobileQuery = window.matchMedia(MOBILE_TABLE_ACTIONS_QUERY);
+    const updateViewport = () => setIsMobileViewport(mobileQuery.matches);
+
+    updateViewport();
+    mobileQuery.addEventListener("change", updateViewport);
+
+    return () => mobileQuery.removeEventListener("change", updateViewport);
+  }, []);
+
+  useEffect(() => {
+    if (!onFilteredElementsChange) return;
+
+    const lastFilteredElements = lastFilteredElementsRef.current;
+    const hasSameElements =
+      lastFilteredElements.length === filteredElements.length &&
+      lastFilteredElements.every((element, index) => element === filteredElements[index]);
+
+    if (hasSameElements) return;
+
+    lastFilteredElementsRef.current = filteredElements;
+    onFilteredElementsChange(filteredElements);
+  }, [filteredElements, onFilteredElementsChange]);
 
   useEffect(() => {
     if (hydrated && !isLoading) {
@@ -179,8 +209,19 @@ const CustomTable = ({
     [SHORTKEYS.LEFT_ARROW]: () => handleShortcutPageChange(activePage - 1),
   });
 
+  const renderSelectionActionsPopup = (trigger, position) => (
+    <PopupActions
+      position={position}
+      trigger={trigger}
+      buttons={selectionActions}
+      open={isPopupOpen}
+      onOpen={() => setIsPopupOpen(true)}
+      onClose={() => setIsPopupOpen(false)}
+    />
+  );
+
   return (
-    <Container ref={tableRef} $tableHeight={$tableHeight}>
+    <Container ref={tableRef} $tableHeight={$tableHeight} $ribbonOverflow={$ribbonOverflow}>
       {paginate && (
         <Pagination
           activePage={activePage}
@@ -191,21 +232,66 @@ const CustomTable = ({
           onPageSizeChange={handlePageSizeChange}
         />
       )}
-      <Loader $marginTop active={isLoading} $greyColor>
-        <Table sortable celled compact striped={!basic} color={color} definition={isSelectable}>
-          <TableHeader fullWidth>
-            <TableRow>
-              {isSelectable && (
-                <HeaderCell $width="50px" padding="0">
-                  <CenteredFlex>
-                    <Checkbox
-                      indeterminate={!!Object.keys(selection).length && !allSelected}
-                      checked={!isLoading && allSelected}
-                      onChange={handleToggleAll}
-                    />
-                  </CenteredFlex>
-                </HeaderCell>
-              )}
+      <TableOuterWrapper>
+        {!!selectedCount && !isMobileViewport && (
+          <BatchGearDesktop>
+            {renderSelectionActionsPopup(
+              <Button
+                type="button"
+                icon
+                circular
+                color={COLORS.YELLOW}
+                size="mini"
+                aria-label="Acciones"
+                data-testid="table-selection-actions-trigger-desktop"
+              >
+                <Icon name={ICONS.COG} />
+              </Button>,
+              POPUP_POSITIONS.RIGHT_CENTER
+            )}
+          </BatchGearDesktop>
+        )}
+        <TableScrollContainer $tableHeight={$tableHeight} $hasTableHeight={!!$tableHeight} $ribbonOverflow={$ribbonOverflow}>
+          <TableLoaderArea $hasPagination={paginate}>
+            {!!selectedCount && isMobileViewport && (
+              <SelectionActionsBar>
+                <SelectionActionsCount>
+                  {formatCount(selectedCount, "seleccionado", "seleccionados")}
+                </SelectionActionsCount>
+                {renderSelectionActionsPopup(
+                  (
+                    <Button
+                      type="button"
+                      icon
+                      labelPosition="left"
+                      color={COLORS.YELLOW}
+                      size="small"
+                      aria-label="Acciones"
+                      data-testid="table-selection-actions-trigger"
+                    >
+                      <Icon name={ICONS.COG} />
+                      Acciones
+                    </Button>
+                  ),
+                  POPUP_POSITIONS.BOTTOM_RIGHT
+                )}
+              </SelectionActionsBar>
+            )}
+            <Loader $marginTop $tableArea active={isLoading} $greyColor>
+              <Table sortable celled compact striped={!basic} color={color} definition={isSelectable} unstackable>
+              <TableHeader fullWidth>
+                <TableRow>
+                  {isSelectable && (
+                    <HeaderCell $width="50px" padding="0">
+                      <CenteredFlex>
+                        <Checkbox
+                          indeterminate={!!Object.keys(selection).length && !allSelected}
+                          checked={!isLoading && allSelected}
+                          onChange={handleToggleAll}
+                        />
+                      </CenteredFlex>
+                    </HeaderCell>
+                  )}
               {headers.map((header) => (
                 <HeaderCell
                   key={`header_${header.id}`}
@@ -217,19 +303,17 @@ const CustomTable = ({
                   {header.title}
                 </HeaderCell>
               ))}
-              {!!Object.keys(selection).length && (
-                <ActionsContainer $header $open={isPopupOpen}>
-                  <InnerActionsContainer $header>
-                    <PopupActions
-                      position="right center"
-                      trigger={<Button icon circular color={COLORS.YELLOW} size="mini"><Icon name={ICONS.COG} /></Button>}
-                      buttons={selectionActions}
-                      open={isPopupOpen}
-                      onOpen={() => setIsPopupOpen(true)}
-                      onClose={() => setIsPopupOpen(false)}
+              {!!actions.length && (
+                <HeaderCell $cursor="default" $width="52px" padding="0">
+                  <CenteredFlex>
+                    <Popup
+                      size={SIZES.TINY}
+                      content="Acciones"
+                      position={POPUP_POSITIONS.TOP_CENTER}
+                      trigger={<Icon $height={CONTENT_SIZES.FIT} name={ICONS.COG} color={COLORS.GREY} />}
                     />
-                  </InnerActionsContainer>
-                </ActionsContainer>
+                  </CenteredFlex>
+                </HeaderCell>
               )}
             </TableRow>
           </TableHeader>
@@ -237,7 +321,7 @@ const CustomTable = ({
             <Table.Body>
               {!currentPageElements.length ? (
                 <Table.Row>
-                  <Cell colSpan={headers.length + (isSelectable ? 2 : 1)} textAlign="center">
+                  <Cell colSpan={headers.length + (isSelectable ? 1 : 0) + (actions.length ? 1 : 0)} textAlign="center">
                     <Header as="h4">
                       No se encontraron ítems
                     </Header>
@@ -248,7 +332,7 @@ const CustomTable = ({
                   if (page) {
                     const rowKey = typeof mainKey === "function" ? mainKey(element, index) : element[mainKey];
                     return (
-                      <TableRow key={rowKey || index}>
+                      <TableRow key={rowKey || index} data-testid="table-row" data-row-id={rowKey || ""}>
                         {isSelectable && (
                           <Cell $basic={basic}>
                             <CenteredFlex>
@@ -292,6 +376,7 @@ const CustomTable = ({
                               <LinkContent
                                 data-href={href || ""}
                                 data-clickable={!!href}
+                                data-testid={`table-cell-${header.key || header.id}`}
                               >
                                 {header.value(element, index)}
                               </LinkContent>
@@ -299,15 +384,15 @@ const CustomTable = ({
                           );
                         })}
                         {!!actions.length && (
-                          <ActionsContainer $actionButtonInside={$actionButtonInside} $open={isPopupOpen}>
-                            <InnerActionsContainer $actionButtonInside={$actionButtonInside}>
+                          <ActionsContainer>
+                            <InnerActionsContainer $open={popupOpenId === element[mainKey]}>
                               {actions.length > 1 ? (
                                 <PopupActions
                                   open={popupOpenId === element[mainKey]}
                                   onOpen={() => setPopupOpenId(element[mainKey])}
                                   onClose={() => setPopupOpenId(null)}
-                                  position="left center"
-                                  trigger={<Button icon circular color={COLORS.BLUE} size="mini"><Icon name={ICONS.COG} /></Button>}
+                                  position={POPUP_POSITIONS.LEFT_CENTER}
+                                  trigger={<Button type="button" data-testid="table-row-actions-trigger" icon circular color={COLORS.BLUE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                   buttons={actions.map((action, idx) => {
                                     const resolvedIcon = resolveActionProp(action.icon, element, index);
                                     const resolvedColor = resolveActionProp(action.color, element, index);
@@ -330,6 +415,7 @@ const CustomTable = ({
                                         loading={resolvedLoading}
                                         basic={resolvedBasic}
                                         iconOnly={action.iconOnly}
+                                        dataTestId={`table-row-action-${action.id}`}
                                       />
                                     );
                                   })}
@@ -345,7 +431,7 @@ const CustomTable = ({
                   }
                   const rowKey = typeof mainKey === "function" ? mainKey(element, index) : element[mainKey];
                   return (
-                    <TableRow key={rowKey || index}>
+                    <TableRow key={rowKey || index} data-testid="table-row" data-row-id={rowKey || ""}>
                       {headers.map(header => (
                         <Cell
                           key={`cell_${header.id}`}
@@ -358,15 +444,15 @@ const CustomTable = ({
                         </Cell>
                       ))}
                       {!!actions.length && (
-                        <ActionsContainer $stillShow $actionButtonInside={$actionButtonInside} $open={isPopupOpen}>
-                          <InnerActionsContainer $actionButtonInside={$actionButtonInside}>
+                        <ActionsContainer>
+                          <InnerActionsContainer $open={popupOpenId === element[mainKey]}>
                             {actions.length > 1 ? (
                               <PopupActions
                                 open={popupOpenId === element[mainKey]}
                                 onOpen={() => setPopupOpenId(element[mainKey])}
                                 onClose={() => setPopupOpenId(null)}
-                                position="left center"
-                                trigger={<Button type="button" icon circular color={COLORS.ORANGE} size="mini"><Icon name={ICONS.COG} /></Button>}
+                                position={POPUP_POSITIONS.LEFT_CENTER}
+                                trigger={<Button type="button" data-testid="table-row-actions-trigger" icon circular color={COLORS.ORANGE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                 buttons={actions.map((action, idx) => {
                                   const resolvedIcon = resolveActionProp(action.icon, element, index);
                                   const resolvedColor = resolveActionProp(action.color, element, index);
@@ -388,6 +474,7 @@ const CustomTable = ({
                                       loading={resolvedLoading}
                                       basic={resolvedBasic}
                                       iconOnly={action.iconOnly}
+                                      dataTestId={`table-row-action-${action.id}`}
                                     />
                                   );
                                 })}
@@ -404,18 +491,21 @@ const CustomTable = ({
               )}
             </Table.Body>
           )}
-        </Table>
-        {onDownloadExcel && (
-          <Flex width="fit-content" $alignSelf="flex-end">
-            <IconedButton
-              text="Descargar excel"
-              icon={ICONS.FILE_EXCEL}
-              onClick={() => onDownloadExcel(filteredElements)}
-              width="fit-content"
-            />
-          </Flex>
-        )}
-      </Loader>
+          </Table>
+          {onDownloadExcel && (
+            <Flex width={CONTENT_SIZES.FIT} $alignSelf="flex-end">
+              <IconedButton
+                text="Descargar excel"
+                icon={ICONS.FILE_EXCEL}
+                onClick={() => onDownloadExcel(filteredElements)}
+                width={CONTENT_SIZES.FIT}
+              />
+            </Flex>
+          )}
+            </Loader>
+          </TableLoaderArea>
+        </TableScrollContainer>
+      </TableOuterWrapper>
     </Container>
   );
 };

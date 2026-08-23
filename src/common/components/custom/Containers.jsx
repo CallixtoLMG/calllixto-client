@@ -2,6 +2,8 @@ import { Form as SForm } from "semantic-ui-react";
 import styled from "styled-components";
 import { Flex } from "./Flex";
 
+const MOBILE_BREAKPOINT = "767px";
+
 export const Form = styled(SForm)`
   display: flex !important;
   flex-direction: ${({ $flexDirection = "column" }) => $flexDirection} !important;
@@ -25,9 +27,26 @@ export const FieldsContainer = styled(Flex)`
   column-gap: ${({ $columnGap = '15px' }) => $columnGap} !important;
   row-gap: ${({ $rowGap = 'auto' }) => $rowGap} !important;
   width: ${({ width = 'auto' }) => width} !important;
+  min-width: 0 !important;
   min-height: ${({ $minHeight = 'auto' }) => $minHeight} !important;
   height: ${({ height = 'auto' }) => height} !important;
   align-items: ${({ $alignItems = 'auto' }) => $alignItems} !important;
+
+  @media (max-width: ${MOBILE_BREAKPOINT}) {
+    width: ${({ width }) => width || '100%'} !important;
+    row-gap: ${({ $rowGap = 'auto' }) => ($rowGap === 'auto' ? '15px' : $rowGap)} !important;
+
+    > :not(button) {
+      flex: 1 1 100% !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+    }
+
+    > .field:empty {
+      display: none !important;
+    }
+  }
 `;
 
 export const ButtonsContainer = styled(Flex)`

@@ -9,6 +9,23 @@ export const COLORS = {
   YELLOW: "yellow"
 };
 
+export const CONTENT_SIZES = {
+  FIT: "fit-content",
+  MAX: "max-content",
+  MIN: "min-content",
+};
+
+export const POPUP_POSITIONS = {
+  BOTTOM_CENTER: "bottom center",
+  BOTTOM_LEFT: "bottom left",
+  BOTTOM_RIGHT: "bottom right",
+  LEFT_CENTER: "left center",
+  RIGHT_CENTER: "right center",
+  TOP_CENTER: "top center",
+  TOP_LEFT: "top left",
+  TOP_RIGHT: "top right",
+};
+
 export const SEMANTIC_COLORS = [
   { key: "yellow", text: "Amarillo", value: "yellow" },
   { key: "blue", text: "Azul", value: "blue" },

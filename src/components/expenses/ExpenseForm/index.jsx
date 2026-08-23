@@ -2,7 +2,7 @@ import { useGetSetting } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form, FormField } from "@/common/components/custom";
 import { DropdownControlled, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
-import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
+import { CONTENT_SIZES, ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
 import { now } from "@/common/utils/dates";
 import { useKeyboardShortcuts } from "@/hooks";
@@ -11,6 +11,25 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo } from
 import { FormProvider, useForm } from "react-hook-form";
 import { DatePickerControlled } from "../../../common/components/form/DatePicker";
 import { EMPTY_EXPENSE } from "../expenses.constants";
+
+const getClonedInitialValues = (expense) => ({
+  ...EMPTY_EXPENSE,
+  name: expense?.name ?? EMPTY_EXPENSE.name,
+  amount: expense?.amount ?? EMPTY_EXPENSE.amount,
+  expirationDate: expense?.expirationDate ?? EMPTY_EXPENSE.expirationDate,
+  comments: expense?.comments ?? EMPTY_EXPENSE.comments,
+  categories: expense?.categories ?? [],
+  tags: expense?.tags ?? [],
+  paymentsMade: [],
+});
+
+const getInitialValues = (expense) => ({
+  ...EMPTY_EXPENSE,
+  tags: [],
+  categories: [],
+  expirationDate: expense?.expirationDate ? expense?.expirationDate : now(),
+  ...expense,
+});
 
 const ExpenseForm = forwardRef(({
   expense,
@@ -21,30 +40,17 @@ const ExpenseForm = forwardRef(({
   isCloning = false,
 },
   ref) => {
-  const getInitialValues = (expense) => ({
-    ...EMPTY_EXPENSE,
-    tags: [],
-    categories: [],
-    expirationDate: expense?.expirationDate ? expense?.expirationDate : now(),
-    ...expense,
-  });
-
   const clonedInitialValues = useMemo(() => {
     if (!isCloning || !expense) return EMPTY_EXPENSE;
 
-    const { id, createdAt, createdBy, updatedAt, updatedBy, state, paymentsMade, ...rest } = expense;
-
-    return {
-      ...EMPTY_EXPENSE,
-      ...rest,
-      paymentsMade: [],
-      categories: rest.categories || [],
-      tags: rest.tags || [],
-    };
+    return getClonedInitialValues(expense);
   }, [expense, isCloning]);
+  const initialValues = useMemo(() => (
+    isCloning ? clonedInitialValues : getInitialValues(expense)
+  ), [clonedInitialValues, expense, isCloning]);
 
   const methods = useForm({
-    defaultValues: isCloning ? clonedInitialValues : getInitialValues(expense),
+    defaultValues: initialValues,
   });
   const { isFetching: isExpensesSettingsFetching, refetch: refetchExprensesSettings } = useGetSetting(ENTITIES.EXPENSE);
   const { options: tagsOptions, optionsMapper: tagsMapper } = useSettingArrayField(ENTITIES.EXPENSE, "tags", expense?.tags || []);
@@ -53,13 +59,13 @@ const ExpenseForm = forwardRef(({
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
     submitForm: () => handleSubmit(handleForm)(),
-    resetForm: () => reset(getInitialValues(expense)),
+    resetForm: () => reset(initialValues),
   }));
 
   useEffect(() => {
-    reset(getInitialValues(expense));
+    reset(initialValues);
     refetchExprensesSettings();
-  }, [expense, refetchExprensesSettings, reset]);
+  }, [initialValues, refetchExprensesSettings, reset]);
 
   const handleReset = useCallback(() => {
     if (isCloning) {
@@ -87,7 +93,7 @@ const ExpenseForm = forwardRef(({
     },
     {
       key: SHORTKEYS.DELETE,
-      action: () => reset(getInitialValues(expense)),
+      action: () => reset(initialValues),
       condition: validateShortcuts.canReset,
     }
   ]);
@@ -109,6 +115,7 @@ const ExpenseForm = forwardRef(({
             <TextControlled
               name="name"
               label="Detalle"
+              dataTestId="expense-name-field"
               rules={RULES.REQUIRED}
               disabled={!isUpdating && view}
               required={isUpdating || !view}
@@ -168,7 +175,7 @@ const ExpenseForm = forwardRef(({
               name="tags"
               label="Etiquetas"
               placeholder="Selecciona etiquetas"
-              height="fit-content"
+              height={CONTENT_SIZES.FIT}
               multiple
               clearable={isUpdating && !view}
               icon={(!isUpdating && view) ? null : undefined}
