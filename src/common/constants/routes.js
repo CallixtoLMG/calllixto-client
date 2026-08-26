@@ -1,5 +1,6 @@
 export const ROOT_PAGE = "/";
 export const BUDGETS_PAGE = "/ventas";
+export const ANALYTICS_PAGE = "/analisis-de-datos";
 export const PUBLIC_BUDGETS_PAGE = "/public/budgets";
 export const LOGIN_PAGE = "/login";
 export const CHANGE_PASSWORD_PAGE = "/cambiar-contrasena";

@@ -6,6 +6,7 @@ import { StyledListHeader, StyledModalContent } from "../components/modals/Modal
 import { ENTITIES } from "./entities";
 import { MAINTENANCE_PAGE } from "./maintenance";
 import {
+  ANALYTICS_PAGE,
   CHANGE_PASSWORD_PAGE,
   LOGIN_PAGE,
   NOT_FOUND_PAGE,
@@ -97,6 +98,10 @@ export const PAGES = {
     SINGULAR_NAME: "Caja",
     SHORTKEYS: 'Control+7',
     BADGE: isNewFeature('2026-01-01') ? 'new' : undefined
+  },
+  ANALYTICS: {
+    BASE: ANALYTICS_PAGE,
+    NAME: "Análisis de datos",
   },
   USERS: {
     BASE: "/usuarios",
@@ -256,6 +261,12 @@ export const getNavigationItems = (role) => {
       icon: ICONS.CASH_REGISTER,
       href: PAGES.CASH_BALANCES.BASE,
       badge: PAGES.CASH_BALANCES.BADGE,
+    },
+    {
+      id: "analytics",
+      label: PAGES.ANALYTICS.NAME,
+      icon: ICONS.CHART_LINE,
+      href: PAGES.ANALYTICS.BASE,
     },
     ROLES.canManageUsers[role] && {
       id: "users",
@@ -472,6 +483,7 @@ export const ICONS = {
   CLOCK: "clock",
   MONEY: "money",
   CALCULATOR: "calculator",
+  CHART_LINE: "chart line",
   COPYRIGHT: "copyright",
   CLIPBOARD: "clipboard",
   MONEY_BILL_ALTERNATE: "money bill alternate",
