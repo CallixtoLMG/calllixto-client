@@ -9,6 +9,7 @@ import {
   buildMockExpenses,
   buildMockOverview,
   buildMockProducts,
+  buildMockSalesRanking,
   buildMockSalesTimeseries,
   emptyAnalyticsMockData,
 } from "@/components/analytics/analytics.mock";
@@ -70,6 +71,24 @@ const createMockAnalyticsProvider = ({ mockState = ANALYTICS_MOCK_STATES.READY }
       ...source,
       range,
       sortBy,
+    });
+  },
+  getSalesRanking: ({ range, dimension }) => {
+    if (shouldThrow(mockState, ANALYTICS_MOCK_STATES.TOP_PRODUCTS_ERROR)) {
+      throw new Error("No se pudo cargar el ranking de ventas.");
+    }
+
+    const source = shouldUseEmpty(mockState)
+      ? {
+        ...emptyAnalyticsMockData.salesRanking,
+        dimension,
+      }
+      : buildMockSalesRanking({ range, dimension });
+
+    return delay({
+      ...source,
+      range,
+      dimension,
     });
   },
   getExpenses: ({ range }) => {
@@ -140,6 +159,16 @@ export const useAnalyticsTopProducts = ({ range, sortBy = "revenue", mockState }
     mockState,
     queryKey: [ANALYTICS_QUERY_KEYS.TOP_PRODUCTS, range, sortBy, mockState],
     queryFn: () => provider.getTopProducts({ range, sortBy }),
+  });
+};
+
+export const useAnalyticsSalesRanking = ({ range, dimension, mockState }) => {
+  const provider = getAnalyticsProvider({ mockState });
+
+  return useAnalyticsQuery({
+    mockState,
+    queryKey: [ANALYTICS_QUERY_KEYS.SALES_RANKING, range, dimension, mockState],
+    queryFn: () => provider.getSalesRanking({ range, dimension }),
   });
 };
 

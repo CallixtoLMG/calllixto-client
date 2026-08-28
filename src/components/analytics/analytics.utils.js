@@ -4,10 +4,13 @@ import {
   ANALYTICS_BUSINESS_TIMEZONE,
   ANALYTICS_GRANULARITY_THRESHOLDS,
   ANALYTICS_GROUP_BY,
+  ANALYTICS_EXPENSE_KPI_KEYS,
   ANALYTICS_KPI_CONFIG,
   ANALYTICS_KPI_FORMATS,
   ANALYTICS_MONTH_NAMES,
   ANALYTICS_PRESETS,
+  ANALYTICS_SALES_KPI_KEYS,
+  ANALYTICS_SUMMARY_KPI_KEYS,
   ANALYTICS_SHORT_MONTH_NAMES,
   SALES_CHART_CONFIG,
 } from "@/components/analytics/analytics.constants";
@@ -28,7 +31,7 @@ export const formatShortDate = (date) => dayjs(date).format("DD/MM");
 export const formatFullDate = (date) => dayjs(date).format("DD/MM/YYYY");
 export const formatDateRange = (range) => `${formatShortDate(range.from)} - ${formatShortDate(range.to)}`;
 export const formatPercent = (value) => `${getFormatedNumber(value)}%`;
-export const formatPoints = (value) => `${value > 0 ? "+" : ""}${getFormatedNumber(value)} p.p.`;
+export const formatPoints = (value) => `${value > 0 ? "+" : ""}${getFormatedNumber(value)} puntos porcentuales`;
 export const toDateValue = (date) => date.format("YYYY-MM-DD");
 export const getBusinessTodayValue = () => toDateValue(dayjs().tz(ANALYTICS_BUSINESS_TIMEZONE));
 
@@ -95,6 +98,26 @@ export const analyticsKpiConfig = ANALYTICS_KPI_CONFIG.map(({ formatKey, ...conf
   ...config,
   format: analyticsKpiFormatters[formatKey],
 }));
+
+export const analyticsSummaryKpiConfig = ANALYTICS_SUMMARY_KPI_KEYS.map((key) => {
+  const config = analyticsKpiConfig.find((item) => item.key === key);
+
+  if (key !== "grossProfit") return config;
+
+  return {
+    ...config,
+    secondaryMetric: {
+      key: "grossMargin",
+      label: "de margen",
+      format: analyticsKpiFormatters[ANALYTICS_KPI_FORMATS.PERCENT],
+      unavailableLabel: "Sin datos de margen",
+    },
+  };
+});
+
+export const analyticsSalesKpiConfig = analyticsKpiConfig.filter(({ key }) => ANALYTICS_SALES_KPI_KEYS.includes(key));
+
+export const analyticsExpenseKpiConfig = analyticsKpiConfig.filter(({ key }) => ANALYTICS_EXPENSE_KPI_KEYS.includes(key));
 
 export const getChangeDisplay = ({ metric, changeKey, isPercentagePoints }) => {
   const rawValue = Number(metric?.[changeKey] ?? 0);

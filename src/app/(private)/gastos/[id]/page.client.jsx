@@ -6,7 +6,7 @@ import { FieldsContainer, Flex, FormField, Message, MessageHeader } from "@/comm
 import { TextField } from "@/common/components/form";
 import { UnsavedChangesModal } from "@/common/components/modals";
 import ModalCancel from "@/common/components/modals/ModalCancel";
-import { CONTENT_SIZES, COLORS, DATE_FORMATS, ENTITIES, ICONS, PAGES } from "@/common/constants";
+import { COLORS, CONTENT_SIZES, DATE_FORMATS, ENTITIES, ICONS, PAGES } from "@/common/constants";
 import { isItemCancelled } from "@/common/utils";
 import { getFormatedDate, isDateAfter, now } from "@/common/utils/dates";
 import ExpenseForm from "@/components/expenses/ExpenseForm";
@@ -21,6 +21,7 @@ import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 
 const ExpensePageClient = ({ expense }) => {
+  console.log(expense)
   const { role, userData } = useUserContext();
   const { push, refresh } = useRouter();
   const { setLabels } = useBreadcrumContext();
