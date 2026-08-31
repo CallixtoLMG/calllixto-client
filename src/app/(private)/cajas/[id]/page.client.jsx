@@ -7,7 +7,7 @@ import { PriceField } from "@/common/components/form";
 import { DatePickerControlled } from "@/common/components/form/DatePicker";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { CONTENT_SIZES, COLORS, DELETE, ICONS, PAGES } from "@/common/constants";
+import { COLORS, CONTENT_SIZES, DELETE, ICONS, PAGES } from "@/common/constants";
 import { datePickerNow, getDateUTC } from "@/common/utils/dates";
 import { BillDetails } from "@/components/cashBalances/BillsDetails";
 import CashBalanceForm from "@/components/cashBalances/CashBalanceForm";
@@ -25,6 +25,7 @@ import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 
 const CashBalancePageClient = ({ cashBalance }) => {
+  console.log(cashBalance)
   const { role } = useUserContext();
   const { push, refresh } = useRouter();
   const { setLabels } = useBreadcrumContext();

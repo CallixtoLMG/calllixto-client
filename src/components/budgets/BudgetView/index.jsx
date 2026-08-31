@@ -5,6 +5,8 @@ import { ENTITIES } from "@/common/constants";
 import BudgetDeliveries from "@/components/budgets/BudgetDeliveries";
 import DeliveriesHistory from "@/components/budgets/BudgetDeliveries/DeliveriesHistory";
 import DeliveriesPrint from "@/components/budgets/BudgetDeliveries/DeliveriesPrint";
+import BudgetReturns from "@/components/budgets/BudgetReturns";
+import ReturnFormModal from "@/components/budgets/BudgetReturns/ReturnFormModal";
 import BudgetDetails from "@/components/budgets/BudgetView/BudgetDetails";
 import { Loader, OnlyPrint } from "@/components/layout";
 import Payments from "@/components/payments";
@@ -30,6 +32,7 @@ const BudgetView = ({
   isLoadingPayments,
   activeIndex,
   onTabChange,
+  role,
 }) => {
   const editPayment = useEditPayment();
   const createPayment = useCreatePayment();
@@ -37,6 +40,7 @@ const BudgetView = ({
   const confirmBudgetDiscount = useConfirmBudgetDiscount();
   const deliveriesPrintRef = useRef();
   const [isModalPaymentOpen, setIsModalPaymentOpen] = useState(false);
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { data: stockFlowsByBudget, isLoading: isLoadingStockFlowsByBudget } = useListStockFlowsByBudget({ budgetId: budget.id });
 
@@ -182,6 +186,16 @@ const BudgetView = ({
             </FlexColumn>
           ),
         },
+        {
+          key: "returns",
+          label: "Devoluciones",
+          component: (
+            <BudgetReturns
+              role={role}
+              onCreateReturn={() => setIsReturnModalOpen(true)}
+            />
+          ),
+        },
       ]
       : []),
   ];
@@ -208,6 +222,14 @@ const BudgetView = ({
         activeIndex={activeIndex}
         onTabChange={onTabChange}
       />
+      {isReturnModalOpen && (
+        <ReturnFormModal
+          open={isReturnModalOpen}
+          onClose={() => setIsReturnModalOpen(false)}
+          budget={budget}
+          role={role}
+        />
+      )}
     </FormProvider>
   );
 };

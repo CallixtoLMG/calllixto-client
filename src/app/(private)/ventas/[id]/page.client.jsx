@@ -377,6 +377,7 @@ const BudgetPageClient = ({ budget }) => {
           refetch={refresh}
           isLoadingPayments={isLoadingPayments}
           refetchPayments={refetchPayments}
+          role={role}
         />
       </FormProvider>
       <ModalPDF
