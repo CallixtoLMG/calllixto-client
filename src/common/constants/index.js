@@ -172,6 +172,16 @@ const buildEntityChildren = (page, extra = []) => {
   return [...children, ...extra];
 };
 
+const getProductChildren = (role) => {
+  const children = buildEntityChildren(PAGES.PRODUCTS);
+
+  if (ROLES.canCreateProduct[role]) {
+    return children;
+  }
+
+  return children.filter(({ href }) => href !== PAGES.PRODUCTS.CREATE);
+};
+
 const SETTINGS_NAV_ITEMS = [
   {
     id: "settings-general",
@@ -227,7 +237,7 @@ export const getNavigationItems = (role) => {
       id: "products",
       label: PAGES.PRODUCTS.NAME,
       icon: ICONS.BOX,
-      children: buildEntityChildren(PAGES.PRODUCTS),
+      children: getProductChildren(role),
       badge: PAGES.PRODUCTS.BADGE,
     },
     {

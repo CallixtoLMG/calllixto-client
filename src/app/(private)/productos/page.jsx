@@ -49,49 +49,60 @@ const Products = () => {
   const sideActions = useMemo(() => {
     const actions = [];
 
-    if (RULES.canCreate[role]) {
+    if (RULES.canCreateProduct[role]) {
       actions.push({
         id: 1,
         icon: ICONS.ADD,
         color: COLORS.GREEN,
         href: PAGES.PRODUCTS.CREATE,
         text: 'Crear producto',
-      },
-        {
-          id: 2,
-          icon: ICONS.FILE_EXCEL,
-          color: COLORS.BLUE,
-          text: 'Excel',
-          collapsedTooltip: 'Acciones de productos con Excel',
-          items: [
-            {
-              id: "batch-create",
-              text: "Crear lote de productos",
-              color: COLORS.GREEN,
-              button: <BatchImportProducts key="batch-create" isCreating />,
-            },
-            {
-              id: "batch-update",
-              text: "Actualizar lote de productos",
-              color: COLORS.BLUE,
-              button: <BatchImportProducts key="batch-update" />,
-            },
-            {
-              id: "template",
-              icon: ICONS.FILE_EXCEL_OUTLINE,
-              color: COLORS.BLUE,
-              text: "Descargar plantilla de productos",
-              showTooltipWhenExpanded: true,
-              onClick: () => downloadExcel(EXAMPLE_TEMPLATE_DATA, "Ejemplo de tabla"),
-            },
-          ],
-        });
+      });
+    }
+
+    if (RULES.canCreate[role]) {
+      actions.push({
+        id: 2,
+        icon: ICONS.FILE_EXCEL,
+        color: COLORS.BLUE,
+        text: 'Excel',
+        collapsedTooltip: 'Acciones de productos con Excel',
+        items: [
+          {
+            id: "batch-create",
+            text: "Crear lote de productos",
+            color: COLORS.GREEN,
+            button: <BatchImportProducts key="batch-create" isCreating />,
+          },
+          {
+            id: "batch-update",
+            text: "Actualizar lote de productos",
+            color: COLORS.BLUE,
+            button: <BatchImportProducts key="batch-update" />,
+          },
+          {
+            id: "template",
+            icon: ICONS.FILE_EXCEL_OUTLINE,
+            color: COLORS.BLUE,
+            text: "Descargar plantilla de productos",
+            showTooltipWhenExpanded: true,
+            onClick: () => downloadExcel(EXAMPLE_TEMPLATE_DATA, "Ejemplo de tabla"),
+          },
+        ],
+      });
     }
 
     return actions;
   }, [role]);
 
-  useKeyboardShortcuts(() => push(PAGES.PRODUCTS.CREATE), SHORTKEYS.ENTER);
+  const createProductShortcuts = useMemo(() => ([
+    {
+      key: SHORTKEYS.ENTER,
+      action: () => push(PAGES.PRODUCTS.CREATE),
+      condition: () => RULES.canCreateProduct[role],
+    },
+  ]), [push, role]);
+
+  useKeyboardShortcuts(createProductShortcuts);
 
   return (
     <>

@@ -76,7 +76,7 @@ const ProductPageClient = ({ product }) => {
   };
 
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
-    canUpdate: RULES.canUpdate[role],
+    canUpdate: RULES.canUpdateProduct[role],
     onBeforeView,
   });
   const { handleProtectedAction } = useProtectedAction({ formRef, onBeforeView });
@@ -315,7 +315,7 @@ const ProductPageClient = ({ product }) => {
           iconOnly: true,
         },
       ];
-      if (!isProductDeleted(product?.state) && !isProductInactive(product?.state)) {
+      if (RULES.canUpdateProduct[role] && !isProductDeleted(product?.state) && !isProductInactive(product?.state)) {
         actions.push({
           id: 2,
           icon: isProductOOS(product?.state) ? ICONS.BOX : ICONS.BAN,
@@ -328,7 +328,7 @@ const ProductPageClient = ({ product }) => {
           iconOnly: true,
         });
       }
-      if (!isProductDeleted(product?.state)) {
+      if (RULES.canUpdateProduct[role] && !isProductDeleted(product?.state)) {
         actions.push({
           id: 3,
           icon: isProductInactive(product?.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
@@ -339,6 +339,8 @@ const ProductPageClient = ({ product }) => {
           disabled: !!activeAction || isEditPending,
           iconOnly: true,
         });
+      }
+      if (RULES.canRemoveProduct[role] && !isProductDeleted(product?.state)) {
         actions.push({
           id: 4,
           icon: ICONS.TRASH,
@@ -351,7 +353,7 @@ const ProductPageClient = ({ product }) => {
           iconOnly: true,
         });
       }
-      if (isProductDeleted(product?.state)) {
+      if (RULES.canRemoveProduct[role] && isProductDeleted(product?.state)) {
         actions.push({
           id: 5,
           icon: ICONS.UNDO,
@@ -378,7 +380,7 @@ const ProductPageClient = ({ product }) => {
       setActions(actions);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product, activeAction, isEditPending, setActions]);
+  }, [product, role, activeAction, isEditPending, setActions]);
 
   const panes = [
     {
