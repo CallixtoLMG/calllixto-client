@@ -63,7 +63,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel, si
     removeAfterPrint: true,
   });
 
-  const actions = RULES.canRemove[role] ? [
+  const actions = RULES.canRemoveProduct[role] ? [
     {
       id: 1,
       icon: ICONS.TRASH,
@@ -203,7 +203,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel, si
       />
     ];
 
-    if (allSelectedProductsAreDeleted && RULES.canRemove[role]) {
+    if (allSelectedProductsAreDeleted && RULES.canRemoveProduct[role]) {
       actions.unshift(
         <IconedButton
           key={3}
@@ -217,7 +217,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel, si
       );
     }
 
-    if (RULES.canRemove[role]) {
+    if (RULES.canRemoveProduct[role]) {
       actions.unshift(
         <IconedButton
           key={1}

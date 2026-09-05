@@ -2,6 +2,7 @@ export const ROLES = {
   CALLIXTO: 'callixto',
   SADMIN: 'sadmin',
   ADMIN: 'admin',
+  MELI: 'meli',
   USER: 'user',
 }
 
@@ -19,6 +20,11 @@ const ADMIN = {
   ...SADMIN
 }
 
+const PRODUCT_ADMIN = {
+  [ROLES.MELI]: true,
+  ...ADMIN
+}
+
 export const RULES = {
   canUpdate: {
     ...ADMIN
@@ -28,6 +34,15 @@ export const RULES = {
   },
   canCreate: {
     ...ADMIN
+  },
+  canUpdateProduct: {
+    ...PRODUCT_ADMIN
+  },
+  canRemoveProduct: {
+    ...PRODUCT_ADMIN
+  },
+  canCreateProduct: {
+    ...PRODUCT_ADMIN
   },
   canManageUsers: {
     ...SADMIN

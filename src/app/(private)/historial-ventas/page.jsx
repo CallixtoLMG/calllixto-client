@@ -2,7 +2,7 @@
 import { useListBudgetsHistory } from "@/api/budgets";
 import { useGetSetting } from "@/api/settings";
 import { useListUsers } from "@/api/users";
-import { BUTTON_TEXTS, COLORS, CONTENT_SIZES, ENTITIES, ICONS, INFO, PAGES } from "@/common/constants";
+import { COLORS, CONTENT_SIZES, ENTITIES, HARD_DELETED, ICONS, INFO, PAGES } from "@/common/constants";
 import BudgetsHistoryFilter from "@/components/budgets/BudgetsHistoryFilters";
 import BudgetsPage, { downloadBudgetsExcel } from "@/components/budgets/BudgetsPage";
 import { BASE_BUDGETS_HISTORY_RANGES, BUDGETS_HISTORY_FILTERS_KEY, BUDGET_STATES, DATE_RANGE_KEY, buildCustomHistoryRanges } from "@/components/budgets/budgets.constants";
@@ -50,13 +50,15 @@ const BudgetsHistory = () => {
   const budgets = useMemo(() => {
     if (!budgetsData) return [];
 
-    return budgetsData.map(budget => ({
-      ...budget,
-      href:
-        budget.state === BUDGET_STATES.DRAFT.id
-          ? PAGES.BUDGETS.DRAFT(budget.id)
-          : PAGES.BUDGETS.SHOW(budget.id),
-    }));
+    return budgetsData
+      .filter(budget => budget.state !== HARD_DELETED)
+      .map(budget => ({
+        ...budget,
+        href:
+          budget.state === BUDGET_STATES.DRAFT.id
+            ? PAGES.BUDGETS.DRAFT(budget.id)
+            : PAGES.BUDGETS.SHOW(budget.id),
+      }));
   }, [budgetsData]);
   const users = useMemo(() => usersData?.users, [usersData]);
   const loading = useMemo(() => isLoadingBudgets || isLoadingUsers || isRefetching, [isLoadingBudgets, isLoadingUsers, isRefetching]);

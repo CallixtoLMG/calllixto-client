@@ -1,4 +1,5 @@
 "use client";
+import { useUserContext } from "@/User";
 import { useListBrands } from "@/api/brands";
 import { useCreateProduct } from "@/api/products";
 import { useGetSetting } from "@/api/settings";
@@ -8,12 +9,14 @@ import { ENTITIES, PAGES } from "@/common/constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { useUnsavedChanges } from "@/hooks";
+import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 
 const CreateProduct = () => {
+  const { userData } = useUserContext();
   const { push } = useRouter();
   const { data: brands, isLoading: isLoadingBrands, refetch: refetchBrands, isRefetching: isBrandsRefetching } = useListBrands();
   const { data: suppliers, isLoading: isLoadingSuppliers, refetch: refetchSuppliers, isRefetching: isSupplierRefetching } = useListSuppliers();
@@ -26,6 +29,9 @@ const CreateProduct = () => {
     formRef,
     onDiscard: () => formRef.current?.resetForm(),
   });
+  const resolvedRole = userData?.roles?.[0] ?? userData?.role;
+  const isUserResolved = userData?.isAuthorized === false || (userData?.isAuthorized && !!resolvedRole);
+  const canCreateProduct = !!RULES.canCreateProduct[resolvedRole];
 
   useEffect(() => {
     resetActions();
@@ -34,6 +40,12 @@ const CreateProduct = () => {
     refetchBlacklist();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (isUserResolved && !canCreateProduct) {
+      push(PAGES.NOT_FOUND.BASE);
+    }
+  }, [canCreateProduct, isUserResolved, push]);
 
   useEffect(() => {
     setLabels([{ name: 'Productos' }, { name: 'Crear' }]);
@@ -53,6 +65,14 @@ const CreateProduct = () => {
       toast.error(error.message);
     }
   });
+
+  if (!isUserResolved) {
+    return <Loader active />;
+  }
+
+  if (!canCreateProduct) {
+    return null;
+  }
 
   return (
     <Loader active={isLoadingBrands || isLoadingSuppliers || isBrandsRefetching || isSupplierRefetching}>

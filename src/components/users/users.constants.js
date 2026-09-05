@@ -121,6 +121,7 @@ export const ROLE_LABELS = {
   CALLIXTO: 'Callixto',
   SADMIN: 'Super administrador',
   ADMIN: 'Administrador',
+  MELI: 'Meli',
   USER: 'Usuario',
 };
 
