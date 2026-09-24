@@ -1,11 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
-import { expectSuccessfulApiResponse, isApiResponse } from "./support/api";
+import { expectSuccessfulApiResponse, getE2EApiJson, isApiResponse } from "./support/api";
+import { confirmOpenCashBalance, openCashBalanceModal } from "./support/cashBalances";
 import { loginAsE2EUser } from "./support/auth";
 import { E2E_ACCOUNTS } from "./support/env";
 import {
   addAddress,
   addPhone,
   dismissUnsavedChangesIfVisible,
+  waitForCurrentRouteChunk,
   waitForEntityDetailUrl,
 } from "./support/entities";
 
@@ -33,10 +35,96 @@ type ProductFixture = {
   url: string;
 };
 
+type ProductOptions = {
+  name?: string;
+  cost?: string;
+  price?: string;
+  stockControl?: boolean;
+};
+
 type BudgetDependencies = {
   customer: CustomerFixture;
   product: ProductFixture;
 };
+
+type ProductResponse = {
+  [key: string]: unknown;
+  product?: {
+    id?: string;
+    stock?: number | string;
+    stockControl?: boolean;
+  };
+};
+
+type BudgetResponse = {
+  [key: string]: unknown;
+  budget?: {
+    id?: string;
+    state?: string;
+    cancelledMsg?: string;
+  };
+};
+
+type Payment = {
+  id?: string;
+  paymentId?: string;
+  entity?: string;
+  entityId?: string;
+  method?: string;
+  amount?: number | string;
+  comments?: string;
+};
+
+type PaymentsResponse = {
+  [key: string]: unknown;
+  payments?: Payment[] | null;
+};
+
+type CashFlow = {
+  id?: string;
+  entity?: string;
+  entityId?: string;
+  cashBalanceId?: string;
+  method?: string;
+  amount?: number | string;
+  comments?: string;
+};
+
+type CashBalanceResponse = {
+  [key: string]: unknown;
+  cashBalance?: {
+    id?: string;
+    currentAmount?: number | string;
+    flows?: {
+      budgets?: CashFlow[];
+    };
+  };
+};
+
+type StockFlow = {
+  id?: string;
+  budgetId?: string;
+  productId?: string;
+  quantity?: number | string;
+  inflow?: boolean;
+  comments?: string;
+};
+
+type StockFlowsResponse = {
+  [key: string]: unknown;
+  stockFlows?: StockFlow[];
+};
+
+type MoneyMovement = {
+  id?: string;
+  paymentId?: string;
+  entityId?: string;
+  method?: string;
+  amount?: number | string;
+  comments?: string;
+};
+
+const CANCEL_REVERSAL_COMMENT = "Venta cancelada.";
 
 const responseEntityByApiPath: Record<string, string> = {
   customers: "customer",
@@ -146,7 +234,8 @@ const createProductForBudget = async (
     name = `E2E Product Budget Action ${timestamp}`,
     cost = "1000",
     price = "1500",
-  } = {},
+    stockControl,
+  }: ProductOptions = {},
 ): Promise<ProductFixture> => {
   let lastError: unknown;
 
@@ -166,6 +255,12 @@ const createProductForBudget = async (
       await page.locator('input[name="name"]').fill(name);
       await fillTestIdInput(page, "product-cost-field", cost, "1,000");
       await fillTestIdInput(page, "product-price-field", price, "1,500");
+      if (stockControl === true) {
+        await page.getByTestId("product-stock-control-toggle").click();
+      } else if (stockControl === false) {
+        await page.getByTestId("product-stock-control-toggle").click();
+        await page.getByTestId("product-stock-control-toggle").click();
+      }
       await page.getByPlaceholder("Realmente son muchas pulgadas").fill(`Producto E2E para budget ${timestamp}`);
       await expect(page.getByPlaceholder("Realmente son muchas pulgadas")).toHaveValue(`Producto E2E para budget ${timestamp}`);
       await submitCreateForm(page, "products", "productos");
@@ -184,18 +279,231 @@ const createProductForBudget = async (
   throw lastError;
 };
 
-const createBudgetDependencies = async (page: Page, timestamp: number): Promise<BudgetDependencies> => {
+const createBudgetDependencies = async (page: Page, timestamp: number, productOptions: ProductOptions = {}): Promise<BudgetDependencies> => {
   const customer = await createCustomerForBudgetIfNeeded(page, timestamp);
-  const product = await createProductForBudget(page, timestamp);
+  const product = await createProductForBudget(page, timestamp, productOptions);
 
   return { customer, product };
 };
+
+const getProductByApi = async (page: Page, productId: string) => {
+  const body = await getE2EApiJson<ProductResponse>(page, `products/${productId}`);
+  expect(body.product, JSON.stringify(body)).toBeTruthy();
+  return body.product as NonNullable<ProductResponse["product"]>;
+};
+
+const getBudgetByApi = async (page: Page, budgetId: string) => {
+  const body = await getE2EApiJson<BudgetResponse>(page, `budgets/${budgetId}`);
+  expect(body.budget, JSON.stringify(body)).toBeTruthy();
+  return body.budget as NonNullable<BudgetResponse["budget"]>;
+};
+
+const getPaymentsByBudgetApi = async (page: Page, budgetId: string) => {
+  const body = await getE2EApiJson<PaymentsResponse>(page, `payments/budget/${budgetId}`);
+  return body.payments ?? [];
+};
+
+const getCashBalanceByApi = async (page: Page, cashBalanceId: string) => {
+  const body = await getE2EApiJson<CashBalanceResponse>(page, `cash-balances/${cashBalanceId}`);
+  expect(body.cashBalance, JSON.stringify(body)).toBeTruthy();
+  return body.cashBalance as NonNullable<CashBalanceResponse["cashBalance"]>;
+};
+
+const getStockFlowsByBudgetApi = async (page: Page, budgetId: string) => {
+  const body = await getE2EApiJson<StockFlowsResponse>(
+    page,
+    `stock-flows?sort=budgetId&budgetId=${encodeURIComponent(budgetId)}`,
+  );
+
+  return Array.isArray(body) ? body as StockFlow[] : body.stockFlows ?? [];
+};
+
+const numberValue = (value: number | string | undefined) => Number(value ?? 0);
+
+const movementId = (movement: MoneyMovement) => movement.id ?? movement.paymentId;
+
+const findById = <T extends MoneyMovement>(items: T[], id: string) =>
+  items.find((item) => movementId(item) === id);
+
+const expectMoneyClose = (actual: number | string | undefined, expected: number) => {
+  expect(numberValue(actual)).toBeCloseTo(expected, 2);
+};
+
+const moneyEquals = (actual: number | string | undefined, expected: number) =>
+  Math.abs(numberValue(actual) - expected) < 0.01;
+
+const openCashBalanceForBudgetCancel = async (page: Page, timestamp: number) => {
+  const comment = `E2E Budget Cancel Cash Balance ${timestamp}`;
+
+  await openCashBalanceModal(page);
+  await page.getByTestId("cash-balance-select-all-payment-methods").click();
+  await expect(page.locator('input[value="Todos"]')).toBeVisible();
+  await page.getByTestId("cash-balance-initial-amount-field").locator("input").fill("1000");
+  await page.getByTestId("cash-balance-comments-field").fill(comment);
+
+  return confirmOpenCashBalance(page, comment);
+};
+
+const addInitialStock = async (page: Page, product: ProductFixture, quantity: number, timestamp: number) => {
+  await page.goto(product.url);
+  await waitForEntityDetailUrl(page, "productos");
+  await page.locator(".ui.tabular.menu .item").filter({ hasText: /^Control de stock$/ }).click();
+  await expect(page.getByText(/movimientos de stock/i)).toBeVisible({ timeout: 30_000 });
+
+  await page.getByTestId("stock-add-button").click();
+  await fillTestIdInput(page, "stock-quantity-field", String(quantity));
+  await fillTestIdInput(page, "stock-comments-field", `Stock inicial E2E cancel budget ${timestamp}`);
+
+  const responsePromise = page.waitForResponse((response) =>
+    isApiResponse(response, "POST", `stock-flows/${product.fullId}`),
+  );
+
+  await Promise.all([
+    responsePromise,
+    page.getByTestId("modal-confirm").click(),
+  ]);
+
+  await expectSuccessfulApiResponse(await responsePromise, { responseEntity: "stockFlow" });
+  await expect.poll(async () => numberValue((await getProductByApi(page, product.fullId)).stock), {
+    timeout: 30_000,
+  }).toBe(quantity);
+};
+
+const selectFirstPaymentMethod = async (page: Page) => {
+  await page.getByTestId("budget-payment-method-dropdown").click();
+  const option = page
+    .locator('[role="option"]')
+    .filter({ visible: true })
+    .filter({ hasNotText: /todos|sin resultados|no hay|no se encontraron|dolares/i })
+    .first();
+
+  await expect(option).toBeVisible({ timeout: 30_000 });
+  const method = (await option.innerText()).trim();
+  await option.click();
+
+  return method;
+};
+
+const addBudgetPayment = async (page: Page, budgetId: string, amount: number, timestamp: number) => {
+  const comments = `Pago E2E cancel budget ${timestamp}`;
+
+  await page.getByTestId("budget-detail-tab-payments").click();
+  await expect(page.getByText(/detalle de pagos/i)).toBeVisible({ timeout: 30_000 });
+  await page.getByTestId("budget-add-payment-button").click();
+  await expect(page.locator(".ui.modal").getByText(/^agregar pago$/i)).toBeVisible({ timeout: 30_000 });
+
+  const method = await selectFirstPaymentMethod(page);
+  await page.getByTestId("budget-payment-amount-field").locator("input").fill(String(amount));
+  await page.getByTestId("budget-payment-comments-field").fill(comments);
+
+  const responsePromise = page.waitForResponse((response) =>
+    isApiResponse(response, "POST", `payments/budget/${budgetId}`),
+  );
+
+  await Promise.all([
+    responsePromise,
+    page.getByTestId("budget-payment-submit-button").click(),
+  ]);
+
+  const body = await expectSuccessfulApiResponse(await responsePromise, { responseEntity: "payment" });
+  const payment = body.payment as Payment;
+  const id = movementId(payment);
+  expect(id, JSON.stringify(body)).toBeTruthy();
+
+  await expect(page.getByTestId("table-row").filter({ hasText: comments })).toBeVisible({ timeout: 30_000 });
+
+  return {
+    id: id as string,
+    entity: payment.entity,
+    entityId: payment.entityId,
+    method: payment.method ?? method,
+    amount: numberValue(payment.amount ?? amount),
+    comments: payment.comments ?? comments,
+  };
+};
+
+const completeBudgetDelivery = async (
+  page: Page,
+  budgetId: string,
+  product: ProductFixture,
+  quantity: number,
+  timestamp: number,
+) => {
+  await page.getByTestId("budget-detail-tab-deliveries").click();
+  await page.getByTestId("budget-open-delivery-modal-button").click();
+  const modal = page.locator(".ui.modal").filter({ hasText: /registrar entrega/i });
+  await expect(modal).toBeVisible({ timeout: 30_000 });
+
+  await page.getByTestId("budget-delivery-note-field").locator("input").fill(`R-${timestamp}`);
+  const row = modal.getByRole("row").filter({ hasText: product.name });
+  await expect(row).toBeVisible({ timeout: 30_000 });
+  await row.locator("input").first().fill(String(quantity));
+
+  const responsePromise = page.waitForResponse((response) =>
+    isApiResponse(response, "POST", `stock-flows/${budgetId}/consume`),
+  );
+
+  await Promise.all([
+    responsePromise,
+    page.getByTestId("modal-confirm").click(),
+  ]);
+
+  await expectSuccessfulApiResponse(await responsePromise);
+  await expect(modal).not.toBeVisible({ timeout: 30_000 });
+};
+
+const expectSingleMoneyReversal = <T extends MoneyMovement>(
+  movements: T[],
+  original: T,
+  matchesSource: (movement: T) => boolean,
+) => {
+  const reversals = movements.filter((movement) =>
+    movementId(movement) &&
+    movementId(movement) !== movementId(original) &&
+    movement.entityId === original.entityId &&
+    movement.method === original.method &&
+    movement.comments === CANCEL_REVERSAL_COMMENT &&
+    moneyEquals(movement.amount, -numberValue(original.amount)) &&
+    matchesSource(movement)
+  );
+
+  expect(reversals, JSON.stringify(movements)).toHaveLength(1);
+  const reversal = reversals[0];
+  expect(movementId(reversal), JSON.stringify(reversal)).not.toBe(movementId(original));
+  expect(reversal.entityId, JSON.stringify(reversal)).toBe(original.entityId);
+  expect(reversal.method, JSON.stringify(reversal)).toBe(original.method);
+  expectMoneyClose(reversal.amount, -numberValue(original.amount));
+  expect(reversal.comments, JSON.stringify(reversal)).toBe(CANCEL_REVERSAL_COMMENT);
+
+  return reversal;
+};
+
+const budgetCashFlows = (cashBalance: NonNullable<CashBalanceResponse["cashBalance"]>, budgetId: string) =>
+  (cashBalance.flows?.budgets ?? []).filter((flow) => flow.entityId === budgetId);
+
+const findStockFlowReversal = (stockFlows: StockFlow[], original: StockFlow) =>
+  stockFlows.filter((flow) =>
+    flow.id &&
+    flow.id !== original.id &&
+    flow.budgetId === original.budgetId &&
+    flow.productId === original.productId &&
+    flow.inflow === true &&
+    flow.comments === CANCEL_REVERSAL_COMMENT &&
+    numberValue(flow.quantity) === numberValue(original.quantity)
+  );
 
 const openCreateBudgetPage = async (page: Page) => {
   await page.goto("/ventas");
   await expect(page).toHaveURL(budgetsListUrl);
   await page.goto("/ventas/crear");
   await expect(page).toHaveURL(/\/ventas\/crear(?:\?|$)/);
+  await waitForCurrentRouteChunk(page);
+  await expect(page.getByTestId("budget-customer-search")).toBeVisible({ timeout: 30_000 });
+};
+
+const expectBudgetDetailState = async (page: Page, state: "Confirmado" | "Pendiente") => {
+  const budgetId = new URL(page.url()).pathname.split("/")[2];
+  await expect(page.locator("main")).toContainText(new RegExp(`${budgetId}[\\s\\S]*${state}`, "i"), { timeout: 30_000 });
 };
 
 const addProductToBudget = async (
@@ -227,11 +535,11 @@ const createConfirmedBudgetWithProduct = async (
   timestamp: number,
 ) => {
   await openCreateBudgetPage(page);
-  await page.getByTestId("budget-state-confirmed-button").click();
   await fillBudgetForm(page, dependencies, timestamp);
+  await page.getByTestId("budget-state-confirmed-button").click();
   await page.getByTestId("budget-submit-current-state-button").click();
   await expect(page).toHaveURL(confirmedBudgetUrl, { timeout: 30_000 });
-  await expect(page.getByText(/confirmado/i).first()).toBeVisible({ timeout: 30_000 });
+  await expectBudgetDetailState(page, "Confirmado");
 
   return {
     id: new URL(page.url()).pathname.split("/")[2],
@@ -245,7 +553,7 @@ const openBudgetDetail = async (page: Page, budgetUrl: string, { reload = false 
     await page.reload();
   }
   await expect(page).toHaveURL(confirmedBudgetUrl, { timeout: 30_000 });
-  await expect(page.getByText(/confirmado/i).first()).toBeVisible({ timeout: 30_000 });
+  await expectBudgetDetailState(page, "Confirmado");
 };
 
 const voidCurrentBudget = async (page: Page, reason: string) => {
@@ -351,16 +659,16 @@ const assertProductChangesModalDoesNotReopenAfterTabRoundTrip = async (page: Pag
 };
 
 const completeRequiredCloneFields = async (page: Page, dependencies: BudgetDependencies, timestamp: number) => {
-  await page.getByTestId("budget-state-confirmed-button").click();
   await fillTestIdInput(page, "budget-expiration-days-field", "7");
   await selectSearchOption(page, "budget-customer-search", dependencies.customer.name);
   await page.getByTestId("textarea-comments").fill(`Comentario E2E budget clonado ${timestamp}`);
+  await page.getByTestId("budget-state-confirmed-button").click();
 };
 
 const confirmClonedBudget = async (page: Page) => {
   await page.getByTestId("budget-submit-current-state-button").click();
   await expect(page).toHaveURL(confirmedBudgetUrl, { timeout: 30_000 });
-  await expect(page.getByText(/confirmado/i).first()).toBeVisible({ timeout: 30_000 });
+  await expectBudgetDetailState(page, "Confirmado");
 };
 
 test.describe("budget actions", () => {
@@ -368,15 +676,138 @@ test.describe("budget actions", () => {
     await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
   });
 
-  test("voids a confirmed budget", async ({ page }) => {
+  test("voids a confirmed budget without stock control", async ({ page }) => {
     test.setTimeout(180_000);
 
     const timestamp = Date.now();
-    const dependencies = await createBudgetDependencies(page, timestamp);
+    const dependencies = await createBudgetDependencies(page, timestamp, { stockControl: false });
+    const productWithoutStockControl = await getProductByApi(page, dependencies.product.fullId);
+    expect(productWithoutStockControl.stockControl, JSON.stringify(productWithoutStockControl)).toBe(false);
     const budget = await createConfirmedBudgetWithProduct(page, dependencies, timestamp);
 
     await openBudgetDetail(page, budget.url, { reload: true });
     await voidCurrentBudget(page, `Motivo E2E anulacion budget ${timestamp}`);
+    const stockFlowsAfterCancel = await getStockFlowsByBudgetApi(page, budget.id);
+    expect(stockFlowsAfterCancel).toHaveLength(0);
+  });
+
+  test("voids a confirmed budget with stock control and reverts related movements", async ({ page }) => {
+    test.setTimeout(300_000);
+
+    const timestamp = Date.now();
+    const initialStock = 20;
+    const deliveredQuantity = 1;
+    const paymentAmount = 50;
+    const voidReason = `Motivo E2E anulacion budget stock ${timestamp}`;
+
+    const dependencies = await createBudgetDependencies(page, timestamp, {
+      name: `E2E Product Budget Stock Cancel ${timestamp}`,
+      stockControl: true,
+    });
+    const cashBalance = await openCashBalanceForBudgetCancel(page, timestamp);
+    const cashBalanceBeforePayment = await getCashBalanceByApi(page, cashBalance.id);
+    const cashBeforePayment = numberValue(cashBalanceBeforePayment.currentAmount);
+
+    await addInitialStock(page, dependencies.product, initialStock, timestamp);
+    const productBeforeDelivery = await getProductByApi(page, dependencies.product.fullId);
+    expect(productBeforeDelivery.stockControl, JSON.stringify(productBeforeDelivery)).toBe(true);
+    expect(numberValue(productBeforeDelivery.stock)).toBe(initialStock);
+
+    const budget = await createConfirmedBudgetWithProduct(page, dependencies, timestamp);
+    const confirmedBudget = await getBudgetByApi(page, budget.id);
+    expect(confirmedBudget.state, JSON.stringify(confirmedBudget)).toBe("CONFIRMED");
+
+    const createdPayment = await addBudgetPayment(page, budget.id, paymentAmount, timestamp);
+    const paymentsBeforeCancel = await getPaymentsByBudgetApi(page, budget.id);
+    const originalPayment = findById(paymentsBeforeCancel, createdPayment.id);
+    expect(originalPayment, JSON.stringify(paymentsBeforeCancel)).toBeTruthy();
+    expect(originalPayment?.entity, JSON.stringify(originalPayment)).toBe("BUDGET");
+    expect(originalPayment?.entityId, JSON.stringify(originalPayment)).toBe(budget.id);
+    expect(originalPayment?.method, JSON.stringify(originalPayment)).toBe(createdPayment.method);
+    expect(numberValue(originalPayment?.amount), JSON.stringify(originalPayment)).toBeGreaterThan(0);
+    expectMoneyClose(originalPayment?.amount, createdPayment.amount);
+
+    await expect.poll(async () => numberValue((await getCashBalanceByApi(page, cashBalance.id)).currentAmount), {
+      timeout: 30_000,
+    }).toBeCloseTo(cashBeforePayment + createdPayment.amount, 2);
+
+    const cashBalanceAfterPayment = await getCashBalanceByApi(page, cashBalance.id);
+    const originalCashFlowMatches = budgetCashFlows(cashBalanceAfterPayment, budget.id).filter((flow) =>
+      flow.entity === "BUDGET" &&
+      flow.cashBalanceId === cashBalance.id &&
+      flow.method === createdPayment.method &&
+      moneyEquals(flow.amount, createdPayment.amount)
+    );
+    expect(originalCashFlowMatches, JSON.stringify(cashBalanceAfterPayment.flows?.budgets)).toHaveLength(1);
+    const originalCashFlow = originalCashFlowMatches[0];
+    expect(originalCashFlow.id, JSON.stringify(originalCashFlow)).toBeTruthy();
+
+    await completeBudgetDelivery(page, budget.id, dependencies.product, deliveredQuantity, timestamp);
+    await expect.poll(async () => numberValue((await getProductByApi(page, dependencies.product.fullId)).stock), {
+      timeout: 30_000,
+    }).toBe(initialStock - deliveredQuantity);
+
+    const productAfterDelivery = await getProductByApi(page, dependencies.product.fullId);
+    expect(numberValue(productAfterDelivery.stock)).toBe(initialStock - deliveredQuantity);
+
+    const stockFlowsBeforeCancel = await getStockFlowsByBudgetApi(page, budget.id);
+    const originalStockFlowMatches = stockFlowsBeforeCancel.filter((flow) =>
+      flow.budgetId === budget.id &&
+      flow.productId === dependencies.product.fullId &&
+      flow.inflow === false &&
+      numberValue(flow.quantity) === deliveredQuantity
+    );
+    expect(originalStockFlowMatches, JSON.stringify(stockFlowsBeforeCancel)).toHaveLength(1);
+    const originalStockFlow = originalStockFlowMatches[0];
+    expect(originalStockFlow.id, JSON.stringify(originalStockFlow)).toBeTruthy();
+
+    await openBudgetDetail(page, budget.url, { reload: true });
+    await voidCurrentBudget(page, voidReason);
+
+    const cancelledBudget = await getBudgetByApi(page, budget.id);
+    expect(cancelledBudget.state, JSON.stringify(cancelledBudget)).toBe("CANCELLED");
+    expect(cancelledBudget.cancelledMsg, JSON.stringify(cancelledBudget)).toBe(voidReason);
+
+    const productAfterCancel = await getProductByApi(page, dependencies.product.fullId);
+    expect(numberValue(productAfterCancel.stock)).toBe(initialStock);
+
+    const cashBalanceAfterCancel = await getCashBalanceByApi(page, cashBalance.id);
+    expectMoneyClose(cashBalanceAfterCancel.currentAmount, cashBeforePayment);
+
+    const paymentsAfterCancel = await getPaymentsByBudgetApi(page, budget.id);
+    const preservedPayment = findById(paymentsAfterCancel, createdPayment.id);
+    expect(preservedPayment, JSON.stringify(paymentsAfterCancel)).toBeTruthy();
+    const paymentReversal = expectSingleMoneyReversal(
+      paymentsAfterCancel,
+      originalPayment as Payment,
+      (payment) => payment.entity === originalPayment?.entity,
+    );
+    expect(paymentReversal.entity, JSON.stringify(paymentReversal)).toBe("BUDGET");
+
+    const cashFlowsAfterCancel = budgetCashFlows(cashBalanceAfterCancel, budget.id);
+    const preservedCashFlow = findById(cashFlowsAfterCancel, originalCashFlow.id as string);
+    expect(preservedCashFlow, JSON.stringify(cashFlowsAfterCancel)).toBeTruthy();
+    const cashFlowReversal = expectSingleMoneyReversal(
+      cashFlowsAfterCancel,
+      originalCashFlow,
+      (flow) => flow.cashBalanceId === originalCashFlow.cashBalanceId,
+    );
+    expect(cashFlowReversal.cashBalanceId, JSON.stringify(cashFlowReversal)).toBe(cashBalance.id);
+
+    const stockFlowsAfterCancel = await getStockFlowsByBudgetApi(page, budget.id);
+    const preservedStockFlow = findById(stockFlowsAfterCancel, originalStockFlow.id as string);
+    expect(preservedStockFlow, JSON.stringify(stockFlowsAfterCancel)).toBeTruthy();
+    expect(preservedStockFlow?.inflow, JSON.stringify(preservedStockFlow)).toBe(false);
+    expect(numberValue(preservedStockFlow?.quantity), JSON.stringify(preservedStockFlow)).toBe(deliveredQuantity);
+    const stockFlowReversals = findStockFlowReversal(stockFlowsAfterCancel, originalStockFlow);
+    expect(stockFlowReversals, JSON.stringify(stockFlowsAfterCancel)).toHaveLength(1);
+    const stockFlowReversal = stockFlowReversals[0];
+    expect(stockFlowReversal.id, JSON.stringify(stockFlowReversal)).not.toBe(originalStockFlow.id);
+    expect(stockFlowReversal.budgetId, JSON.stringify(stockFlowReversal)).toBe(budget.id);
+    expect(stockFlowReversal.productId, JSON.stringify(stockFlowReversal)).toBe(dependencies.product.fullId);
+    expect(stockFlowReversal.inflow, JSON.stringify(stockFlowReversal)).toBe(true);
+    expect(numberValue(stockFlowReversal.quantity), JSON.stringify(stockFlowReversal)).toBe(deliveredQuantity);
+    expect(stockFlowReversal.comments, JSON.stringify(stockFlowReversal)).toBe(CANCEL_REVERSAL_COMMENT);
   });
 
   test("clones a confirmed budget and handles product changes modal", async ({ page }) => {

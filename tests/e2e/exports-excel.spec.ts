@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import * as XLSX from "xlsx";
 import { loginAsE2EUser } from "./support/auth";
+import { confirmOpenCashBalance, openCashBalanceModal } from "./support/cashBalances";
 import { E2E_ACCOUNTS, getE2EApiBaseUrl } from "./support/env";
 
 type ExportScenario = {
@@ -53,6 +54,8 @@ const exportScenarios: ExportScenario[] = [
     path: "/cajas",
     expectedFileName: /lista de cajas\.xlsx$/i,
     accountName: E2E_ACCOUNTS.modulesEnabled,
+    prepare: async (page, timestamp) => (await createCashBalanceForExport(page, timestamp)).id,
+    filter: (page, value) => filterById(page, value),
     tags: ["@modules-enabled", "@cash-balances"],
   },
 ];
@@ -60,9 +63,7 @@ const exportScenarios: ExportScenario[] = [
 const openListPage = async (page: Page, path: string) => {
   await page.goto(path);
   await expect(page).toHaveURL(new RegExp(`${path}(?:\\?|$)`));
-  await expect(page.getByTestId("table-row")).not.toHaveCount(0);
-  const excelAction = await revealExcelDownloadAction(page);
-  await expect(excelAction).toBeEnabled();
+  await expect(getPageActionsRail(page)).toBeAttached({ timeout: 30_000 });
 };
 
 const getVisibleTableRowsCount = async (page: Page) => {
@@ -279,6 +280,24 @@ const createBudgetByApi = async (page: Page, timestamp: number) => {
   return { customerName: customer.name };
 };
 
+const createCashBalanceForExport = async (page: Page, timestamp: number) => {
+  const comment = `E2E Export Cash Balance ${timestamp}`;
+
+  await openCashBalanceModal(page);
+  await page.getByTestId("cash-balance-select-all-payment-methods").click();
+  await expect(page.locator('input[value="Todos"]')).toBeVisible();
+  await page.getByTestId("cash-balance-initial-amount-field").locator("input").fill("100");
+  await page.getByTestId("cash-balance-comments-field").fill(comment);
+
+  const cashBalance = await confirmOpenCashBalance(page, comment);
+  return cashBalance;
+};
+
+const filterById = async (page: Page, value: string) => {
+  await page.locator('input[name="id"]').fill(value);
+  await page.locator('input[name="id"]').press("Enter");
+};
+
 const filterByName = async (page: Page, value: string) => {
   await page.locator('input[name="name"]').fill(value);
   await page.locator('input[name="name"]').press("Enter");
@@ -291,6 +310,10 @@ const filterBudgetByCustomer = async (page: Page, value: string) => {
 
 const expectExportableRow = async (page: Page, value: string) => {
   await expect(page.getByTestId("table-row").filter({ hasText: value })).toBeVisible({ timeout: 30_000 });
+};
+
+const expectExportableRows = async (page: Page) => {
+  await expect(page.getByTestId("table-row")).not.toHaveCount(0, { timeout: 30_000 });
 };
 
 const readExcelRowsCount = async (filePath: string) => {
@@ -318,7 +341,11 @@ test.describe("exports", () => {
       if (exportableRowText && scenario.filter) {
         await scenario.filter(page, exportableRowText);
         await expectExportableRow(page, exportableRowText);
+      } else {
+        await expectExportableRows(page);
       }
+
+      await expect(await revealExcelDownloadAction(page)).toBeEnabled();
 
       const expectedRowsCount = await getExpectedExportRowsCount(page);
       expect(expectedRowsCount, `${scenario.name} should have rows to export`).toBeGreaterThan(0);
