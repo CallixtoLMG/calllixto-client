@@ -1,7 +1,6 @@
 import { expect, test, type Page, type Response } from "@playwright/test";
 import { loginAsE2EUser } from "./support/auth";
 import { confirmOpenCashBalance, openCashBalanceModal } from "./support/cashBalances";
-import { E2E_ACCOUNTS } from "./support/env";
 
 type CloseCashBalanceResponse = {
   statusOk?: boolean;
@@ -45,7 +44,7 @@ const closeCurrentCashBalance = async (page: Page) => {
 
 test.describe("cash balance", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
+    await loginAsE2EUser(page);
   });
 
   test(

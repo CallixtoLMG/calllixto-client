@@ -1,13 +1,13 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import * as XLSX from "xlsx";
+import { getE2EAccountApiUrl, getE2EApiHeaders } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
-import { E2E_ACCOUNTS, getE2EApiBaseUrl } from "./support/env";
+import { confirmOpenCashBalance, openCashBalanceModal } from "./support/cashBalances";
 
 type ExportScenario = {
   name: string;
   path: string;
   expectedFileName: RegExp;
-  accountName?: string;
   prepare?: (page: Page, timestamp: number) => Promise<string>;
   filter?: (page: Page, value: string) => Promise<void>;
   tags?: string[];
@@ -52,7 +52,8 @@ const exportScenarios: ExportScenario[] = [
     name: "cash balances",
     path: "/cajas",
     expectedFileName: /lista de cajas\.xlsx$/i,
-    accountName: E2E_ACCOUNTS.modulesEnabled,
+    prepare: async (page, timestamp) => (await createCashBalanceForExport(page, timestamp)).id,
+    filter: (page, value) => filterById(page, value),
     tags: ["@modules-enabled", "@cash-balances"],
   },
 ];
@@ -60,9 +61,7 @@ const exportScenarios: ExportScenario[] = [
 const openListPage = async (page: Page, path: string) => {
   await page.goto(path);
   await expect(page).toHaveURL(new RegExp(`${path}(?:\\?|$)`));
-  await expect(page.getByTestId("table-row")).not.toHaveCount(0);
-  const excelAction = await revealExcelDownloadAction(page);
-  await expect(excelAction).toBeEnabled();
+  await expect(getPageActionsRail(page)).toBeAttached({ timeout: 30_000 });
 };
 
 const getVisibleTableRowsCount = async (page: Page) => {
@@ -139,30 +138,15 @@ const downloadExcel = async (page: Page) => {
   return downloadPromise;
 };
 
-const getCookieValue = async (page: Page, name: string) =>
-  (await page.context().cookies()).find((cookie) => cookie.name === name)?.value;
-
-const getApiHeaders = async (page: Page) => {
-  const token = await getCookieValue(page, "token");
-  expect(token, "E2E login should provide an auth token").toBeTruthy();
-
-  return { authorization: `Bearer ${token}` };
-};
-
-const getAccountApiUrl = (path: string) => {
-  const accountBaseUrl = `${getE2EApiBaseUrl().replace(/\/+$/g, "")}/${E2E_ACCOUNTS.modulesEnabled}/`;
-  return new URL(path.replace(/^\/+/g, ""), accountBaseUrl).toString();
-};
-
 const postApi = async <TBody extends Record<string, unknown>>(
   page: Page,
   path: string,
   payload: Record<string, unknown>,
   responseEntity: string,
 ) => {
-  const response = await page.request.post(getAccountApiUrl(path), {
+  const response = await page.request.post(getE2EAccountApiUrl(path), {
     data: payload,
-    headers: await getApiHeaders(page),
+    headers: await getE2EApiHeaders(page),
   });
 
   expect(response.status()).toBeLessThan(500);
@@ -279,6 +263,24 @@ const createBudgetByApi = async (page: Page, timestamp: number) => {
   return { customerName: customer.name };
 };
 
+const createCashBalanceForExport = async (page: Page, timestamp: number) => {
+  const comment = `E2E Export Cash Balance ${timestamp}`;
+
+  await openCashBalanceModal(page);
+  await page.getByTestId("cash-balance-select-all-payment-methods").click();
+  await expect(page.locator('input[value="Todos"]')).toBeVisible();
+  await page.getByTestId("cash-balance-initial-amount-field").locator("input").fill("100");
+  await page.getByTestId("cash-balance-comments-field").fill(comment);
+
+  const cashBalance = await confirmOpenCashBalance(page, comment);
+  return cashBalance;
+};
+
+const filterById = async (page: Page, value: string) => {
+  await page.locator('input[name="id"]').fill(value);
+  await page.locator('input[name="id"]').press("Enter");
+};
+
 const filterByName = async (page: Page, value: string) => {
   await page.locator('input[name="name"]').fill(value);
   await page.locator('input[name="name"]').press("Enter");
@@ -291,6 +293,10 @@ const filterBudgetByCustomer = async (page: Page, value: string) => {
 
 const expectExportableRow = async (page: Page, value: string) => {
   await expect(page.getByTestId("table-row").filter({ hasText: value })).toBeVisible({ timeout: 30_000 });
+};
+
+const expectExportableRows = async (page: Page) => {
+  await expect(page.getByTestId("table-row")).not.toHaveCount(0, { timeout: 30_000 });
 };
 
 const readExcelRowsCount = async (filePath: string) => {
@@ -309,7 +315,7 @@ const readExcelRowsCount = async (filePath: string) => {
 test.describe("exports", () => {
   for (const scenario of exportScenarios) {
     test(`exports ${scenario.name} table to Excel`, { tag: scenario.tags }, async ({ page }) => {
-      await loginAsE2EUser(page, { accountName: scenario.accountName ?? E2E_ACCOUNTS.modulesEnabled });
+      await loginAsE2EUser(page);
 
       const exportableRowText = scenario.prepare ? await scenario.prepare(page, Date.now()) : null;
 
@@ -318,7 +324,11 @@ test.describe("exports", () => {
       if (exportableRowText && scenario.filter) {
         await scenario.filter(page, exportableRowText);
         await expectExportableRow(page, exportableRowText);
+      } else {
+        await expectExportableRows(page);
       }
+
+      await expect(await revealExcelDownloadAction(page)).toBeEnabled();
 
       const expectedRowsCount = await getExpectedExportRowsCount(page);
       expect(expectedRowsCount, `${scenario.name} should have rows to export`).toBeGreaterThan(0);

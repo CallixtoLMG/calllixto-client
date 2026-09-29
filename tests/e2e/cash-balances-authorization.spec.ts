@@ -2,7 +2,7 @@ import { expect, test, type Response } from "@playwright/test";
 import { isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
 import { openCashBalanceModal } from "./support/cashBalances";
-import { E2E_ACCOUNTS } from "./support/env";
+import { getE2EModulesDisabledAccountSlug } from "./support/env";
 
 type CashBalanceResponseBody = {
   statusOk?: boolean;
@@ -46,9 +46,10 @@ test.describe("cash balance authorization", () => {
     async ({ page }) => {
       const timestamp = Date.now();
       const comment = `E2E denied cash balance ${timestamp}`;
+      const accountSlug = getE2EModulesDisabledAccountSlug();
 
-      await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesDisabled });
-      await expect(page.getByText(E2E_ACCOUNTS.modulesDisabled)).toBeVisible();
+      await loginAsE2EUser(page, { accountSlug });
+      await expect(page.getByText(accountSlug)).toBeVisible();
 
       await openCashBalanceModal(page);
       await page.getByTestId("cash-balance-select-all-payment-methods").click();
