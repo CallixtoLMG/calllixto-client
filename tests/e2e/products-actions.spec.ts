@@ -1,6 +1,5 @@
 import { expect, test, type Locator, type Page, type Response } from "@playwright/test";
 import { loginAsE2EUser } from "./support/auth";
-import { E2E_ACCOUNTS } from "./support/env";
 import {
   deleteCurrentEntity,
   deleteEntityIfPresent,
@@ -370,7 +369,7 @@ const cleanupCreatedData = async (
 
 test.describe("product actions", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
+    await loginAsE2EUser(page);
   });
 
   test("prints product barcode", async ({ page }) => {

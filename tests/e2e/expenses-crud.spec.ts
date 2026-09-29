@@ -1,7 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { expectSuccessfulApiResponse, isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
-import { E2E_ACCOUNTS } from "./support/env";
 import { waitForEntityDetailUrl, waitForExpenseSettingsReady } from "./support/entities";
 
 const listUrl = /\/gastos(?:\?|$)/;
@@ -238,7 +237,7 @@ const voidExpenseIfPresent = async (page: Page, expenseUrl: string, reason: stri
 
 test.describe("expenses", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
+    await loginAsE2EUser(page);
   });
 
   test("creates, updates, and voids an expense", async ({ page }) => {

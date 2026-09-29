@@ -7,7 +7,6 @@ import {
   isApiResponse,
 } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
-import { E2E_ACCOUNTS } from "./support/env";
 import {
   deleteEntityIfPresent,
   dismissUnsavedChangesIfVisible,
@@ -409,7 +408,7 @@ const addStockMovement = async (page: Page, type: "add" | "remove", quantity: st
 
 test.describe("products", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
+    await loginAsE2EUser(page);
   });
 
   test("creates and updates a product", async ({ page }) => {

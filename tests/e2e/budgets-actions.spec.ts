@@ -2,7 +2,6 @@ import { expect, test, type Page } from "@playwright/test";
 import { expectSuccessfulApiResponse, getE2EApiJson, isApiResponse } from "./support/api";
 import { confirmOpenCashBalance, openCashBalanceModal } from "./support/cashBalances";
 import { loginAsE2EUser } from "./support/auth";
-import { E2E_ACCOUNTS } from "./support/env";
 import {
   addAddress,
   addPhone,
@@ -673,7 +672,7 @@ const confirmClonedBudget = async (page: Page) => {
 
 test.describe("budget actions", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
+    await loginAsE2EUser(page);
   });
 
   test("voids a confirmed budget without stock control", async ({ page }) => {

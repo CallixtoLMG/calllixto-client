@@ -2,7 +2,6 @@ import { expect, test, type Page } from "@playwright/test";
 import { expectSuccessfulApiResponse, isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
 import { confirmOpenCashBalance, openCashBalanceModal } from "./support/cashBalances";
-import { E2E_ACCOUNTS } from "./support/env";
 import {
   addAddress,
   addPhone,
@@ -333,7 +332,7 @@ const voidExpenseIfPossible = async (page: Page, expenseUrl: string | null, reas
 
 test.describe("cash balance movements", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
+    await loginAsE2EUser(page);
   });
 
   test(

@@ -1,14 +1,13 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import * as XLSX from "xlsx";
+import { getE2EAccountApiUrl, getE2EApiHeaders } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
 import { confirmOpenCashBalance, openCashBalanceModal } from "./support/cashBalances";
-import { E2E_ACCOUNTS, getE2EApiBaseUrl } from "./support/env";
 
 type ExportScenario = {
   name: string;
   path: string;
   expectedFileName: RegExp;
-  accountName?: string;
   prepare?: (page: Page, timestamp: number) => Promise<string>;
   filter?: (page: Page, value: string) => Promise<void>;
   tags?: string[];
@@ -53,7 +52,6 @@ const exportScenarios: ExportScenario[] = [
     name: "cash balances",
     path: "/cajas",
     expectedFileName: /lista de cajas\.xlsx$/i,
-    accountName: E2E_ACCOUNTS.modulesEnabled,
     prepare: async (page, timestamp) => (await createCashBalanceForExport(page, timestamp)).id,
     filter: (page, value) => filterById(page, value),
     tags: ["@modules-enabled", "@cash-balances"],
@@ -140,30 +138,15 @@ const downloadExcel = async (page: Page) => {
   return downloadPromise;
 };
 
-const getCookieValue = async (page: Page, name: string) =>
-  (await page.context().cookies()).find((cookie) => cookie.name === name)?.value;
-
-const getApiHeaders = async (page: Page) => {
-  const token = await getCookieValue(page, "token");
-  expect(token, "E2E login should provide an auth token").toBeTruthy();
-
-  return { authorization: `Bearer ${token}` };
-};
-
-const getAccountApiUrl = (path: string) => {
-  const accountBaseUrl = `${getE2EApiBaseUrl().replace(/\/+$/g, "")}/${E2E_ACCOUNTS.modulesEnabled}/`;
-  return new URL(path.replace(/^\/+/g, ""), accountBaseUrl).toString();
-};
-
 const postApi = async <TBody extends Record<string, unknown>>(
   page: Page,
   path: string,
   payload: Record<string, unknown>,
   responseEntity: string,
 ) => {
-  const response = await page.request.post(getAccountApiUrl(path), {
+  const response = await page.request.post(getE2EAccountApiUrl(path), {
     data: payload,
-    headers: await getApiHeaders(page),
+    headers: await getE2EApiHeaders(page),
   });
 
   expect(response.status()).toBeLessThan(500);
@@ -332,7 +315,7 @@ const readExcelRowsCount = async (filePath: string) => {
 test.describe("exports", () => {
   for (const scenario of exportScenarios) {
     test(`exports ${scenario.name} table to Excel`, { tag: scenario.tags }, async ({ page }) => {
-      await loginAsE2EUser(page, { accountName: scenario.accountName ?? E2E_ACCOUNTS.modulesEnabled });
+      await loginAsE2EUser(page);
 
       const exportableRowText = scenario.prepare ? await scenario.prepare(page, Date.now()) : null;
 
