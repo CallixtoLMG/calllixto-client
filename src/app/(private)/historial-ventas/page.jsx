@@ -1,12 +1,14 @@
 "use client";
+import { readListPagination } from "@/api/listPagination";
 import { useListBudgetsHistory } from "@/api/budgets";
 import { useGetSetting } from "@/api/settings";
 import { useListUsers } from "@/api/users";
-import { COLORS, CONTENT_SIZES, ENTITIES, HARD_DELETED, ICONS, INFO, PAGES } from "@/common/constants";
+import { COLORS, CONTENT_SIZES, ENTITIES, ICONS, INFO, PAGES } from "@/common/constants";
 import BudgetsHistoryFilter from "@/components/budgets/BudgetsHistoryFilters";
 import BudgetsPage, { downloadBudgetsExcel } from "@/components/budgets/BudgetsPage";
-import { BASE_BUDGETS_HISTORY_RANGES, BUDGETS_HISTORY_FILTERS_KEY, BUDGET_STATES, DATE_RANGE_KEY, buildCustomHistoryRanges } from "@/components/budgets/budgets.constants";
+import { BASE_BUDGETS_HISTORY_RANGES, BUDGETS_HISTORY_FILTERS_KEY, EMPTY_FILTERS, BUDGET_STATES, DATE_RANGE_KEY, buildCustomHistoryRanges } from "@/components/budgets/budgets.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import useFilters from "@/hooks/useFilters";
 import useFilterParams from "@/hooks/useFilterParams";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -29,9 +31,18 @@ const BudgetsHistory = () => {
     },
   });
 
+  const filterControls = useFilters({
+    defaultFilters: EMPTY_FILTERS,
+    key: BUDGETS_HISTORY_FILTERS_KEY,
+    remoteEntity: "budgets",
+    resetKey: dateRange,
+  });
+
   const { data: budgetsData, isLoading: isLoadingBudgets, isRefetching, refetch: refetchBudgetsHistory } = useListBudgetsHistory({
     startDate: dateRange.startDate,
     endDate: dateRange.endDate,
+    ...filterControls.listRequest,
+    enabled: filterControls.hydrated,
   });
   const { data: usersData, isLoading: isLoadingUsers } = useListUsers();
   const { setLabels } = useBreadcrumContext();
@@ -48,10 +59,9 @@ const BudgetsHistory = () => {
     [customPresets]
   );
   const budgets = useMemo(() => {
-    if (!budgetsData) return [];
+    if (!budgetsData?.budgets) return [];
 
-    return budgetsData
-      .filter(budget => budget.state !== HARD_DELETED)
+    return budgetsData.budgets
       .map(budget => ({
         ...budget,
         href:
@@ -140,8 +150,9 @@ const BudgetsHistory = () => {
   }, [setActions, setInfo]);
 
   const handleSearch = useCallback((newRange) => {
+    filterControls.setFilters({ ...filterControls.filters, page: 1 });
     setDateRange(newRange);
-  }, [setDateRange]);
+  }, [setDateRange, filterControls]);
 
   if (!hydrated) return null;
 
@@ -157,7 +168,8 @@ const BudgetsHistory = () => {
         <BudgetsPage
           isLoading={loading}
           budgets={loading ? [] : budgets}
-          filterKey={BUDGETS_HISTORY_FILTERS_KEY}
+          filterControls={filterControls}
+          serverPagination={{ ...filterControls.listRequest, ...readListPagination(budgetsData) }}
           usersOptions={usersOptions}
           onRefetch={refetchBudgetsHistory}
           useSideActions

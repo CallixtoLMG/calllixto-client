@@ -10,13 +10,14 @@ import { LIST_PRODUCTS_QUERY_KEY } from "@/components/products/products.constant
 import { LIST_SUPPLIERS_QUERY_KEY } from '@/components/suppliers/suppliers.constants';
 import { LIST_USERS_QUERY_KEY } from '@/components/users/users.constants';
 import { useRestoreEntity } from '@/hooks';
+import { handleFilterEnter } from '@/hooks/useFilters';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Dropdown, Icon, Popup } from 'semantic-ui-react';
 import { IconedButton } from '../buttons';
 import { DesktopRestoreAction, FiltersActions, FiltersContainer, FiltersSearchActions, HeaderSegment, MainContainer, MobileRestoreAction, NarrowRestoreAction, RefetchAction, WideRestoreAction } from './styles';
 
-const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, hydrated, showRefetchAction = true }) => {
+const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, hydrated, showRefetchAction = true, remote = false }) => {
   const ENTITY_MAPPING = {
     [ENTITIES.CUSTOMERS]: { queryKey: LIST_CUSTOMERS_QUERY_KEY, text: PAGES.CUSTOMERS.NAME },
     [ENTITIES.PRODUCTS]: { queryKey: LIST_PRODUCTS_QUERY_KEY, text: PAGES.PRODUCTS.NAME },
@@ -48,7 +49,8 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
     }
 
     try {
-      await restoreEntity();
+      if (remote) await onRefetch?.();
+      else await restoreEntity();
 
     } catch (error) {
       console.error("Error en restoreEntity:", error);
@@ -59,7 +61,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
   };
 
   return (
-    <MainContainer>
+    <MainContainer onKeyDownCapture={remote ? handleFilterEnter : undefined}>
       <HeaderSegment flex="1">
         <FiltersContainer>
           <DesktopRestoreAction>
@@ -140,7 +142,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
         setShowModal={setShowModal}
         isLoading={isLoading}
         noConfirmation={true}
-        bodyContent={
+        bodyContent={remote ? "Se volverá a consultar la página actual con sus filtros." :
           <>
             <strong>¡Atención!</strong> Esta acción puede tomar varios minutos en completarse, no se recomienda ejecutarla de manera frecuente!
             Si no encuentras un elemento en las tablas, podrías probar primero usando opción de <strong>&quot;Actualización ligera&quot;</strong>.

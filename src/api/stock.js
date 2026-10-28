@@ -7,7 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 import { getInstance } from "./axios";
 import { useCreateItem, useInvalidateQueries, usePostUpdateItem } from "./common";
 
-export const MAX_STOCK_TRANSACTION_OPERATIONS = 90;
+export const MAX_STOCK_BATCH_FLOWS = 250;
+export const MAX_STOCK_TRANSACTION_OPERATIONS = 500;
 
 export const buildSupplierStockBatches = (flows = []) => {
   if (!Array.isArray(flows) || flows.length === 0) return [];
@@ -31,7 +32,13 @@ export const buildSupplierStockBatches = (flows = []) => {
   flows.forEach((flow) => {
     const productId = flow?.productId;
 
-    if (batch.length && getOperationCount(productId) > MAX_STOCK_TRANSACTION_OPERATIONS) {
+    if (
+      batch.length &&
+      (
+        batch.length >= MAX_STOCK_BATCH_FLOWS ||
+        getOperationCount(productId) > MAX_STOCK_TRANSACTION_OPERATIONS
+      )
+    ) {
       flushBatch();
     }
 

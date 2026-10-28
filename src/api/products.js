@@ -1,3 +1,4 @@
+import { usePagedList } from "./pagedLists";
 import { ACTIVE, ALL, DELETE, ENTITIES, HARD_DELETED, INACTIVE, IN_MS, RECOVER, SET_STATE } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { GET_PRODUCT_QUERY_KEY, LIST_ATTRIBUTES, LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, MAIN_KEY } from "@/components/products/products.constants";
@@ -9,35 +10,37 @@ import {
 } from "@/fetchUrls";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { chunk } from "lodash";
-import { useMemo } from "react";
+import { useCallback } from "react";
 import { db } from "../db";
 import { getInstance } from "./axios";
 import { listItems, useBatchDeleteItem, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from "./common";
+import { getSupplierProductsQueryOptions, invalidateSupplierProducts, loadSupplierProducts } from "./supplierProducts";
 
-export function useListProducts() {
-  const query = useQuery({
-    queryKey: [LIST_PRODUCTS_QUERY_KEY],
-    queryFn: () => listItems({
-      entity: ENTITIES.PRODUCTS,
-      url: PATHS.PRODUCTS,
-      params: getDefaultListParams(LIST_ATTRIBUTES)
-    }),
-    staleTime: IN_MS.ONE_DAY,
+export function useListProducts(options = {}) {
+  return usePagedList({
+    entity: ENTITIES.PRODUCTS,
+    url: PATHS.PRODUCTS,
+    queryKey: LIST_PRODUCTS_QUERY_KEY,
+    attributes: LIST_ATTRIBUTES,
+    ...options,
   });
-
-  return query;
 };
 
-export function useHasProductsByBrandId(brandId) {
-  const { data: products, isLoading: isLoadingProducts } = useListProducts();
-
-  const hasAssociatedProducts = useMemo(() => {
-    if (!products?.products || !brandId) return false;
-    return products.products.some(({ id }) => id?.substring(2, 4) === String(brandId));
-  }, [products, brandId]);
-
-  return { hasAssociatedProducts, isLoadingProducts };
-}
+// Full catalog for selectors/association checks; never used as screen page data.
+export function useProductCatalog({ enabled = true } = {}) {
+  return useQuery({
+    queryKey: [LIST_PRODUCTS_QUERY_KEY, "catalog"],
+    queryFn: ({ signal } = {}) => listItems({
+      entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS,
+      params: getDefaultListParams(LIST_ATTRIBUTES),
+      signal,
+    }),
+    staleTime: IN_MS.ONE_DAY,
+    retry: false,
+    refetchOnWindowFocus: false,
+    enabled,
+  });
+};
 
 export function useGetProduct(id) {
   const getProduct = async (id) => {
@@ -127,19 +130,16 @@ export const useEditProduct = () => {
   return editProduct;
 };
 
-export function useProductsBySupplierId(supplierId) {
-  const listBySupplierId = async () => {
-    const { products } = await listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, key: MAIN_KEY });
-    return products.filter((product) => product.id.startsWith(supplierId));
-  }
-
+// Supplier tools need complete data only on an explicit user request.
+export function useProductsBySupplierId(supplierId, { enabled = false } = {}) {
+  const queryClient = useQueryClient();
   const query = useQuery({
-    queryKey: [LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, supplierId],
-    queryFn: () => listBySupplierId(),
-    staleTime: IN_MS.ONE_DAY,
+    ...getSupplierProductsQueryOptions(supplierId),
+    enabled: enabled && Boolean(supplierId),
   });
-
-  return query;
+  const loadProducts = useCallback(() => loadSupplierProducts(queryClient, supplierId), [queryClient, supplierId]);
+  const invalidateProducts = useCallback(() => invalidateSupplierProducts(queryClient, supplierId), [queryClient, supplierId]);
+  return { ...query, loadProducts, invalidateProducts };
 };
 
 export const useCreateBatch = () => {
@@ -173,7 +173,7 @@ export const useCreateBatch = () => {
     };
 
     if (data.statusOk) {
-      queryClient.invalidateQueries({ queryKey: [[LIST_PRODUCTS_QUERY_KEY]], refetchType: ALL })
+      queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY], refetchType: ALL })
     }
 
     return { data };
@@ -186,7 +186,7 @@ export const useEditBatch = () => {
   const queryClient = useQueryClient();
 
   const editBatch = async (products, invalidateQueries = [[LIST_PRODUCTS_QUERY_KEY]]) => {
-    const chunks = chunk(products, 90);
+    const chunks = chunk(products, 500);
     let delay = 0;
     const delayIncrement = 1000;
 

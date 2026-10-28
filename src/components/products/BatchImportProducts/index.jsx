@@ -1,4 +1,4 @@
-import { useCreateBatch, useEditBatch, useListProducts } from "@/api/products";
+import { useCreateBatch, useEditBatch, useProductCatalog } from "@/api/products";
 import { useGetSetting } from "@/api/settings";
 import { PriceControlled, TextControlled } from "@/common/components/form";
 import { COLORS, ENTITIES, FIELD_LABELS, ICONS, TOOLTIPS } from "@/common/constants";
@@ -15,11 +15,11 @@ import { BatchImport } from "../BatchImport";
 import { ConfirmDownloadModal } from "../ConfirmDownloadModal";
 
 export const BatchImportProducts = ({ isCreating, triggerClassName }) => {
-  const { data, isLoading: loadingProducts, refetch: refetchProducts } = useListProducts();
+  const [open, setOpen] = useState(false);
+  const { data, isLoading: loadingProducts, refetch: refetchProducts } = useProductCatalog({ enabled: open });
   const products = useMemo(() => data?.products, [data?.products]);
   const methods = useForm();
   const { handleSubmit, reset, watch, setValue } = methods;
-  const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [downloadProducts, setDownloadProducts] = useState([]);

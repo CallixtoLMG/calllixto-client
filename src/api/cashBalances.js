@@ -1,23 +1,19 @@
+import { usePagedList } from "./pagedLists";
 import { ENTITIES, IN_MS } from "@/common/constants";
-import { getDefaultListParams } from "@/common/utils";
 import { GET_CASH_BALANCE_QUERY_KEY, LIST_ATTRIBUTES, LIST_CASH_BALANCES_QUERY_KEY } from "@/components/cashBalances/cashBalances.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
 import { getInstance } from "./axios";
-import { listItems, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from './common';
+import { useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from './common';
 
-export function useListCashBalances() {
-  const query = useQuery({
-    queryKey: [LIST_CASH_BALANCES_QUERY_KEY],
-    queryFn: () => listItems({
-      entity: ENTITIES.CASHBALANCES,
-      url: PATHS.CASH_BALANCES,
-      params: getDefaultListParams(LIST_ATTRIBUTES)
-    }),
-    staleTime: IN_MS.ONE_DAY,
+export function useListCashBalances(options = {}) {
+  return usePagedList({
+    entity: ENTITIES.CASHBALANCES,
+    url: PATHS.CASH_BALANCES,
+    queryKey: LIST_CASH_BALANCES_QUERY_KEY,
+    attributes: LIST_ATTRIBUTES,
+    ...options,
   });
-
-  return query;
 };
 
 export function useGetCashBalance(id) {

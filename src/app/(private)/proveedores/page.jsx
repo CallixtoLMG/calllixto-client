@@ -1,18 +1,24 @@
 "use client";
+import { readListPagination } from "@/api/listPagination";
 import { useUserContext } from "@/User";
 import { useListSuppliers } from "@/api/suppliers";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel, getFormatedPhone } from "@/common/utils";
 import { useBreadcrumContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
-import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
-import { useKeyboardShortcuts } from "@/hooks";
+import { EMPTY_FILTERS, SUPPLIERS_FILTERS_KEY, SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
+import { useFilters, useKeyboardShortcuts } from "@/hooks";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 
 const Suppliers = () => {
-  const { data, isLoading, isRefetching, refetch } = useListSuppliers();
+  const filterControls = useFilters({
+    defaultFilters: EMPTY_FILTERS,
+    key: SUPPLIERS_FILTERS_KEY,
+    remoteEntity: "suppliers",
+  });
+  const { data, isLoading, isRefetching, refetch } = useListSuppliers({ ...filterControls.listRequest, enabled: filterControls.hydrated });
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { push } = useRouter();
@@ -58,6 +64,8 @@ const Suppliers = () => {
 
   return (
     <SuppliersPage
+      filterControls={filterControls}
+      serverPagination={{ ...filterControls.listRequest, ...readListPagination(data) }}
       onRefetch={refetch}
       isLoading={loading}
       suppliers={loading ? [] : suppliers}

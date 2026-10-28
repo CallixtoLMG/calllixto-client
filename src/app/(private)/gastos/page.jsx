@@ -1,18 +1,24 @@
 "use client";
+import { readListPagination } from "@/api/listPagination";
 import { useUserContext } from "@/User";
 import { useListExpenses } from "@/api/expenses";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel } from "@/common/utils";
 import ExpensesPage from "@/components/expenses/ExpensesPage";
-import { EXPENSE_STATES } from "@/components/expenses/expenses.constants";
+import { EMPTY_FILTERS, EXPENSES_FILTERS_KEY, EXPENSE_STATES } from "@/components/expenses/expenses.constants";
 import { useBreadcrumContext } from "@/components/layout";
-import { useKeyboardShortcuts } from "@/hooks";
+import { useFilters, useKeyboardShortcuts } from "@/hooks";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 
 const Expenses = () => {
-  const { data, isLoading, isRefetching, refetch } = useListExpenses();
+  const filterControls = useFilters({
+    defaultFilters: EMPTY_FILTERS,
+    key: EXPENSES_FILTERS_KEY,
+    remoteEntity: "expenses",
+  });
+  const { data, isLoading, isRefetching, refetch } = useListExpenses({ ...filterControls.listRequest, enabled: filterControls.hydrated });
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { push } = useRouter();
@@ -56,6 +62,8 @@ const Expenses = () => {
 
   return (
     <ExpensesPage
+      filterControls={filterControls}
+      serverPagination={{ ...filterControls.listRequest, ...readListPagination(data) }}
       onRefetch={refetch}
       isLoading={loading}
       expenses={loading ? [] : expenses}

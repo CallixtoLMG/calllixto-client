@@ -1,16 +1,22 @@
 "use client";
+import { readListPagination } from "@/api/listPagination";
 import { useListCustomers } from "@/api/customers";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel, getFormatedPhone } from "@/common/utils";
 import CustomersPage from "@/components/customers/CustomersPage";
-import { CUSTOMER_STATES } from "@/components/customers/customers.constants";
+import { EMPTY_FILTERS, CUSTOMERS_FILTERS_KEY, CUSTOMER_STATES } from "@/components/customers/customers.constants";
 import { useBreadcrumContext } from "@/components/layout";
-import { useKeyboardShortcuts } from "@/hooks";
+import { useFilters, useKeyboardShortcuts } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 
 const Customers = () => {
-  const { data, isLoading, isRefetching, refetch } = useListCustomers();
+  const filterControls = useFilters({
+    defaultFilters: EMPTY_FILTERS,
+    key: CUSTOMERS_FILTERS_KEY,
+    remoteEntity: "customers",
+  });
+  const { data, isLoading, isRefetching, refetch } = useListCustomers({ ...filterControls.listRequest, enabled: filterControls.hydrated });
   const { setLabels } = useBreadcrumContext();
   const { push } = useRouter();
 
@@ -49,7 +55,15 @@ const Customers = () => {
   useKeyboardShortcuts(() => push(PAGES.CUSTOMERS.CREATE), SHORTKEYS.ENTER);
 
   return (
-    <CustomersPage onRefetch={refetch} isLoading={loading} customers={loading ? [] : customers} onDownloadExcel={handleDownloadExcel} sideActions={sideActions} />
+    <CustomersPage
+      filterControls={filterControls}
+      serverPagination={{ ...filterControls.listRequest, ...readListPagination(data) }}
+      onRefetch={refetch}
+      isLoading={loading}
+      customers={loading ? [] : customers}
+      onDownloadExcel={handleDownloadExcel}
+      sideActions={sideActions}
+    />
   );
 };
 

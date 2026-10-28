@@ -1,3 +1,4 @@
+import { usePagedList } from "./pagedLists";
 import { ENTITIES, INACTIVE, IN_MS, SET_STATE } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { GET_CUSTOMER_QUERY_KEY, LIST_ATTRIBUTES, LIST_CUSTOMERS_QUERY_KEY } from "@/components/customers/customers.constants";
@@ -6,18 +7,30 @@ import { useQuery } from "@tanstack/react-query";
 import { getInstance } from "./axios";
 import { listItems, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from "./common";
 
-export function useListCustomers() {
-  const query = useQuery({
-    queryKey: [LIST_CUSTOMERS_QUERY_KEY],
-    queryFn: () => listItems({
-      entity: ENTITIES.CUSTOMERS,
-      url: PATHS.CUSTOMERS,
-      params: getDefaultListParams(LIST_ATTRIBUTES)
-    }),
-    retry: false,
+export function useListCustomers(options = {}) {
+  return usePagedList({
+    entity: ENTITIES.CUSTOMERS,
+    url: PATHS.CUSTOMERS,
+    queryKey: LIST_CUSTOMERS_QUERY_KEY,
+    attributes: LIST_ATTRIBUTES,
+    ...options,
   });
+};
 
-  return query;
+// Full catalog for selectors/association checks; never used as screen page data.
+export function useCustomerCatalog({ enabled = true } = {}) {
+  return useQuery({
+    queryKey: [LIST_CUSTOMERS_QUERY_KEY, "catalog"],
+    queryFn: ({ signal } = {}) => listItems({
+      signal,
+      entity: ENTITIES.CUSTOMERS, url: PATHS.CUSTOMERS,
+      params: getDefaultListParams(LIST_ATTRIBUTES),
+    }),
+    staleTime: IN_MS.ONE_DAY,
+    retry: false,
+    refetchOnWindowFocus: false,
+    enabled,
+  });
 };
 
 export function useGetCustomer(id) {

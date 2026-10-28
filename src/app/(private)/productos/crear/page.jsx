@@ -1,9 +1,9 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useListBrands } from "@/api/brands";
+import { useBrandCatalog } from "@/api/brands";
 import { useCreateProduct } from "@/api/products";
 import { useGetSetting } from "@/api/settings";
-import { useListSuppliers } from "@/api/suppliers";
+import { useSupplierCatalog } from "@/api/suppliers";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { ENTITIES, PAGES } from "@/common/constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -18,8 +18,8 @@ import { toast } from "react-hot-toast";
 const CreateProduct = () => {
   const { userData } = useUserContext();
   const { push } = useRouter();
-  const { data: brands, isLoading: isLoadingBrands, refetch: refetchBrands, isRefetching: isBrandsRefetching } = useListBrands();
-  const { data: suppliers, isLoading: isLoadingSuppliers, refetch: refetchSuppliers, isRefetching: isSupplierRefetching } = useListSuppliers();
+  const { data: brands, isLoading: isLoadingBrands, refetch: refetchBrands, isRefetching: isBrandsRefetching } = useBrandCatalog();
+  const { data: suppliers, isLoading: isLoadingSuppliers, refetch: refetchSuppliers, isRefetching: isSupplierRefetching } = useSupplierCatalog();
   const { data: blacklist, refetch: refetchBlacklist } = useGetSetting(ENTITIES.PRODUCT);
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();

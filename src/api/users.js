@@ -1,23 +1,19 @@
+import { usePagedList } from "./pagedLists";
 import { ENTITIES, INACTIVE, IN_MS, SET_STATE } from "@/common/constants";
-import { getDefaultListParams } from '@/common/utils';
 import { GET_USER_QUERY_KEY, LIST_ATTRIBUTES, LIST_USERS_QUERY_KEY, MAIN_KEY } from "@/components/users/users.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
 import { getInstance } from "./axios";
-import { listItems, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from './common';
+import { useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from './common';
 
-export function useListUsers() {
-  const query = useQuery({
-    queryKey: [LIST_USERS_QUERY_KEY],
-    queryFn: () => listItems({
-      entity: ENTITIES.USERS,
-      url: PATHS.USERS,
-      key: MAIN_KEY,
-      params: getDefaultListParams(LIST_ATTRIBUTES)
-    }),
-    staleTime: IN_MS.ONE_DAY,
+export function useListUsers(options = {}) {
+  return usePagedList({
+    entity: ENTITIES.USERS,
+    url: PATHS.USERS,
+    queryKey: LIST_USERS_QUERY_KEY,
+    attributes: LIST_ATTRIBUTES,
+    ...options,
   });
-  return query;
 };
 
 export function useGetUser(username) {

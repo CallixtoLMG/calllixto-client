@@ -1,15 +1,13 @@
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
 import { CONTENT_SIZES, ENTITIES, FIELD_LABELS, PAGES } from "@/common/constants";
-import { createFilter } from "@/common/utils";
 import { useListPageSideActions } from "@/components/layout";
-import { useFilters } from "@/hooks";
 import { useCallback, useMemo } from "react";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
-import { BRANDS_FILTERS_KEY, BRAND_COLUMNS, BRAND_STATES_OPTIONS, EMPTY_FILTERS, LIST_BRANDS_QUERY_KEY } from "../brands.constants";
+import { BRAND_COLUMNS, BRAND_STATES_OPTIONS, EMPTY_FILTERS, LIST_BRANDS_QUERY_KEY } from "../brands.constants";
 
-const BrandsPage = ({ brands = [], isLoading, onRefetch, onDownloadExcel, sideActions = [] }) => {
+const BrandsPage = ({ brands = [], isLoading, onRefetch, onDownloadExcel, sideActions = [], filterControls, serverPagination }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -18,10 +16,10 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch, onDownloadExcel, sideAc
     methods,
     appliedCount,
     hydrated
-  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: BRANDS_FILTERS_KEY });
+  } = filterControls;
 
-  const onFilter = useMemo(() => createFilter(filters, { name: {}, id: {}, state: { fullMatch: true } }), [filters]);
   const { useSideActions, handleFilteredElementsChange } = useListPageSideActions({
+    remote: true,
     sideActions,
     onRefetch,
     onDownloadExcel,
@@ -38,6 +36,7 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch, onDownloadExcel, sideAc
       <FormProvider {...methods}>
         <Form onSubmit={onSubmit}>
           <Filters
+            remote
             entity={ENTITIES.BRANDS}
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
@@ -52,7 +51,6 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch, onDownloadExcel, sideAc
               label={FIELD_LABELS.STATE}
               options={BRAND_STATES_OPTIONS}
               defaultValue={EMPTY_FILTERS.state}
-              afterChange={onSubmit}
             />
             <TextControlled
               name="id"
@@ -76,7 +74,7 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch, onDownloadExcel, sideAc
         headers={BRAND_COLUMNS}
         elements={brands}
         page={PAGES.BRANDS}
-        onFilter={onFilter}
+        serverPagination={serverPagination}
         paginate
         filters={filters}
         setFilters={setFilters}

@@ -38,19 +38,26 @@ const CustomTable = ({
   onFilteredElementsChange,
   disableDefaultPageLink = false,
   $ribbonOverflow = false,
+  paginationResetKey,
+  serverPagination,
 }) => {
 
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
   const isSelectable = useMemo(() => !!selectionActions.length, [selectionActions]);
-  const [activePage, setActivePage] = useState(filters?.page ?? 1);
+  const [localActivePage, setActivePage] = useState(filters?.page ?? 1);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupOpenId, setPopupOpenId] = useState(null);
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [localPageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [isMobileViewport, setIsMobileViewport] = useState(false);
   const tableRef = useRef(null);
   const lastFilteredElementsRef = useRef([]);
-  const [sortConfig, setSortConfig] = useState(filters?.sorting ?? { key: mainKey, direction: ASC });
+  const [localSortConfig, setSortConfig] = useState(filters?.sorting ?? { key: mainKey, direction: ASC });
+  const isServerPaginated = Boolean(serverPagination);
+  const activePage = isServerPaginated ? (serverPagination.pageNumber ?? filters.page ?? 1) : localActivePage;
+  const pageSize = isServerPaginated ? (serverPagination.pageSize ?? filters.pageSize ?? DEFAULT_PAGE_SIZE) : localPageSize;
+  const sortConfig = useMemo(() => isServerPaginated ? (filters.sorting ?? {}) : localSortConfig,
+    [isServerPaginated, filters.sorting, localSortConfig]);
   const selectedCount = useMemo(() => Object.keys(selection).length, [selection]);
 
   const handleSort = (columnKey) => {
@@ -62,10 +69,12 @@ const CustomTable = ({
       };
     }
     setSortConfig(newSorting);
-    setFilters({ ...filters, sorting: newSorting });
+    if (isServerPaginated) clearSelection?.();
+    setFilters({ ...filters, sorting: newSorting, ...(isServerPaginated && { page: 1 }) });
   };
 
   const filteredElements = useMemo(() => {
+    if (isServerPaginated) return elements;
     let result = elements.filter(onFilter);
 
     if (sortConfig.key) {
@@ -94,18 +103,28 @@ const CustomTable = ({
     }
 
     return result;
-  }, [elements, headers, onFilter, sortConfig]);
+  }, [elements, headers, onFilter, sortConfig, isServerPaginated]);
 
 
-  const pages = useMemo(() => (paginate ? Math.ceil(filteredElements.length / pageSize) : 1), [filteredElements, pageSize, paginate]);
+  const pages = useMemo(() => {
+    if (isServerPaginated) {
+      if (serverPagination.total !== undefined) return Math.ceil(serverPagination.total / pageSize);
+      if (serverPagination.totalPages !== undefined) return serverPagination.totalPages;
+      return undefined;
+    }
+    return paginate ? Math.ceil(filteredElements.length / pageSize) : 1;
+  }, [filteredElements, pageSize, paginate, isServerPaginated, serverPagination]);
+  const canGoNext = isServerPaginated
+    ? (pages !== undefined ? activePage < pages : serverPagination.hasNext ?? elements.length === pageSize)
+    : activePage < pages;
   const currentPageElements = useMemo(() => {
-    if (!paginate) {
+    if (isServerPaginated || !paginate) {
       return filteredElements;
     }
     const startIndex = (activePage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     return filteredElements.slice(startIndex, endIndex);
-  }, [activePage, filteredElements, pageSize, paginate]);
+  }, [activePage, filteredElements, pageSize, paginate, isServerPaginated]);
 
   const allSelected = useMemo(() => {
     return !!currentPageElements.length && currentPageElements.every(product => selection[product[mainKey]]);
@@ -114,6 +133,14 @@ const CustomTable = ({
   useEffect(() => {
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (!isServerPaginated) setActivePage(filters?.page ?? 1);
+  }, [filters?.page, paginationResetKey, isServerPaginated]);
+
+  useEffect(() => {
+    if (!isServerPaginated && filters?.sorting) setSortConfig(filters.sorting);
+  }, [filters?.sorting, isServerPaginated]);
 
   useEffect(() => {
     const mobileQuery = window.matchMedia(MOBILE_TABLE_ACTIONS_QUERY);
@@ -140,6 +167,7 @@ const CustomTable = ({
   }, [filteredElements, onFilteredElementsChange]);
 
   useEffect(() => {
+    if (isServerPaginated) return;
     if (hydrated && !isLoading) {
       if (activePage > pages) {
         setActivePage(1);
@@ -148,7 +176,7 @@ const CustomTable = ({
         setPageSize(filters?.pageSize ?? DEFAULT_PAGE_SIZE);
       }
     }
-  }, [hydrated, isLoading, filters?.pageSize, pageSize, pages, activePage]);
+  }, [hydrated, isLoading, filters?.pageSize, pageSize, pages, activePage, isServerPaginated]);
 
   useEffect(() => {
     const tableEl = tableRef.current;
@@ -195,8 +223,10 @@ const CustomTable = ({
   };
 
   const handleShortcutPageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= pages) {
-      setActivePage(newPage);
+    if (isLoading) return;
+    if (newPage >= 1 && (pages !== undefined ? newPage <= pages : newPage < activePage || canGoNext)) {
+      if (isServerPaginated) handlePageChange(null, { activePage: newPage });
+      else setActivePage(newPage);
     }
   };
 
@@ -226,8 +256,12 @@ const CustomTable = ({
         <Pagination
           activePage={activePage}
           pageSize={pageSize}
-          totalItems={filteredElements.length}
+          totalItems={isServerPaginated ? serverPagination.total : filteredElements.length}
           totalPages={pages}
+          isRemote={isServerPaginated}
+          currentItemCount={elements.length}
+          canGoNext={canGoNext}
+          isLoading={isLoading}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
         />

@@ -5,52 +5,28 @@ import { bulkPutStorageItems, clearStorageTable, getAllStorageItems, getStorageI
 import { useQueryClient } from "@tanstack/react-query";
 import { pick } from 'lodash';
 import { getInstance } from './axios';
+import { invalidateListCounts } from './listCounts';
+import { listCatalogPages } from './catalogLists';
 
 const activeVersion = '2025-12-17';
 
 export function useInvalidateQueries() {
   const queryClient = useQueryClient();
-  return (queries) => {
+  return (queries, entity) => {
+    if (entity) invalidateListCounts(queryClient, entity);
     queries.forEach((queryKey) => { queryClient.invalidateQueries({ queryKey, refetchType: ALL }); });
   };
 };
 
-export async function entityList({ entity, url, params }) {
-  try {
-    let values = [];
-    let LastEvaluatedKey;
-
-    do {
-      const queryParams = {
-        ...params,
-        ...(LastEvaluatedKey && { LastEvaluatedKey: JSON.stringify(LastEvaluatedKey) }),
-      };
-
-      const { data } = await getInstance().get(url, {
-        params: queryParams,
-      });
-
-      if (data.statusOk) {
-        values = [...values, ...data[entity]];
-      }
-
-      LastEvaluatedKey = data?.LastEvaluatedKey;
-    } while (LastEvaluatedKey);
-
-    return values;
-  } catch (error) {
-    console.error("entityList - Error fetching data:", error);
-    throw error;
-  }
-};
-
-export async function listItems({ entity, url, params = {} }) {
+// Legacy full catalogs only. Screen listings use pagedLists.listPage instead.
+export async function listItems({ entity, url, params = {}, signal }) {
   let lastUpdatedAt = (await getStorageItem({ entity: LAST_UPDATED_AT, id: entity }))?.lastUpdatedAt;
   let lastHardReset = (await getStorageItem({ entity: LAST_UPDATED_AT, id: "hardReset" }))?.lastUpdatedAt;
 
   if (lastUpdatedAt && getDayDifference(now(), lastUpdatedAt) < 7 && lastHardReset === activeVersion) {
     const startDate = getDateWithOffset({ date: lastUpdatedAt, offset: 1, unit: 'seconds', format: DATE_FORMATS.ISO });
-    const outdatedValues = await entityList({ entity, url, params: { ...params, sort: 'updatedAt', startDate } });
+    const outdatedValues = await listCatalogPages({ entity, url, params: { ...params, sort: 'updatedAt', startDate }, signal,
+      mainKey: entity === 'settings' ? 'entity' : 'id' });
     if (!!outdatedValues.length) {
       for (const value of outdatedValues) {
         if (value.state === HARD_DELETED) {
@@ -61,8 +37,9 @@ export async function listItems({ entity, url, params = {} }) {
       }
     }
   } else {
+    const data = await listCatalogPages({ entity, url, params, signal,
+      mainKey: entity === 'settings' ? 'entity' : 'id' });
     await clearStorageTable(entity);
-    const data = await entityList({ entity, url, params });
     if (!!data.length) {
       await bulkPutStorageItems({ entity, values: data.filter(element => element.state !== HARD_DELETED) });
     }
@@ -77,8 +54,10 @@ export async function listItems({ entity, url, params = {} }) {
 
   const values = await getAllStorageItems({ entity, order: 'descending', sort: 'updatedAt' });
 
-  const { updatedAt, createdAt } = values[0];
-  await updateOrCreateStorageItem({ entity: LAST_UPDATED_AT, value: { id: entity, lastUpdatedAt: updatedAt ?? createdAt } });
+  const { updatedAt, createdAt } = values[0] ?? {};
+  if (updatedAt || createdAt) {
+    await updateOrCreateStorageItem({ entity: LAST_UPDATED_AT, value: { id: entity, lastUpdatedAt: updatedAt ?? createdAt } });
+  }
 
   return { [entity]: values };
 };
@@ -96,7 +75,7 @@ export function useCreateItem() {
           value: attributes ? pick(data[responseEntity], getDefaultAttributes(attributes)) : data[responseEntity],
         });
       }
-      invalidate(invalidateQueries);
+      invalidate(invalidateQueries, entity);
     }
     return data;
   };
@@ -129,7 +108,7 @@ export function usePostUpdateItem() {
         });
       }
 
-      invalidate(invalidateQueries);
+      invalidate(invalidateQueries, entity);
     }
 
     return data;
@@ -153,7 +132,7 @@ export function useEditItem() {
             : data[responseEntity],
         });
       }
-      invalidate(invalidateQueries);
+      invalidate(invalidateQueries, entity);
     } else {
       console.error("Error en la respuesta:", data.message);
     }
@@ -188,7 +167,7 @@ export function usePatchItem() {
             : data[responseEntity],
         });
       }
-      invalidate(invalidateQueries);
+      invalidate(invalidateQueries, entity);
     } else {
       console.error("Error en la respuesta PATCH:", data.message);
     }
@@ -210,7 +189,7 @@ export function useDeleteItem() {
       if (!skipStorageUpdate) {
         await removeStorageItem({ entity, id });
       }
-      invalidate(invalidateQueries);
+      invalidate(invalidateQueries, entity);
     }
     return data;
   };
@@ -259,7 +238,7 @@ export function useBatchDeleteItem() {
       );
     }
 
-    invalidate(invalidateQueries);
+    invalidate(invalidateQueries, entity);
 
     return { statusOk: true, deletedCount };
   };

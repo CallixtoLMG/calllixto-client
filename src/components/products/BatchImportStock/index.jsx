@@ -10,7 +10,7 @@ import { ConfirmDownloadModal } from "@/components/products/ConfirmDownloadModal
 import { useMutation } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import * as XLSX from "xlsx";
@@ -24,6 +24,9 @@ export const BatchImportStock = ({
   supplierId,
   products = [],
   triggerClassName,
+  loadProducts,
+  onProductsChanged,
+  disabled = false,
 }) => {
   const isDiscount = mode === DISCOUNT_STOCK;
   const methods = useForm();
@@ -33,17 +36,13 @@ export const BatchImportStock = ({
   const inputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPreparing, setIsPreparing] = useState(false);
+  const preparingRef = useRef(false);
+  const preparedProductsRef = useRef(null);
   const [downloadRows, setDownloadRows] = useState([]);
   const [showConfirmDownload, setShowConfirmDownload] = useState(false);
   const flows = watch("flows", []);
   const addSupplierStock = useAddSupplierStock();
-
-  const productIndex = useMemo(() => {
-    return products.reduce((acc, p) => {
-      acc[p.id?.toUpperCase()] = p;
-      return acc;
-    }, {});
-  }, [products]);
 
   const importSettings = {
     title: isDiscount ? "Descontar stock" : "Cargar stock",
@@ -55,8 +54,20 @@ export const BatchImportStock = ({
     },
   };
 
-  const handleBeforeOpenFile = () => {
-    reset();
+  const handleBeforeOpenFile = async () => {
+    if (disabled || preparingRef.current) return false;
+    preparingRef.current = true;
+    setIsPreparing(true);
+    try {
+      const loaded = loadProducts ? await loadProducts() : products;
+      if (!loaded) return false;
+      preparedProductsRef.current = loaded;
+      reset();
+      return true;
+    } finally {
+      preparingRef.current = false;
+      setIsPreparing(false);
+    }
   };
 
   const handleFileRead = async (data, { open }) => {
@@ -141,6 +152,7 @@ export const BatchImportStock = ({
   };
 
   const parseExcel = (data) => {
+    const productIndex = Object.fromEntries((preparedProductsRef.current ?? products).map(p => [p.id?.toUpperCase(), p]));
     const workbook = XLSX.read(data, { type: "binary" });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
@@ -299,6 +311,9 @@ export const BatchImportStock = ({
     onError: () => {
       toast.error("Error inesperado al procesar el stock");
     },
+    // A failed batch may have committed earlier chunks. Mark only this
+    // supplier's tool cache stale; never trigger a catalog refetch here.
+    onSettled: () => onProductsChanged?.(),
   });
 
   const onSubmitForm = handleSubmit((data) => {
@@ -383,6 +398,8 @@ export const BatchImportStock = ({
         onOpen={() => setOpenModal(true)}
         triggerClassName={triggerClassName}
         onBeforeOpenFile={handleBeforeOpenFile}
+        isPreparing={isPreparing}
+        disabled={disabled}
         onFileRead={handleFileRead}
         onFileError={() => toast.error("Error al leer el archivo")}
         methods={methods}

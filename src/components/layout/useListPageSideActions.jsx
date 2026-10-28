@@ -21,6 +21,7 @@ const useListPageSideActions = ({
   downloadTooltip,
   downloadParentId,
   showUpdateTooltipWhenExpanded = false,
+  remote = false,
 }) => {
   const { setActions } = useNavActionsContext();
   const [filteredElements, setFilteredElements] = useState([]);
@@ -69,14 +70,15 @@ const useListPageSideActions = ({
     }
 
     try {
-      await restoreEntityRef.current();
+      if (remote) await onRefetchRef.current?.();
+      else await restoreEntityRef.current();
     } catch (error) {
       console.error("Error en restoreEntity:", error);
     }
 
     setIsUpdateLoading(false);
     setShowUpdateModal(false);
-  }, [entity, queryKey]);
+  }, [entity, queryKey, remote]);
 
   const railActions = useMemo(() => {
     if (!useSideActions) return [];
@@ -118,8 +120,10 @@ const useListPageSideActions = ({
             noConfirmation={true}
             bodyContent={
               <>
-                <strong>¡Atención!</strong> Esta acción puede tomar varios minutos en completarse, no se recomienda ejecutarla de manera frecuente!
-                Si no encuentras un elemento en las tablas, podrías probar primero usando opción de <strong>&quot;Actualización ligera&quot;</strong>.
+                {remote ? "Se volverá a consultar la página actual con sus filtros." : <>
+                  <strong>¡Atención!</strong> Esta acción puede tomar varios minutos en completarse, no se recomienda ejecutarla de manera frecuente!
+                  Si no encuentras un elemento en las tablas, podrías probar primero usando opción de <strong>&quot;Actualización ligera&quot;</strong>.
+                </>}
               </>
             }
             warning
@@ -169,6 +173,7 @@ const useListPageSideActions = ({
     onDownloadExcel,
     onRefetch,
     pageName,
+    remote,
     showUpdateModal,
     showUpdateTooltipWhenExpanded,
     sideActions,

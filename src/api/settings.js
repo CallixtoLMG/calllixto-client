@@ -8,11 +8,14 @@ import { listItems, useEditItem } from "./common";
 export function useListSettings() {
   const query = useQuery({
     queryKey: [LIST_SETTINGS_QUERY_KEY],
-    queryFn: () => listItems({
+    queryFn: ({ signal } = {}) => listItems({
+      signal,
       entity: ENTITIES.SETTINGS,
       url: PATHS.SETTINGS,
     }),
     staleTime: IN_MS.ONE_DAY,
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 
   return query;

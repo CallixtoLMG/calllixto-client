@@ -1,3 +1,4 @@
+import { usePagedList } from "./pagedLists";
 import { ENTITIES, INACTIVE, IN_MS, SET_STATE } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { GET_BRAND_QUERY_KEY, LIST_ATTRIBUTES, LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
@@ -6,18 +7,30 @@ import { useQuery } from '@tanstack/react-query';
 import { getInstance } from "./axios";
 import { listItems, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from './common';
 
-export function useListBrands() {
-  const query = useQuery({
-    queryKey: [LIST_BRANDS_QUERY_KEY],
-    queryFn: () => listItems({
-      entity: ENTITIES.BRANDS,
-      url: PATHS.BRANDS,
-      params: getDefaultListParams(LIST_ATTRIBUTES)
+export function useListBrands(options = {}) {
+  return usePagedList({
+    entity: ENTITIES.BRANDS,
+    url: PATHS.BRANDS,
+    queryKey: LIST_BRANDS_QUERY_KEY,
+    attributes: LIST_ATTRIBUTES,
+    ...options,
+  });
+};
+
+// Full catalog for selectors/association checks; never used as screen page data.
+export function useBrandCatalog({ enabled = true } = {}) {
+  return useQuery({
+    queryKey: [LIST_BRANDS_QUERY_KEY, "catalog"],
+    queryFn: ({ signal } = {}) => listItems({
+      signal,
+      entity: ENTITIES.BRANDS, url: PATHS.BRANDS,
+      params: getDefaultListParams(LIST_ATTRIBUTES),
     }),
     staleTime: IN_MS.ONE_DAY,
+    retry: false,
+    refetchOnWindowFocus: false,
+    enabled,
   });
-
-  return query;
 };
 
 export function useGetBrand(id) {

@@ -1,7 +1,7 @@
-import { useListProducts } from "@/api/products";
+import { useProductCatalog } from "@/api/products";
 import { useConsumeStock } from "@/api/stock";
 import { IconedButton } from "@/common/components/buttons";
-import { Box, FieldsContainer, Flex, OverflowWrapper } from "@/common/components/custom";
+import { Box, FieldsContainer, Flex, Message, MessageHeader, OverflowWrapper } from "@/common/components/custom";
 import { NumberField, TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import { Table } from "@/common/components/table";
@@ -66,7 +66,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
   const [deliveryNote, setDeliveryNote] = useState("");
   const [mode, setMode] = useState(null);
   const { isMobile, showText } = useBudgetActionButtonMode();
-  const { data: currentProductsData } = useListProducts();
+  const { data: currentProductsData, isError: isProductsError, error: productsError } = useProductCatalog();
 
   const watchedProducts = useWatch({ control, name: "products" });
 
@@ -377,6 +377,12 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
   return (
     <>
       <FlexColumn width="100%" $rowGap="15px" className="ui form">
+        {isProductsError && (
+          <Message negative>
+            <MessageHeader>No se pudo cargar el catálogo de productos</MessageHeader>
+            <p>{productsError?.message}</p>
+          </Message>
+        )}
         <DeliveriesToolbar $columnGap="15px" $justifyContent="space-between">
           <Header>Productos</Header>
           <DeliveriesActionsRow $columnGap="15px" $rowGap="10px" wrap="wrap" $justifyContent="flex-end">

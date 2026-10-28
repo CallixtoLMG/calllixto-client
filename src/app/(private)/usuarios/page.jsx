@@ -1,4 +1,5 @@
 "use client";
+import { readListPagination } from "@/api/listPagination";
 import { useUserContext } from "@/User";
 import { useListUsers } from "@/api/users";
 import { COLORS, DATE_FORMATS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
@@ -6,14 +7,19 @@ import { downloadExcel, getFormatedPhone } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import { useBreadcrumContext } from "@/components/layout";
 import UsersPage from "@/components/users/UserPage";
-import { USERS_ROLE_OPTIONS, USER_STATES } from "@/components/users/users.constants";
-import { useKeyboardShortcuts } from "@/hooks";
+import { EMPTY_FILTERS, USERS_FILTERS_KEY, USERS_ROLE_OPTIONS, USER_STATES } from "@/components/users/users.constants";
+import { useFilters, useKeyboardShortcuts } from "@/hooks";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 
 const Users = () => {
-  const { data, isLoading, isRefetching, refetch } = useListUsers();
+  const filterControls = useFilters({
+    defaultFilters: EMPTY_FILTERS,
+    key: USERS_FILTERS_KEY,
+    remoteEntity: "users",
+  });
+  const { data, isLoading, isRefetching, refetch } = useListUsers({ ...filterControls.listRequest, enabled: filterControls.hydrated });
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { push } = useRouter();
@@ -67,6 +73,8 @@ const Users = () => {
 
   return (
     <UsersPage
+      filterControls={filterControls}
+      serverPagination={{ ...filterControls.listRequest, ...readListPagination(data) }}
       onRefetch={refetch}
       isLoading={loading}
       users={loading ? [] : users}

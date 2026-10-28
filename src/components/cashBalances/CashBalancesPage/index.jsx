@@ -1,21 +1,17 @@
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
 import { CONTENT_SIZES, ENTITIES, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
-import { createFilter } from "@/common/utils";
 import { useListPageSideActions } from "@/components/layout";
-import { useFilters } from "@/hooks";
 import { useCallback, useMemo } from "react";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
 import {
-  CASH_BALANCES_FILTERS_KEY,
   CASH_BALANCE_STATES_OPTIONS,
-  EMPTY_FILTERS,
   LIST_CASH_BALANCES_QUERY_KEY,
   getCashBalanceColumns
 } from "../cashBalances.constants";
 
-const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOptions, onDownloadExcel, sideActions = [] }) => {
+const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOptions, onDownloadExcel, sideActions = [], filterControls, serverPagination }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -24,7 +20,7 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
     methods,
     appliedCount,
     hydrated
-  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: CASH_BALANCES_FILTERS_KEY });
+  } = filterControls;
 
   const normalizedCashBalances = useMemo(() => {
     return cashBalances.map(cashBalance => ({
@@ -33,8 +29,8 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
     }));
   }, [cashBalances]);
 
-  const onFilter = useMemo(() => createFilter(filters, { id: {}, paymentMethods: { isArray: true, skipAll: true }, state: { fullMatch: true } }), [filters]);
   const { useSideActions, handleFilteredElementsChange } = useListPageSideActions({
+    remote: true,
     sideActions,
     onRefetch,
     onDownloadExcel,
@@ -56,6 +52,7 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
       <FormProvider {...methods}>
         <Form onSubmit={onSubmit}>
           <Filters
+            remote
             entity={ENTITIES.CASHBALANCES}
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
@@ -69,7 +66,6 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
               name="state"
               label="Estado"
               options={CASH_BALANCE_STATES_OPTIONS}
-              afterChange={onSubmit}
             />
             <TextControlled
               name="id"
@@ -85,7 +81,6 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
               label="Método de pago"
               placeholder="Efectivo"
               options={[SELECT_ALL_OPTION, ...paymentOptions]}
-              afterChange={onSubmit}
               textMaxWidth={CONTENT_SIZES.FIT}
               height="35px"
             />
@@ -97,7 +92,7 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
         headers={cashBalanceColumns}
         elements={normalizedCashBalances}
         page={PAGES.CASH_BALANCES}
-        onFilter={onFilter}
+        serverPagination={serverPagination}
         paginate
         filters={filters}
         setFilters={setFilters}

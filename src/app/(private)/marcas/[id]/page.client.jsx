@@ -1,7 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useDeleteBrand, useEditBrand, useSetBrandState } from "@/api/brands";
-import { useHasProductsByBrandId } from "@/api/products";
 import { FieldsContainer, FormField, Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
@@ -27,6 +26,12 @@ const BrandPageClient = ({ brand }) => {
   const [activeAction, setActiveAction] = useState(null);
   const [reason, setReason] = useState("");
   const editBrand = useEditBrand();
+  const deleteBrand = useDeleteBrand();
+  const canDeleteBrand = brand?.hasProducts === false;
+  const productsInfoMissing = typeof brand?.hasProducts !== "boolean";
+  const deleteBlockedMessage = brand?.hasProducts === true
+    ? "No se puede eliminar esta marca, existen productos asociados."
+    : "Información de productos asociados no disponible. No se puede eliminar esta marca hasta recibir esa información.";
   const formRef = useRef(null);
 
   const {
@@ -48,10 +53,8 @@ const BrandPageClient = ({ brand }) => {
     onBeforeView,
   });
 
-  const deleteBrand = useDeleteBrand();
   const setBrandState = useSetBrandState();
 
-  const { hasAssociatedProducts, isLoadingProducts } = useHasProductsByBrandId(brand?.id);
   const { handleProtectedAction } = useProtectedAction({ formRef, onBeforeView });
 
   useEffect(() => {
@@ -112,18 +115,14 @@ const BrandPageClient = ({ brand }) => {
 
   const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
     mutationFn: () => deleteBrand(brand.id),
-    onSuccess: (response) => {
+    onSuccess: response => {
       if (response.statusOk) {
         toast.success("Marca eliminada permanentemente!");
         push(PAGES.BRANDS.BASE);
-      } else {
-        toast.error(`${response?.message} (${response?.error?.message})`);
-      }
+      } else toast.error(response?.message || response?.error?.message || "No se pudo eliminar la marca");
     },
-    onSettled: () => {
-      setActiveAction(null);
-      handleModalClose();
-    },
+    onError: error => toast.error(error?.response?.data?.message || error.message || "No se pudo eliminar la marca"),
+    onSettled: () => { setActiveAction(null); handleModalClose(); },
   });
 
   const { mutate: mutateState, isPending: isMutateStatePending } = useMutation({
@@ -147,16 +146,18 @@ const BrandPageClient = ({ brand }) => {
   });
 
   const handleActionConfirm = async () => {
+    if (modalAction === DELETE) {
+      if (!canDeleteBrand || isDeletePending) return;
+      setActiveAction(DELETE);
+      mutateDelete();
+      return;
+    }
     if (modalAction === INACTIVE && !reason) {
       toast.error("Debe proporcionar una razón para desactivar la marca.");
       return;
     }
 
     setActiveAction(modalAction);
-
-    if (modalAction === DELETE) {
-      mutateDelete();
-    }
 
     if (modalAction === ACTIVE || modalAction === INACTIVE) {
       mutateState({
@@ -175,6 +176,7 @@ const BrandPageClient = ({ brand }) => {
   useEffect(() => {
     if (brand) {
       const handleClick = (action) => () => handleProtectedAction(() => {
+        if (action === DELETE && !canDeleteBrand) return;
         setModalAction(action);
         setIsModalOpen(true);
       });
@@ -195,22 +197,28 @@ const BrandPageClient = ({ brand }) => {
           icon: ICONS.TRASH,
           color: COLORS.RED,
           text: "Eliminar marca",
-          collapsedTooltip: hasAssociatedProducts ? "No se puede eliminar esta marca, existen productos asociados." : undefined,
           basic: true,
           onClick: handleClick(DELETE),
           loading: activeAction === DELETE,
-          disabled: hasAssociatedProducts || !!activeAction,
-          tooltip: hasAssociatedProducts ? "No se puede eliminar esta marca, existen productos asociados." : false,
+          disabled: !canDeleteBrand || !!activeAction,
+          tooltip: !canDeleteBrand ? deleteBlockedMessage : false,
+          collapsedTooltip: !canDeleteBrand ? deleteBlockedMessage : undefined,
           iconOnly:true
         },
       ] : [];
       setActions(actions);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [role, brand, activeAction, isMutateStatePending, isDeletePending, setActions, hasAssociatedProducts]);
+  }, [role, brand, activeAction, isMutateStatePending, setActions, canDeleteBrand, deleteBlockedMessage]);
 
   return (
-    <Loader active={isLoadingProducts}>
+    <Loader>
+      {productsInfoMissing && RULES.canRemove[role] && (
+        <Message warning>
+          <MessageHeader>Información de productos asociados no disponible</MessageHeader>
+          <p>No se puede eliminar esta marca hasta recibir esa información.</p>
+        </Message>
+      )}
       {!isItemInactive(brand?.state) && toggleButton}
       {isItemInactive(brand?.state) && (
         <FieldsContainer>
@@ -230,8 +238,8 @@ const BrandPageClient = ({ brand }) => {
         onSubmit={mutateEdit}
         isLoading={isEditPending}
         isUpdating={isUpdating && !isItemInactive(brand?.state)}
-        view
         isDeletePending={isDeletePending}
+        view
       />
       <UnsavedChangesModal
         open={showUnsavedModal}
@@ -245,9 +253,9 @@ const BrandPageClient = ({ brand }) => {
         confirmButtonIcon={icon}
         showModal={isModalOpen}
         setShowModal={handleModalClose}
-        isLoading={isDeletePending || isMutateStatePending}
+        isLoading={isMutateStatePending || isDeletePending}
         noConfirmation={!requiresConfirmation}
-        disableButtons={!reason && modalAction === INACTIVE}
+        disableButtons={(modalAction === DELETE && !canDeleteBrand) || (!reason && modalAction === INACTIVE)}
         bodyContent={
           modalAction === INACTIVE && (
             <TextField

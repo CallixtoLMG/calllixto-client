@@ -1,18 +1,24 @@
 "use client";
+import { readListPagination } from "@/api/listPagination";
 import { useUserContext } from "@/User";
 import { useListBrands } from "@/api/brands";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel } from "@/common/utils";
 import BrandsPage from "@/components/brands/BrandsPage";
-import { BRAND_STATES } from "@/components/brands/brands.constants";
+import { EMPTY_FILTERS, BRANDS_FILTERS_KEY, BRAND_STATES } from "@/components/brands/brands.constants";
 import { useBreadcrumContext } from "@/components/layout";
-import { useKeyboardShortcuts } from "@/hooks";
+import { useFilters, useKeyboardShortcuts } from "@/hooks";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 
 const Brands = () => {
-  const { data, isLoading, isRefetching, refetch } = useListBrands();
+  const filterControls = useFilters({
+    defaultFilters: EMPTY_FILTERS,
+    key: BRANDS_FILTERS_KEY,
+    remoteEntity: "brands",
+  });
+  const { data, isLoading, isRefetching, refetch } = useListBrands({ ...filterControls.listRequest, enabled: filterControls.hydrated });
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { push } = useRouter();
@@ -59,6 +65,8 @@ const Brands = () => {
 
   return (
     <BrandsPage
+      filterControls={filterControls}
+      serverPagination={{ ...filterControls.listRequest, ...readListPagination(data) }}
       onRefetch={refetch}
       isLoading={loading}
       brands={loading ? [] : brands}

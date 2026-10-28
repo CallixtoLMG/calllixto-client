@@ -1,23 +1,19 @@
+import { usePagedList } from "./pagedLists";
 import { ENTITIES, IN_MS } from "@/common/constants";
-import { getDefaultListParams } from '@/common/utils';
 import { CANCEL, PATHS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
 import { GET_EXPENSE_QUERY_KEY, LIST_ATTRIBUTES, LIST_EXPENSES_QUERY_KEY } from "../components/expenses/expenses.constants";
 import { getInstance } from "./axios";
-import { listItems, useCreateItem, useEditItem } from './common';
+import { useCreateItem, useEditItem } from './common';
 
-export function useListExpenses() {
-  const query = useQuery({
-    queryKey: [LIST_EXPENSES_QUERY_KEY],
-    queryFn: () => listItems({
-      entity: ENTITIES.EXPENSES,
-      url: PATHS.EXPENSES,
-      params: getDefaultListParams(LIST_ATTRIBUTES)
-    }),
-    staleTime: IN_MS.ONE_DAY,
+export function useListExpenses(options = {}) {
+  return usePagedList({
+    entity: ENTITIES.EXPENSES,
+    url: PATHS.EXPENSES,
+    queryKey: LIST_EXPENSES_QUERY_KEY,
+    attributes: LIST_ATTRIBUTES,
+    ...options,
   });
-
-  return query;
 };
 
 export function useGetExpense(id) {

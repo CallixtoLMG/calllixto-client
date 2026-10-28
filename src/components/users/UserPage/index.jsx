@@ -1,15 +1,13 @@
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
 import { CONTENT_SIZES, ENTITIES, PAGES } from "@/common/constants";
-import { createFilter } from "@/common/utils";
 import { useListPageSideActions } from "@/components/layout";
-import { useFilters } from "@/hooks";
 import { useCallback, useMemo } from "react";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
-import { EMPTY_FILTERS, LIST_USERS_QUERY_KEY, USERS_FILTERS_KEY, USER_COLUMNS, USER_STATE_OPTIONS } from "../users.constants";
+import { EMPTY_FILTERS, LIST_USERS_QUERY_KEY, USER_COLUMNS, USER_STATE_OPTIONS } from "../users.constants";
 
-const UsersPage = ({ users = [], isLoading, onRefetch, onDownloadExcel, sideActions = [] }) => {
+const UsersPage = ({ users = [], isLoading, onRefetch, onDownloadExcel, sideActions = [], filterControls, serverPagination }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -18,10 +16,10 @@ const UsersPage = ({ users = [], isLoading, onRefetch, onDownloadExcel, sideActi
     methods,
     appliedCount,
     hydrated
-  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: USERS_FILTERS_KEY });
+  } = filterControls;
 
-  const onFilter = useMemo(() => createFilter(filters, { username: {}, firstName: {}, lastName: {}, state: { fullMatch: true } }), [filters]);
   const { useSideActions, handleFilteredElementsChange } = useListPageSideActions({
+    remote: true,
     sideActions,
     onRefetch,
     onDownloadExcel,
@@ -38,6 +36,7 @@ const UsersPage = ({ users = [], isLoading, onRefetch, onDownloadExcel, sideActi
       <FormProvider {...methods}>
         <Form onSubmit={onSubmit}>
           <Filters
+            remote
             entity={ENTITIES.USERS}
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
@@ -52,7 +51,6 @@ const UsersPage = ({ users = [], isLoading, onRefetch, onDownloadExcel, sideActi
               label="Estado"
               options={USER_STATE_OPTIONS}
               defaultValue={EMPTY_FILTERS.state}
-              afterChange={onSubmit}
             />
             <TextControlled
               name="username"
@@ -83,7 +81,7 @@ const UsersPage = ({ users = [], isLoading, onRefetch, onDownloadExcel, sideActi
         headers={USER_COLUMNS}
         elements={users}
         page={PAGES.USERS}
-        onFilter={onFilter}
+        serverPagination={serverPagination}
         paginate
         filters={filters}
         setFilters={setFilters}

@@ -1,15 +1,13 @@
 import { DropdownControlled, TextControlled } from '@/common/components/form';
 import { Filters, Table } from '@/common/components/table';
 import { CONTENT_SIZES, ENTITIES, FIELD_LABELS, PAGES } from "@/common/constants";
-import { createFilter } from '@/common/utils';
 import { useListPageSideActions } from "@/components/layout";
-import { useFilters } from "@/hooks";
 import { useCallback, useMemo } from "react";
 import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
-import { CUSTOMERS_FILTERS_KEY, CUSTOMER_STATES_OPTIONS, EMPTY_FILTERS, HEADERS, LIST_CUSTOMERS_QUERY_KEY } from "../customers.constants";
+import { CUSTOMER_STATES_OPTIONS, EMPTY_FILTERS, HEADERS, LIST_CUSTOMERS_QUERY_KEY } from "../customers.constants";
 
-const CustomersPage = ({ customers = [], isLoading, onRefetch, onDownloadExcel, sideActions = [] }) => {
+const CustomersPage = ({ customers = [], isLoading, onRefetch, onDownloadExcel, sideActions = [], filterControls, serverPagination }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -18,10 +16,10 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch, onDownloadExcel, 
     methods,
     appliedCount,
     hydrated
-  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: CUSTOMERS_FILTERS_KEY });
+  } = filterControls;
 
-  const onFilter = useMemo(() => createFilter(filters, { name: {}, state: { fullMatch: true } }), [filters]);
   const { useSideActions, handleFilteredElementsChange } = useListPageSideActions({
+    remote: true,
     sideActions,
     onRefetch,
     onDownloadExcel,
@@ -36,8 +34,9 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch, onDownloadExcel, 
   return (
     <>
       <FormProvider {...methods}>
-        <Form onSubmit={onSubmit} key={JSON.stringify(filters)}>
+        <Form onSubmit={onSubmit}>
           <Filters
+            remote
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
             appliedCount={appliedCount}
@@ -52,7 +51,6 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch, onDownloadExcel, 
               label={FIELD_LABELS.STATE}
               options={CUSTOMER_STATES_OPTIONS}
               value={EMPTY_FILTERS.state}
-              afterChange={onSubmit}
             />
             <TextControlled
               name="name"
@@ -69,7 +67,7 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch, onDownloadExcel, 
         headers={HEADERS}
         page={PAGES.CUSTOMERS}
         elements={customers}
-        onFilter={onFilter}
+        serverPagination={serverPagination}
         paginate
         filters={filters}
         setFilters={setFilters}

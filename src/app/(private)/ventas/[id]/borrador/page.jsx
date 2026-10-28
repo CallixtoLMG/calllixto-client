@@ -2,10 +2,11 @@
 
 import { useUserContext } from "@/User";
 import { useConfirmBudget, useEditBudget, useGetBudget, } from "@/api/budgets";
-import { useListCustomers } from "@/api/customers";
-import { useListProducts } from "@/api/products";
+import { useCustomerCatalog } from "@/api/customers";
+import { useProductCatalog } from "@/api/products";
 import { useGetSetting } from "@/api/settings";
 import { useConsumeStock } from "@/api/stock";
+import { Message, MessageHeader } from "@/common/components/custom";
 import { UnsavedChangesModal } from "@/common/components/modals";
 import { ENTITIES, PAGES } from "@/common/constants";
 import { mapToDropdownOptions } from "@/common/utils";
@@ -31,8 +32,8 @@ const BudgetDraft = ({ params }) => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const { data: budget, isLoading: loadingBudget } = useGetBudget(id);
-  const { data: productsData, isLoading: loadingProducts, refetch: refetchProductsData, } = useListProducts();
-  const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
+  const { data: productsData, isLoading: loadingProducts, isError: isProductsError, error: productsError, } = useProductCatalog();
+  const { data: customersData, isLoading: loadingCustomers } = useCustomerCatalog();
   const { data: paymentMethods, refetch: refetchPaymentMethods } = useGetSetting(ENTITIES.GENERAL);
   const { data: budgetSettings } = useGetSetting(ENTITIES.BUDGET);
   const editBudget = useEditBudget();
@@ -132,9 +133,8 @@ const BudgetDraft = ({ params }) => {
       { name: PAGES.BUDGETS.NAME },
       { name: id, label: { title: "Borrador", color: BUDGET_STATES.DRAFT.color } },
     ]);
-    refetchProductsData();
     refetchPaymentMethods();
-  }, [id, setLabels, refetchProductsData, refetchPaymentMethods]);
+  }, [id, setLabels, refetchPaymentMethods]);
 
   useEffect(() => {
     if (loadingBudget) return;
@@ -257,6 +257,12 @@ const BudgetDraft = ({ params }) => {
 
   return (
     <Loader active={isLoading}>
+      {isProductsError && (
+        <Message negative>
+          <MessageHeader>No se pudo cargar el catálogo de productos</MessageHeader>
+          <p>{productsError?.message}</p>
+        </Message>
+      )}
       <FormProvider {...methods}>
         <Tab
           panes={panes}

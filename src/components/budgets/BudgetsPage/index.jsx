@@ -1,23 +1,22 @@
 import { DropdownControlled, SearchControlled, TextControlled } from "@/common/components/form";
-import { Filters, Table } from '@/common/components/table';
 import ModalAction from "@/common/components/modals/ModalAction";
-import { BUTTON_TEXTS, CONTENT_SIZES, COLORS, DATE_FORMATS, ENTITIES, ICONS, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
-import { createFilter, downloadExcel, getFormatedPercentage, handleUndefined } from '@/common/utils';
+import { Filters, Table } from '@/common/components/table';
+import { BUTTON_TEXTS, COLORS, CONTENT_SIZES, DATE_FORMATS, ENTITIES, ICONS, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
+import { downloadExcel, getFormatedPercentage, handleUndefined } from '@/common/utils';
 import { getFormatedDate } from "@/common/utils/dates";
-import { getTotal } from "@/components/products/products.utils";
 import { useNavActionsContext } from "@/components/layout";
-import { useFilters, useRestoreEntity } from "@/hooks";
+import { getTotal } from "@/components/products/products.utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
-import { BUDGETS_FILTERS_KEY, BUDGET_STATES, BUDGET_STATES_OPTIONS, BUDGET_STATE_TRANSLATIONS, EMPTY_FILTERS, LIST_BUDGETS_QUERY_KEY, PAYMENT_STATES, PAYMENT_STATES_OPTIONS, getBudgetColumns } from "../budgets.constants";
+import { BUDGET_STATES, BUDGET_STATES_OPTIONS, BUDGET_STATE_TRANSLATIONS, PAYMENT_STATES_OPTIONS, getBudgetColumns } from "../budgets.constants";
 
 export const downloadBudgetsExcel = (elements) => {
   if (!elements.length) return;
   let maxProductCount = 1;
   const mappedBudgets = elements.map(budget => {
-    const translatedState = BUDGET_STATE_TRANSLATIONS[budget.state].singularTitle || "";
+    const translatedState = BUDGET_STATE_TRANSLATIONS[budget.state]?.singularTitle || budget.state || "";
     maxProductCount = Math.max(maxProductCount, budget.products?.length);
     const budgetRow = [
       handleUndefined(budget.id),
@@ -52,7 +51,8 @@ export const downloadBudgetsExcel = (elements) => {
 
 const BudgetsPage = ({
   budgets,
-  filterKey = BUDGETS_FILTERS_KEY,
+  filterControls,
+  serverPagination,
   isLoading,
   onRefetch,
   usersOptions,
@@ -69,16 +69,10 @@ const BudgetsPage = ({
   const onRefetchRef = useRef(onRefetch);
   const shouldRegisterSideActions = sideActions.length > 0;
   const useSideActions = shouldRegisterSideActions || useExternalSideActions;
-  const restoreEntity = useRestoreEntity({ entity: ENTITIES.BUDGETS, key: LIST_BUDGETS_QUERY_KEY });
-  const restoreEntityRef = useRef(restoreEntity);
 
   useEffect(() => {
     onRefetchRef.current = onRefetch;
   }, [onRefetch]);
-
-  useEffect(() => {
-    restoreEntityRef.current = restoreEntity;
-  }, [restoreEntity]);
 
   useEffect(() => {
     filteredBudgetsRef.current = filteredBudgets;
@@ -96,9 +90,9 @@ const BudgetsPage = ({
     setIsUpdateLoading(true);
 
     try {
-      await restoreEntityRef.current();
+      await onRefetchRef.current?.();
     } catch (error) {
-      console.error("Error en restoreEntity:", error);
+      console.error("Error al consultar ventas:", error);
     }
 
     setIsUpdateLoading(false);
@@ -109,40 +103,15 @@ const BudgetsPage = ({
     onRestoreFilters,
     onSubmit,
     filters,
+    draftFilters,
     setFilters,
     methods,
     appliedCount,
     hydrated
-  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: filterKey });
+  } = filterControls;
 
   const { setValue } = methods;
 
-  const onFilter = useMemo(() => createFilter(filters, {
-    id: {},
-    customer: { field: 'name' },
-    paymentStatus: {
-      custom: (item) => {
-        const filter = filters.paymentStatus;
-
-        if (!filter) return true;
-
-        const total = Number(item.total ?? 0);
-        const paid = Number(item.paidAmount ?? 0);
-
-        if (filter === PAYMENT_STATES.PAID.id) {
-          return paid === total;
-        }
-
-        if (filter === PAYMENT_STATES.PENDING.id) {
-          return paid < total;
-        }
-
-        return true;
-      }
-    },
-    createdBy: {},
-    state: { skipAll: true },
-  }), [filters]);
 
   const budgetColumns = useMemo(
     () => getBudgetColumns(filters.state),
@@ -150,10 +119,10 @@ const BudgetsPage = ({
   );
 
   useEffect(() => {
-    if (filters.state === BUDGET_STATES.CONFIRMED.id) {
-      methods.setValue('paymentStatus', SELECT_ALL_OPTION.value);
+    if (draftFilters.state !== BUDGET_STATES.CONFIRMED.id && draftFilters.paymentStatus && draftFilters.paymentStatus !== SELECT_ALL_OPTION.value) {
+      setValue('paymentStatus', SELECT_ALL_OPTION.value, { shouldDirty: true });
     }
-  }, [filters.state, setValue, methods]);
+  }, [draftFilters.state, draftFilters.paymentStatus, setValue]);
 
   const actions = [
     {
@@ -203,8 +172,7 @@ const BudgetsPage = ({
             noConfirmation={true}
             bodyContent={
               <>
-                <strong>¡Atención!</strong> Esta acción puede tomar varios minutos en completarse, no se recomienda ejecutarla de manera frecuente!
-                Si no encuentras un elemento en las tablas, podrías probar primero usando opción de <strong>&quot;Actualización ligera&quot;</strong>.
+                Se volverá a consultar la página actual con sus filtros.
               </>
             }
             warning
@@ -246,6 +214,7 @@ const BudgetsPage = ({
       <FormProvider {...methods}>
         <Form onSubmit={onSubmit}>
           <Filters
+            remote
             entity={ENTITIES.BUDGETS}
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
@@ -261,7 +230,6 @@ const BudgetsPage = ({
               label="Estado"
               options={BUDGET_STATES_OPTIONS}
               defaultValue={SELECT_ALL_OPTION.state}
-              afterChange={onSubmit}
             />
             <TextControlled
               width="8vw"
@@ -292,9 +260,10 @@ const BudgetsPage = ({
                 value: option.text,
               })}
               getDisplayValue={(value) => value ?? ''}
+              onQueryChange={value => setValue('createdBy', value, { shouldDirty: true })}
               persistSelection
             />
-            {filters.state === BUDGET_STATES.CONFIRMED.id && (
+            {draftFilters.state === BUDGET_STATES.CONFIRMED.id && (
               <DropdownControlled
                 minWidth={CONTENT_SIZES.MIN}
                 width="130px"
@@ -302,7 +271,6 @@ const BudgetsPage = ({
                 name="paymentStatus"
                 label="Estado de pago"
                 options={PAYMENT_STATES_OPTIONS}
-                afterChange={onSubmit}
               />
             )}
           </Filters>
@@ -315,7 +283,7 @@ const BudgetsPage = ({
         page={PAGES.BUDGETS}
         actions={actions}
         color={BUDGET_STATES[filters.state]?.color}
-        onFilter={onFilter}
+        serverPagination={serverPagination}
         paginate
         filters={filters}
         setFilters={setFilters}

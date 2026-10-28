@@ -1,20 +1,26 @@
 "use client";
+import { readListPagination } from "@/api/listPagination";
 import { useCreateCashBalance, useListCashBalances } from "@/api/cashBalances";
 import { useGetSetting } from "@/api/settings";
 import { ModalOpenCashBalance } from "@/common/components/modals";
 import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel, mapToDropdownOptions } from "@/common/utils";
 import CashBalancesPage from "@/components/cashBalances/CashBalancesPage";
-import { CASH_BALANCE_STATES } from "@/components/cashBalances/cashBalances.constants";
+import { EMPTY_FILTERS, CASH_BALANCES_FILTERS_KEY, CASH_BALANCE_STATES } from "@/components/cashBalances/cashBalances.constants";
 import { useBreadcrumContext } from "@/components/layout";
-import { useKeyboardShortcuts } from "@/hooks";
+import { useFilters, useKeyboardShortcuts } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 
 const CashBalances = () => {
-  const { data, isLoading, isRefetching, refetch } = useListCashBalances();
+  const filterControls = useFilters({
+    defaultFilters: EMPTY_FILTERS,
+    key: CASH_BALANCES_FILTERS_KEY,
+    remoteEntity: "cashBalances",
+  });
+  const { data, isLoading, isRefetching, refetch } = useListCashBalances({ ...filterControls.listRequest, enabled: filterControls.hydrated });
   const { setLabels } = useBreadcrumContext();
   const { push } = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -97,6 +103,8 @@ const CashBalances = () => {
   return (
     <>
       <CashBalancesPage
+        filterControls={filterControls}
+        serverPagination={{ ...filterControls.listRequest, ...readListPagination(data) }}
         onRefetch={refetch}
         isLoading={isLoading || isRefetching}
         cashBalances={isPending ? [] : cashBalances}

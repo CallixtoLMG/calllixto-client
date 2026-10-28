@@ -7,7 +7,7 @@ const vm = require("node:vm");
 const root = path.join(__dirname, "..", "..");
 const source = fs.readFileSync(path.join(root, "src", "api", "stock.js"), "utf8");
 
-const helperStart = source.indexOf("export const MAX_STOCK_TRANSACTION_OPERATIONS");
+const helperStart = source.indexOf("export const MAX_STOCK_BATCH_FLOWS");
 const helperEnd = source.indexOf("export function useGetStockFlow");
 const helperSource = source
   .slice(helperStart, helperEnd)
@@ -22,6 +22,7 @@ const context = {
 vm.runInNewContext(
   `${helperSource}
 module.exports = {
+  MAX_STOCK_BATCH_FLOWS,
   MAX_STOCK_TRANSACTION_OPERATIONS,
   buildSupplierStockBatches,
   postSupplierStockBatches,
@@ -30,6 +31,7 @@ module.exports = {
 );
 
 const {
+  MAX_STOCK_BATCH_FLOWS,
   MAX_STOCK_TRANSACTION_OPERATIONS,
   buildSupplierStockBatches,
   postSupplierStockBatches,
@@ -49,8 +51,8 @@ const getBatchLengths = (batches) => Array.from(batches, (batch) => batch.length
 
 test("supplier stock batches never exceed the transaction operation budget", () => {
   const flows = [
-    ...createFlows(120),
-    ...createFlows(90, (index) => `REPEATED-${index % 3}`),
+    ...createFlows(600),
+    ...createFlows(300, (index) => `REPEATED-${index % 3}`),
   ];
 
   const batches = buildSupplierStockBatches(flows);
@@ -61,11 +63,20 @@ test("supplier stock batches never exceed the transaction operation budget", () 
   });
 });
 
-test("45 distinct products fit in one supplier stock batch", () => {
-  const batches = buildSupplierStockBatches(createFlows(45));
+test("249 distinct products fit in one supplier stock batch", () => {
+  const batches = buildSupplierStockBatches(createFlows(249));
 
-  assert.deepEqual(getBatchLengths(batches), [45]);
-  assert.equal(getOperationCount(batches[0]), 90);
+  assert.deepEqual(getBatchLengths(batches), [249]);
+  assert.equal(getOperationCount(batches[0]), 498);
+});
+
+test("250 distinct products fit in one supplier stock batch", () => {
+  const batches = buildSupplierStockBatches(createFlows(250));
+
+  assert.equal(MAX_STOCK_BATCH_FLOWS, 250);
+  assert.equal(MAX_STOCK_TRANSACTION_OPERATIONS, 500);
+  assert.deepEqual(getBatchLengths(batches), [250]);
+  assert.equal(getOperationCount(batches[0]), 500);
 });
 
 test("one supplier stock flow makes one batch with two operations", () => {
@@ -75,24 +86,25 @@ test("one supplier stock flow makes one batch with two operations", () => {
   assert.equal(getOperationCount(batches[0]), 2);
 });
 
-test("the 46th distinct product moves to the next supplier stock batch", () => {
-  const batches = buildSupplierStockBatches(createFlows(46));
+test("the 251st distinct product moves to the next supplier stock batch", () => {
+  const batches = buildSupplierStockBatches(createFlows(251));
 
-  assert.deepEqual(getBatchLengths(batches), [45, 1]);
+  assert.deepEqual(getBatchLengths(batches), [250, 1]);
 });
 
-test("120 distinct products are split into 45, 45, and 30 flows", () => {
-  const batches = buildSupplierStockBatches(createFlows(120));
+test("500 distinct products are split into two batches of 250 flows", () => {
+  const batches = buildSupplierStockBatches(createFlows(500));
 
-  assert.deepEqual(getBatchLengths(batches), [45, 45, 30]);
+  assert.deepEqual(getBatchLengths(batches), [250, 250]);
 });
 
-test("repeated products are counted once per batch while each flow is counted", () => {
-  const batches = buildSupplierStockBatches(createFlows(90, () => "SAME_PRODUCT"));
+test("repeated products never produce batches larger than the flow limit", () => {
+  const batches = buildSupplierStockBatches(createFlows(600, () => "SAME_PRODUCT"));
 
-  assert.deepEqual(getBatchLengths(batches), [89, 1]);
-  assert.equal(getOperationCount(batches[0]), 90);
-  assert.equal(getOperationCount(batches[1]), 2);
+  assert.deepEqual(getBatchLengths(batches), [250, 250, 100]);
+  batches.forEach((batch) => {
+    assert.ok(batch.length <= MAX_STOCK_BATCH_FLOWS);
+  });
 });
 
 test("non-contiguous repeated products still count as one unique product per batch", () => {
@@ -140,13 +152,13 @@ test("supplier stock batch posting is sequential", async () => {
   const result = await postSupplierStockBatches({
     supplierId: "AA",
     inflow: true,
-    flows: createFlows(46),
+    flows: createFlows(251),
     post,
   });
 
   assert.equal(result.statusOk, true);
   assert.equal(maxActiveRequests, 1);
-  assert.deepEqual(calls.map((call) => call.body.flows.length), [45, 1]);
+  assert.deepEqual(calls.map((call) => call.body.flows.length), [250, 1]);
   assert.deepEqual(calls.map((call) => call.url), [
     "/stock-flows/AA/add",
     "/stock-flows/AA/add",
@@ -169,13 +181,13 @@ test("supplier stock batch posting stops after an intermediate failure", async (
   const result = await postSupplierStockBatches({
     supplierId: "AA",
     inflow: false,
-    flows: createFlows(120),
+    flows: createFlows(500),
     post,
   });
 
   assert.equal(result.statusOk, false);
   assert.equal(result.error.message, "Demasiadas operaciones");
-  assert.deepEqual(calls.map((call) => call.body.flows.length), [45, 45]);
+  assert.deepEqual(calls.map((call) => call.body.flows.length), [250, 250]);
 });
 
 test("empty supplier stock batches do not make requests", async () => {

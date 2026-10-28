@@ -1,3 +1,4 @@
+import { usePagedList } from "./pagedLists";
 import { ENTITIES, INACTIVE, IN_MS, SET_STATE } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { GET_SUPPLIER_QUERY_KEY, LIST_ATTRIBUTES, LIST_SUPPLIERS_QUERY_KEY } from "@/components/suppliers/suppliers.constants";
@@ -6,18 +7,30 @@ import { useQuery } from "@tanstack/react-query";
 import { getInstance } from "./axios";
 import { listItems, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from "./common";
 
-export function useListSuppliers() {
-  const query = useQuery({
-    queryKey: [LIST_SUPPLIERS_QUERY_KEY],
-    queryFn: () => listItems({
-      entity: ENTITIES.SUPPLIERS,
-      url: PATHS.SUPPLIERS,
-      params: getDefaultListParams(LIST_ATTRIBUTES)
-    }),
-    staleTime: 0,
+export function useListSuppliers(options = {}) {
+  return usePagedList({
+    entity: ENTITIES.SUPPLIERS,
+    url: PATHS.SUPPLIERS,
+    queryKey: LIST_SUPPLIERS_QUERY_KEY,
+    attributes: LIST_ATTRIBUTES,
+    ...options,
   });
+};
 
-  return query;
+// Full catalog for selectors/association checks; never used as screen page data.
+export function useSupplierCatalog({ enabled = true } = {}) {
+  return useQuery({
+    queryKey: [LIST_SUPPLIERS_QUERY_KEY, "catalog"],
+    queryFn: ({ signal } = {}) => listItems({
+      signal,
+      entity: ENTITIES.SUPPLIERS, url: PATHS.SUPPLIERS,
+      params: getDefaultListParams(LIST_ATTRIBUTES),
+    }),
+    staleTime: IN_MS.ONE_DAY,
+    retry: false,
+    refetchOnWindowFocus: false,
+    enabled,
+  });
 };
 
 export function useGetSupplier(id) {

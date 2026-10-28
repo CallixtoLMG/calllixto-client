@@ -30,9 +30,11 @@ export const BatchImport = ({
   openBeforeRead = false,
   accept = ".xlsx,.xls,.xlsm",
   triggerClassName,
+  isPreparing = false,
+  disabled = false,
 }) => {
   const handleOpenFile = async () => {
-    await onBeforeOpenFile?.();
+    if (disabled || isPreparing || (await onBeforeOpenFile?.()) === false) return;
     inputRef.current.value = null;
     inputRef.current.click();
   };
@@ -86,6 +88,8 @@ export const BatchImport = ({
         $paddingLeft="0"
         as={triggerClassName ? undefined : BatchImportIcon}
         onClick={handleOpenFile}
+        loading={isPreparing}
+        disabled={disabled || isPreparing}
         type="button"
         $iconOnly
       >

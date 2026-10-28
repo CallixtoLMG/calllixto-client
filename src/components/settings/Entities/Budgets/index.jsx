@@ -1,4 +1,4 @@
-import { useListCustomers } from "@/api/customers";
+import { useCustomerCatalog } from "@/api/customers";
 import { Divider, FlexColumn } from '@/common/components/custom';
 import { CUSTOMER_STATES } from "@/components/customers/customers.constants";
 import { useMemo } from "react";
@@ -8,7 +8,7 @@ import OnPrint from './OnPrint';
 
 const BudgetsModule = (() => {
 
-  const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
+  const { data: customersData, isLoading: loadingCustomers } = useCustomerCatalog();
 
   const customerOptions = useMemo(() => customersData?.customers?.map(customer => ({
     state: customer.state,

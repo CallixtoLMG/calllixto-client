@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { useDeleteBySupplierId, useProductsBySupplierId } from "@/api/products";
 import { useDeleteSupplier, useEditSupplier, useSetSupplierState } from "@/api/suppliers";
-import { FieldsContainer, FormField, Icon, Message, MessageHeader, } from "@/common/components/custom";
+import { FieldsContainer, FormField, Message, MessageHeader, } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
@@ -19,19 +19,39 @@ import { useAllowUpdate, useProtectedAction, useUnsavedChanges } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 
 const SupplierPageClient = ({ supplier }) => {
   const { role } = useUserContext();
   const { push, refresh } = useRouter();
-  const { data: products, isLoading: loadingProducts, refetch: refetchProducts } = useProductsBySupplierId(supplier.id);
+  const { loadProducts, invalidateProducts } = useProductsBySupplierId(supplier.id, { enabled: false });
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [confirmationAction, setConfirmationAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
-  const [isExcelLoading, setIsExcelLoading] = useState(false);
+  const toolBusy = useRef(false);
+  const [batchProductCount, setBatchProductCount] = useState(0);
+  const [printProducts, setPrintProducts] = useState([]);
+  const pendingPrintProducts = useRef([]);
+  const printReady = useRef(null);
+  const hasProducts = supplier?.hasProducts === true;
+  const runProductsTool = useCallback(async (name, action) => {
+    if (!hasProducts || toolBusy.current) return;
+    toolBusy.current = true;
+    setActiveAction(name);
+    try {
+      const items = await loadProducts();
+      if (!items.length) { toast("No hay productos de este proveedor."); return; }
+      return await action(items);
+    } catch (error) {
+      toast.error(error.message || "No se pudieron cargar los productos del proveedor");
+    } finally {
+      toolBusy.current = false;
+      setActiveAction(null);
+    }
+  }, [hasProducts, loadProducts]);
   const [reason, setReason] = useState("");
   const printRef = useRef(null);
   const formRef = useRef(null);
@@ -55,6 +75,11 @@ const SupplierPageClient = ({ supplier }) => {
   const { handleProtectedAction } = useProtectedAction({ formRef, onBeforeView });
   const editSupplier = useEditSupplier();
   const deleteSupplier = useDeleteSupplier();
+  const canDeleteSupplier = supplier?.hasProducts === false;
+  const productsInfoMissing = typeof supplier?.hasProducts !== "boolean";
+  const deleteBlockedMessage = supplier?.hasProducts === true
+    ? "No se puede eliminar este proveedor, existen productos asociados."
+    : "Información de productos asociados no disponible. No se puede eliminar este proveedor hasta recibir esa información.";
   const deleteBySupplierId = useDeleteBySupplierId();
   const setSupplierState = useSetSupplierState();
 
@@ -65,15 +90,22 @@ const SupplierPageClient = ({ supplier }) => {
 
   useEffect(() => {
     setLabels([{ name: PAGES.SUPPLIERS.NAME }, { name: supplier?.name }]);
-    refetchProducts();
-  }, [setLabels, supplier, refetchProducts]);
+  }, [setLabels, supplier]);
 
-  const hasAssociatedProducts = useMemo(() => !!products?.length, [products]);
+  useEffect(() => {
+    printReady.current?.();
+    printReady.current = null;
+  }, [printProducts]);
 
-  const handlePrint = useReactToPrint({
+  const printOptions = useMemo(() => ({
+    onBeforeGetContent: () => new Promise(resolve => {
+      printReady.current = resolve;
+      setPrintProducts([...pendingPrintProducts.current]);
+    }),
     content: () => printRef.current,
     removeAfterPrint: true,
-  });
+  }), []);
+  const handlePrint = useReactToPrint(printOptions);
 
   const modalConfig = {
     deleteSupplier: {
@@ -82,13 +114,10 @@ const SupplierPageClient = ({ supplier }) => {
       ),
       confirmText: "eliminar",
       icon: ICONS.TRASH,
-      tooltip: hasAssociatedProducts
-        ? 'No se puede eliminar este proveedor, existen productos asociados.'
-        : false,
     },
     deleteBatch: {
       header: (
-        <>¿Está seguro que desea eliminar los {products?.length || ""} productos del proveedor <i>{supplier?.name} ({supplier?.id}) </i> ?</>
+        <>¿Está seguro que desea eliminar los {batchProductCount} productos del proveedor <i>{supplier?.name} ({supplier?.id}) </i> ?</>
       ),
       confirmText: "eliminar",
       icon: ICONS.TRASH,
@@ -137,6 +166,8 @@ const SupplierPageClient = ({ supplier }) => {
         if (response.statusOk) {
           toast.success('Lista de productos del proveedor eliminada!');
           handleModalClose();
+          invalidateProducts();
+          refresh();
         } else {
           toast.error(`${response?.message} (${response?.error?.message})`);
         }
@@ -147,22 +178,17 @@ const SupplierPageClient = ({ supplier }) => {
       },
     });
 
-  const { mutate: mutateDelete, isPending: isDeletePending } =
-    useMutation({
-      mutationFn: () => deleteSupplier(supplier.id),
-      onSuccess: (response) => {
-        if (response.statusOk) {
-          toast.success('Proveedor eliminado permanentemente!');
-          push(PAGES.SUPPLIERS.BASE);
-        } else {
-          toast.error(`${response?.message} (${response?.error?.message})`);
-        }
-      },
-      onSettled: () => {
-        setActiveAction(null);
-        handleModalClose();
-      },
-    });
+  const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
+    mutationFn: () => deleteSupplier(supplier.id),
+    onSuccess: response => {
+      if (response.statusOk) {
+        toast.success("Proveedor eliminado permanentemente!");
+        push(PAGES.SUPPLIERS.BASE);
+      } else toast.error(response?.message || response?.error?.message || "No se pudo eliminar el proveedor");
+    },
+    onError: error => toast.error(error?.response?.data?.message || error.message || "No se pudo eliminar el proveedor"),
+    onSettled: () => { setActiveAction(null); handleModalClose(); },
+  });
 
   const { mutate: mutateState, isPending: isMutateStatePending } = useMutation({
     mutationFn: setSupplierState,
@@ -185,6 +211,12 @@ const SupplierPageClient = ({ supplier }) => {
   });
 
   const handleActionConfirm = async () => {
+    if (confirmationAction === "deleteSupplier") {
+      if (!canDeleteSupplier || isDeletePending) return;
+      setActiveAction("deleteSupplier");
+      mutateDelete();
+      return;
+    }
     if (confirmationAction === INACTIVE && !reason) {
       toast.error("Debe proporcionar una razón para desactivar el proveedor.");
       return;
@@ -194,10 +226,6 @@ const SupplierPageClient = ({ supplier }) => {
 
     if (confirmationAction === "deleteBatch") {
       mutateDeleteBatch();
-    }
-
-    if (confirmationAction === "deleteSupplier") {
-      mutateDelete();
     }
 
     if (confirmationAction === ACTIVE || confirmationAction === INACTIVE) {
@@ -219,27 +247,11 @@ const SupplierPageClient = ({ supplier }) => {
     confirmationAction === "deleteBatch";
 
   useEffect(() => {
-    const handleBarCodePrint = () => {
-      if (hasAssociatedProducts) {
-        setActiveAction("print");
-        handlePrint();
-        setActiveAction(null);
-      } else {
-        toast("No hay productos de este proveedor.", {
-          icon: (
-            <Icon
-              margin="0"
-              toast
-              name={ICONS.INFO_CIRCLE}
-              color={COLORS.BLUE}
-            />
-          ),
-        });
-      }
-    };
-
-    const handleDownloadExcel = () => {
-      if (!products) return;
+    const handleBarCodePrint = () => runProductsTool("print", items => {
+      pendingPrintProducts.current = items;
+      handlePrint();
+    });
+    const handleDownloadExcel = () => runProductsTool("excel", items => {
       const headers = [
         'Id',
         'Nombre',
@@ -252,7 +264,7 @@ const SupplierPageClient = ({ supplier }) => {
         'Comentarios',
       ];
 
-      const mappedProducts = products.map((product) => {
+      const mappedProducts = items.map((product) => {
         const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
         return [
           product.id,
@@ -270,24 +282,25 @@ const SupplierPageClient = ({ supplier }) => {
         [headers, ...mappedProducts],
         `Lista de productos de ${supplier.name}`,
       );
-    };
+    });
 
     let actions = [];
 
     if (RULES.canRemove[role]) {
       const handleClick = (action) => () =>
         handleProtectedAction(() => {
+          if (action === "deleteSupplier" && !canDeleteSupplier) return;
           setConfirmationAction(action);
         });
-      const isStockExcelDisabled =
-        isExcelLoading ||
-        !!activeAction ||
-        loadingProducts ||
-        isEditPending ||
-        !hasAssociatedProducts;
-      const stockExcelTooltip = !loadingProducts && !hasAssociatedProducts
-        ? "No se puede importar stock porque no existen productos de este proveedor."
-        : false;
+      const busy = !!activeAction || isEditPending;
+      const productsDisabled = !hasProducts || busy;
+      const handleDeleteBatch = () => {
+        if (productsDisabled) return;
+        return handleProtectedAction(() => runProductsTool("prepareDeleteBatch", items => {
+          setBatchProductCount(items.length);
+          setConfirmationAction("deleteBatch");
+        }));
+      };
 
       actions = [{
         id: 1,
@@ -296,13 +309,7 @@ const SupplierPageClient = ({ supplier }) => {
         text: "Imprimir códigos de productos",
         onClick: handleBarCodePrint,
         loading: activeAction === "print",
-        disabled: !!activeAction || isEditPending || !hasAssociatedProducts,
-        tooltip: !hasAssociatedProducts
-          ? 'No existen productos de este proveedor.'
-          : false,
-        collapsedTooltip: !hasAssociatedProducts
-          ? 'No existen productos de este proveedor.'
-          : undefined,
+        disabled: productsDisabled,
         iconOnly: true
       },
       {
@@ -322,43 +329,31 @@ const SupplierPageClient = ({ supplier }) => {
         icon: ICONS.FILE_EXCEL,
         color: COLORS.BLUE,
         text: "Stock/Excel",
-        collapsedTooltip: stockExcelTooltip || "Acciones de stock y Excel del proveedor",
-        disabled: isStockExcelDisabled,
-        tooltip: stockExcelTooltip,
+        collapsedTooltip: "Acciones de stock y Excel del proveedor",
+        disabled: busy,
+        loading: activeAction === "excel" || activeAction === UPLOAD_STOCK || activeAction === DISCOUNT_STOCK,
         items: [
           {
             id: "download-products",
             icon: ICONS.DOWNLOAD,
             color: COLORS.BLUE,
             text: "Descargar productos del proveedor",
-            onClick: () => {
-              if (products?.length) {
-                setIsExcelLoading(true);
-                handleDownloadExcel();
-                setIsExcelLoading(false);
-              } else {
-                toast("No hay productos de este proveedor para descargar.", {
-                  icon: (
-                    <Icon
-                      margin="0"
-                      toast
-                      name={ICONS.INFO_CIRCLE}
-                      color={COLORS.BLUE}
-                    />
-                  ),
-                });
-              }
-            },
+            onClick: handleDownloadExcel,
+            loading: activeAction === "excel",
+            disabled: productsDisabled,
           },
           {
             id: "upload-stock",
             text: "Cargar stock del proveedor",
             color: COLORS.GREEN,
+            disabled: productsDisabled,
             button: (
               <BatchImportStock
                 mode={UPLOAD_STOCK}
                 supplierId={supplier?.id}
-                products={products}
+                disabled={productsDisabled}
+                loadProducts={() => runProductsTool(UPLOAD_STOCK, items => items)}
+                onProductsChanged={invalidateProducts}
               />
             ),
           },
@@ -366,11 +361,14 @@ const SupplierPageClient = ({ supplier }) => {
             id: "discount-stock",
             text: "Descontar stock del proveedor",
             color: COLORS.RED,
+            disabled: productsDisabled,
             button: (
               <BatchImportStock
                 mode={DISCOUNT_STOCK}
                 supplierId={supplier?.id}
-                products={products}
+                disabled={productsDisabled}
+                loadProducts={() => runProductsTool(DISCOUNT_STOCK, items => items)}
+                onProductsChanged={invalidateProducts}
               />
             ),
           },
@@ -388,15 +386,9 @@ const SupplierPageClient = ({ supplier }) => {
         icon: ICONS.LIST_UL,
         color: COLORS.RED,
         text: "Eliminar todos los productos del proveedor",
-        onClick: handleClick('deleteBatch'),
-        loading: activeAction === "deleteBatch",
-        disabled: !hasAssociatedProducts || !!activeAction || isEditPending,
-        tooltip: !hasAssociatedProducts
-          ? 'No existen productos de este proveedor.'
-          : false,
-        collapsedTooltip: !hasAssociatedProducts
-          ? 'No existen productos de este proveedor.'
-          : undefined,
+        onClick: handleDeleteBatch,
+        loading: activeAction === "deleteBatch" || activeAction === "prepareDeleteBatch",
+        disabled: productsDisabled,
         iconOnly: true
       },
       {
@@ -406,13 +398,9 @@ const SupplierPageClient = ({ supplier }) => {
         text: "Eliminar proveedor",
         onClick: handleClick('deleteSupplier'),
         loading: activeAction === "deleteSupplier",
-        disabled: hasAssociatedProducts || !!activeAction || isEditPending,
-        tooltip: hasAssociatedProducts
-          ? 'No se puede eliminar este proveedor, existen productos asociados.'
-          : false,
-        collapsedTooltip: hasAssociatedProducts
-          ? 'No se puede eliminar este proveedor, existen productos asociados.'
-          : undefined,
+        disabled: !canDeleteSupplier || !!activeAction || isEditPending,
+        tooltip: !canDeleteSupplier ? deleteBlockedMessage : false,
+        collapsedTooltip: !canDeleteSupplier ? deleteBlockedMessage : undefined,
         iconOnly: true,
         basic: true,
         popupPosition: POPUP_POSITIONS.BOTTOM_RIGHT
@@ -421,10 +409,16 @@ const SupplierPageClient = ({ supplier }) => {
 
     setActions(actions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [role, supplier, products, hasAssociatedProducts, activeAction, isEditPending, loadingProducts, isExcelLoading]);
+  }, [role, supplier, activeAction, isEditPending, hasProducts, canDeleteSupplier, deleteBlockedMessage, runProductsTool, invalidateProducts, handlePrint]);
 
   return (
-    <Loader active={loadingProducts}>
+    <Loader>
+      {productsInfoMissing && RULES.canRemove[role] && (
+        <Message warning>
+          <MessageHeader>Información de productos asociados no disponible</MessageHeader>
+          <p>No se puede eliminar este proveedor hasta recibir esa información.</p>
+        </Message>
+      )}
       {!isItemInactive(supplier?.state) && toggleButton}
       {isItemInactive(supplier?.state) && (
         <FieldsContainer>
@@ -444,12 +438,12 @@ const SupplierPageClient = ({ supplier }) => {
         onSubmit={mutateEdit}
         isLoading={isEditPending}
         isUpdating={isUpdating && !isItemInactive(supplier?.state)}
-        view
         isDeletePending={isDeletePending}
+        view
       />
       {!isUpdating && (
         <OnlyPrint>
-          <PrintBarCodes ref={printRef} products={products} />
+          <PrintBarCodes ref={printRef} products={printProducts} />
         </OnlyPrint>
       )}
       <UnsavedChangesModal
@@ -466,10 +460,10 @@ const SupplierPageClient = ({ supplier }) => {
         setShowModal={handleModalClose}
         isLoading={
           isDeleteBatchPending ||
-          isDeletePending ||
-          isMutateStatePending
+          isMutateStatePending || isDeletePending
         }
         noConfirmation={!requiresConfirmation}
+        disableButtons={confirmationAction === "deleteSupplier" && !canDeleteSupplier}
         bodyContent={
           confirmationAction === INACTIVE && (
             <TextField

@@ -94,7 +94,7 @@ export const USER_STATES = {
   },
 };
 
-export const EMPTY_FILTERS = { username: '', firstName: '', state: USER_STATES.ACTIVE.id };
+export const EMPTY_FILTERS = { username: '', firstName: '', lastName: '', state: USER_STATES.ACTIVE.id };
 export const EMPTY_USER = {
   firstName: '',
   lastName: '',

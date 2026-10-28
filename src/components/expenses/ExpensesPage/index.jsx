@@ -3,32 +3,25 @@ import { Flex } from '@/common/components/custom';
 import { DropdownControlled, TextControlled } from '@/common/components/form';
 import { Filters, Table } from '@/common/components/table';
 import { CONTENT_SIZES, ENTITIES, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
-import { createFilter } from '@/common/utils';
 import { useListPageSideActions } from "@/components/layout";
-import { useFilters } from "@/hooks";
 import { useCallback, useMemo } from 'react';
 import { FormProvider } from "react-hook-form";
 import { Form, Label } from "semantic-ui-react";
-import { EMPTY_FILTERS, EXPENSES_FILTERS_KEY, EXPENSES_STATE_OPTIONS, EXPENSE_STATES, HEADERS, LIST_EXPENSES_QUERY_KEY } from '../expenses.constants';
+import { EXPENSES_STATE_OPTIONS, EXPENSE_STATES, HEADERS, LIST_EXPENSES_QUERY_KEY } from '../expenses.constants';
 
-const ExpensesPage = ({ expenses = [], isLoading, onRefetch, onDownloadExcel, sideActions = [] }) => {
+const ExpensesPage = ({ expenses = [], isLoading, onRefetch, onDownloadExcel, sideActions = [], filterControls, serverPagination }) => {
   const {
     onRestoreFilters,
     onSubmit,
     filters,
     setFilters,
     methods
-  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: EXPENSES_FILTERS_KEY });
+  } = filterControls;
 
   const { data, isLoading: isLoadingSettings } = useGetSetting(ENTITIES.EXPENSE);
 
-  const onFilter = useMemo(() => createFilter(filters, {
-    id: {},
-    name: {},
-    categories: { skipAll: true, arrayKey: 'name', fullMatch: true },
-    state: { skipAll: true, fullMatch: true }
-  }), [filters]);
   const { useSideActions, handleFilteredElementsChange } = useListPageSideActions({
+    remote: true,
     sideActions,
     onRefetch,
     onDownloadExcel,
@@ -55,6 +48,7 @@ const ExpensesPage = ({ expenses = [], isLoading, onRefetch, onDownloadExcel, si
       <FormProvider {...methods}>
         <Form onSubmit={onSubmit}>
           <Filters
+            remote
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
             entity={ENTITIES.EXPENSES}
@@ -67,7 +61,6 @@ const ExpensesPage = ({ expenses = [], isLoading, onRefetch, onDownloadExcel, si
               label="Estado"
               options={EXPENSES_STATE_OPTIONS}
               value={SELECT_ALL_OPTION.state}
-              afterChange={onSubmit}
             />
             <TextControlled
               name="id"
@@ -91,7 +84,6 @@ const ExpensesPage = ({ expenses = [], isLoading, onRefetch, onDownloadExcel, si
               label="Categorias"
               options={categoryOptions}
               value={SELECT_ALL_OPTION.state}
-              afterChange={onSubmit}
               loading={isLoadingSettings}
             />
           </Filters>
@@ -102,7 +94,7 @@ const ExpensesPage = ({ expenses = [], isLoading, onRefetch, onDownloadExcel, si
         headers={HEADERS}
         page={PAGES.EXPENSES}
         elements={expenses}
-        onFilter={onFilter}
+        serverPagination={serverPagination}
         paginate
         filters={filters}
         setFilters={setFilters}

@@ -1,4 +1,5 @@
-"use client"
+"use client";
+import { readListPagination } from "@/api/listPagination";
 import { useUserContext } from "@/User";
 import { useListProducts } from "@/api/products";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
@@ -6,16 +7,21 @@ import { downloadExcel } from "@/common/utils";
 import { useBreadcrumContext } from "@/components/layout";
 import { BatchImportProducts } from "@/components/products/BatchImportProducts";
 import ProductsPage from "@/components/products/ProductsPage";
-import { EXAMPLE_TEMPLATE_DATA, PRODUCT_STATES } from "@/components/products/products.constants";
+import { EMPTY_FILTERS, PRODUCTS_FILTERS_KEY, EXAMPLE_TEMPLATE_DATA, PRODUCT_STATES } from "@/components/products/products.constants";
 import { getFormatedMargin } from "@/components/products/products.utils";
-import { useKeyboardShortcuts } from "@/hooks";
+import { useFilters, useKeyboardShortcuts } from "@/hooks";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 
 const Products = () => {
   const { role } = useUserContext();
-  const { data, isLoading, isRefetching, refetch } = useListProducts();
+  const filterControls = useFilters({
+    defaultFilters: EMPTY_FILTERS,
+    key: PRODUCTS_FILTERS_KEY,
+    remoteEntity: "products",
+  });
+  const { data, isLoading, isRefetching, refetch } = useListProducts({ ...filterControls.listRequest, enabled: filterControls.hydrated });
   const { setLabels } = useBreadcrumContext();
   const { push } = useRouter();
 
@@ -107,6 +113,8 @@ const Products = () => {
   return (
     <>
       <ProductsPage
+        filterControls={filterControls}
+        serverPagination={{ ...filterControls.listRequest, ...readListPagination(data) }}
         onRefetch={refetch}
         isLoading={loading}
         products={loading ? [] : products}

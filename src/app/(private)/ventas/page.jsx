@@ -1,17 +1,23 @@
 "use client";
+import { readListPagination } from "@/api/listPagination";
 import { useListBudgets } from "@/api/budgets";
 import { useGetSetting } from "@/api/settings";
 import { useListUsers } from "@/api/users";
 import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { formatLastCount } from "@/common/utils/pluralization";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
-import { BUDGET_STATES, DEFAULT_DATE_RANGE_VALUE } from "@/components/budgets/budgets.constants";
+import { BUDGETS_FILTERS_KEY, EMPTY_FILTERS, BUDGET_STATES, DEFAULT_DATE_RANGE_VALUE } from "@/components/budgets/budgets.constants";
 import { useBreadcrumContext } from "@/components/layout";
-import { useKeyboardShortcuts } from "@/hooks";
+import { useFilters, useKeyboardShortcuts } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
 const Budgets = () => {
+  const filterControls = useFilters({
+    defaultFilters: EMPTY_FILTERS,
+    key: BUDGETS_FILTERS_KEY,
+    remoteEntity: "budgets",
+  });
   const { data: usersData, isLoading: isLoadingUsers } = useListUsers();
   const { setLabels } = useBreadcrumContext();
   const { push } = useRouter();
@@ -19,7 +25,8 @@ const Budgets = () => {
   const rangeValue = Number(budgetsSettings?.defaultPageDateRange?.value) || DEFAULT_DATE_RANGE_VALUE;
   const { data: budgetsData, isLoading: isLoadingBudgets, isRefetching, refetch } = useListBudgets({
     defaultPageDateRange: rangeValue,
-    enabled: !!rangeValue,
+    enabled: !!rangeValue && filterControls.hydrated,
+    ...filterControls.listRequest,
   });
 
   useEffect(() => {
@@ -39,9 +46,8 @@ const Budgets = () => {
   }, [setLabels, isFetchingSettings, rangeValue]);
 
   useEffect(() => {
-    refetch()
     refetchSettings()
-  }, [refetch, refetchSettings]);
+  }, [refetchSettings]);
 
   const budgets = useMemo(() => {
     if (!budgetsData?.budgets) return [];
@@ -88,6 +94,8 @@ const Budgets = () => {
 
   return (
     <BudgetsPage
+      filterControls={filterControls}
+      serverPagination={{ ...filterControls.listRequest, ...readListPagination(budgetsData) }}
       onRefetch={refetch}
       isLoading={loading}
       budgets={loading ? [] : budgets}

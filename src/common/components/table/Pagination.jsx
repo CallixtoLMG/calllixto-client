@@ -1,5 +1,5 @@
 import { POPUP_POSITIONS, PAGE_SIZE_OPTIONS } from "@/common/constants";
-import { Popup, Pagination as SPagination } from "semantic-ui-react";
+import { Button, Popup, Pagination as SPagination } from "semantic-ui-react";
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
 import { Dropdown } from "../custom";
@@ -87,6 +87,10 @@ const Pagination = ({
   totalPages,
   onPageChange,
   onPageSizeChange,
+  isRemote = false,
+  currentItemCount,
+  canGoNext,
+  isLoading,
 }) => {
   const [isCompactPagination, setIsCompactPagination] = useState(false);
   const [isPageSizeOpen, setIsPageSizeOpen] = useState(false);
@@ -122,13 +126,20 @@ const Pagination = ({
 
   return (
     <PageSizePaginationContainer $justifyContent="space-between" $pageSizeOpen={isPageSizeOpen}>
-      <ElementCounter
+      {isRemote && totalItems === undefined ? (
+        <span data-testid="remote-page-info">Página {activePage} · {currentItemCount} recibidos · Total no informado</span>
+      ) : <ElementCounter
         fontWeight
         currentPage={activePage}
         pageSize={pageSize}
         totalItems={totalItems}
-      />
-      <NavigationPagination
+      />}
+      {isRemote && totalPages === undefined ? (
+        <Button.Group>
+          <Button type="button" disabled={isLoading || activePage <= 1} onClick={() => onPageChange(null, { activePage: activePage - 1 })} data-testid="remote-previous-page">Anterior</Button>
+          <Button type="button" disabled={isLoading || !canGoNext} onClick={() => onPageChange(null, { activePage: activePage + 1 })} data-testid="remote-next-page">Siguiente</Button>
+        </Button.Group>
+      ) : <NavigationPagination
         activePage={activePage}
         onPageChange={onPageChange}
         siblingRange={isCompactPagination ? 0 : 2}
@@ -137,8 +148,9 @@ const Pagination = ({
         lastItem={null}
         pointing
         secondary
-        totalPages={totalPages}
-      />
+        totalPages={Math.max(1, totalPages)}
+        disabled={isRemote && isLoading}
+      />}
       <Popup
         size="mini"
         content="Elementos mostrados"
