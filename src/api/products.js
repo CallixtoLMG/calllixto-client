@@ -182,11 +182,13 @@ export const useCreateBatch = () => {
   return createBatch;
 };
 
+const MAX_PRODUCT_BATCH_SIZE = 500;
+
 export const useEditBatch = () => {
   const queryClient = useQueryClient();
 
   const editBatch = async (products, invalidateQueries = [[LIST_PRODUCTS_QUERY_KEY]]) => {
-    const chunks = chunk(products, 90);
+    const chunks = chunk(products, MAX_PRODUCT_BATCH_SIZE);
     let delay = 0;
     const delayIncrement = 1000;
 
