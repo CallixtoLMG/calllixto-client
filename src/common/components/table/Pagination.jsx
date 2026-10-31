@@ -83,6 +83,7 @@ const PageSizePaginationContainer = styled(PaginationContainer)`
 const Pagination = ({
   activePage,
   pageSize,
+  pageSizeReady = true,
   totalItems,
   totalPages,
   onPageChange,
@@ -151,7 +152,9 @@ const Pagination = ({
           >
             <PageSizeDropdown
               options={PAGE_SIZE_OPTIONS}
-              value={pageSize}
+              value={pageSizeReady ? pageSize : ""}
+              placeholder="…"
+              disabled={!pageSizeReady}
               onChange={(event, data) => {
                 onPageSizeChange(event, data);
                 setIsPageSizeOpen(false);

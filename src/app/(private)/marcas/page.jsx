@@ -1,18 +1,26 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useListBrands } from "@/api/brands";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { fetchBrandsForExport, usePagedBrands } from "@/api/brands";
+import { useRefreshServerList } from "@/api/pagedLists";
+import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel } from "@/common/utils";
 import BrandsPage from "@/components/brands/BrandsPage";
-import { BRAND_STATES } from "@/components/brands/brands.constants";
+import { BRANDS_FILTERS_KEY, BRAND_SORT_FIELDS, BRAND_STATES, EMPTY_FILTERS } from "@/components/brands/brands.constants";
 import { useBreadcrumContext } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo } from "react";
+import useServerListFilters from "@/hooks/useServerListFilters";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "react-hot-toast";
 
 const Brands = () => {
-  const { data, isLoading, isRefetching, refetch } = useListBrands();
+  const refreshList = useRefreshServerList(ENTITIES.BRANDS);
+  const list = useServerListFilters({
+    key: BRANDS_FILTERS_KEY, defaultFilters: EMPTY_FILTERS, sortFields: BRAND_SORT_FIELDS, onApply: refreshList,
+  });
+  const { data, total, isFetching, error } = usePagedBrands(list);
+  const [isExporting, setIsExporting] = useState(false);
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { push } = useRouter();
@@ -21,23 +29,40 @@ const Brands = () => {
     setLabels([{ name: PAGES.BRANDS.NAME }]);
   }, [setLabels]);
 
-  const brands = useMemo(() => data?.brands, [data]);
-  const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
+  const { hydrated, pageNumber, pageSize, setPageNumber, appliedFilters, sort, order, refresh } = list;
+  useEffect(() => {
+    if (!hydrated || isFetching || total === null) return;
+    const lastPage = Math.max(1, Math.ceil(total / pageSize));
+    if (pageNumber > lastPage) setPageNumber(lastPage);
+  }, [hydrated, isFetching, total, pageNumber, pageSize, setPageNumber]);
 
-  const handleDownloadExcel = useCallback((elements) => {
-    if (!elements.length) return;
-    const headers = ['Id', 'Nombre', 'Estado', 'Comentarios'];
-    const mappedBrands = elements.map(brand => {
-      const brandState = BRAND_STATES[brand.state]?.singularTitle || brand.state;
-      return [
-        brand.id,
-        brand.name,
-        brandState,
-        brand.comments,
-      ];
-    });
-    downloadExcel([headers, ...mappedBrands], "Lista de Marcas");
-  }, []);
+  useEffect(() => {
+    if (error) toast.error(error.message);
+  }, [error]);
+
+  const handleDownloadExcel = useCallback(async () => {
+    if (isExporting) return;
+    setIsExporting(true);
+    try {
+      const elements = await fetchBrandsForExport({ appliedFilters, sort, order });
+      if (!elements.length) return;
+      const headers = ['Id', 'Nombre', 'Estado', 'Comentarios'];
+      const mappedBrands = elements.map(brand => {
+        const brandState = BRAND_STATES[brand.state]?.singularTitle || brand.state;
+        return [
+          brand.id,
+          brand.name,
+          brandState,
+          brand.comments,
+        ];
+      });
+      downloadExcel([headers, ...mappedBrands], "Lista de Marcas");
+    } catch (error) {
+      toast.error(error.message || "No se pudieron exportar las marcas.");
+    } finally {
+      setIsExporting(false);
+    }
+  }, [appliedFilters, sort, order, isExporting]);
 
   const sideActions = useMemo(() => {
     const actions = [];
@@ -52,17 +77,26 @@ const Brands = () => {
       })
     }
 
+    actions.push({
+      id: "update", icon: ICONS.REFRESH, color: COLORS.BLUE,
+      text: "Actualizar marcas", onClick: refresh, disabled: !hydrated || isFetching,
+    }, {
+      id: "download-excel", icon: ICONS.FILE_EXCEL, color: COLORS.BLUE,
+      text: "Descargar marcas en Excel", onClick: handleDownloadExcel,
+      disabled: !hydrated || isFetching || total === null || total === 0 || isExporting,
+      loading: isExporting, showTooltipWhenExpanded: true,
+    });
     return actions;
-  }, [push, role]);
+  }, [push, role, refresh, hydrated, isFetching, total, isExporting, handleDownloadExcel]);
 
   useKeyboardShortcuts(() => push(PAGES.BRANDS.CREATE), SHORTKEYS.ENTER);
 
   return (
     <BrandsPage
-      onRefetch={refetch}
-      isLoading={loading}
-      brands={loading ? [] : brands}
-      onDownloadExcel={handleDownloadExcel}
+      isLoading={!hydrated || isFetching}
+      brands={data?.items ?? []}
+      list={list}
+      total={total}
       sideActions={sideActions}
     />
   );
