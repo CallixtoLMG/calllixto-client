@@ -29,7 +29,7 @@ test("sales sidebar uses specific Excel label without old generic text", () => {
 
 test("requested expanded tooltip exceptions are opt-in on action definitions", () => {
   const useListPageSideActions = read("src", "components", "layout", "useListPageSideActions.jsx");
-  const suppliersPage = read("src", "components", "suppliers", "SuppliersPage", "index.jsx");
+  const suppliersPage = read("src", "app", "(private)", "proveedores", "page.jsx");
   const productsListPage = read("src", "app", "(private)", "productos", "page.jsx");
   const productDetailPage = read("src", "app", "(private)", "productos", "[id]", "page.client.jsx");
   const saleDetailPage = read("src", "app", "(private)", "ventas", "[id]", "page.client.jsx");
@@ -37,7 +37,7 @@ test("requested expanded tooltip exceptions are opt-in on action definitions", (
   const historyPage = read("src", "app", "(private)", "historial-ventas", "page.jsx");
 
   assert.match(useListPageSideActions, /text: downloadTooltip \|\| "Descargar Excel"[\s\S]*showTooltipWhenExpanded: true/);
-  assert.match(suppliersPage, /showUpdateTooltipWhenExpanded: true/);
+  assert.match(suppliersPage, /text: "Actualizar proveedores"[\s\S]*showTooltipWhenExpanded: true/);
   assert.match(productsListPage, /text: "Descargar plantilla de productos"[\s\S]*showTooltipWhenExpanded: true/);
   assert.match(productDetailPage, /text: "Imprimir código de barras"[\s\S]*showTooltipWhenExpanded: true/);
   assert.match(productDetailPage, /isProductOOS\(product\?\.state\) \? "Actualizar a con stock" : "Actualizar a sin stock"/);

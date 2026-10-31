@@ -24,10 +24,6 @@ if (typeof window !== "undefined") {
 
 export { db };
 
-export async function bulkAddStorageItems({ entity, values }) {
-  await db[entity].bulkAdd(values);
-};
-
 export async function bulkPutStorageItems({ entity, values }) {
   await db[entity].bulkPut(values);
 };
