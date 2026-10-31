@@ -6,6 +6,7 @@ import { Popup } from 'semantic-ui-react';
 export const GET_BRAND_QUERY_KEY = 'getBrand';
 export const LIST_BRANDS_QUERY_KEY = 'listBrands';
 export const BRANDS_FILTERS_KEY = 'brandsFilters';
+export const BRAND_SORT_FIELDS = { id: 'id', name: 'name', state: 'state' };
 export const LIST_ATTRIBUTES = ['id', 'name', 'comments',  'state', 'inactiveReason'];
 
 export const BRAND_COLUMNS = [
@@ -53,7 +54,7 @@ export const BRAND_STATES = {
 };
 
 export const EMPTY_BRAND = { name: '', id: '', comments: '' };
-export const EMPTY_FILTERS = { id: '', name: '', state: BRAND_STATES.ACTIVE.id };
+export const EMPTY_FILTERS = { id: '', name: '', state: '' };
 
 export const BRAND_STATES_OPTIONS = Object.values(BRAND_STATES)
   .map(({ id, title, color }) => ({
