@@ -1,49 +1,31 @@
 import { DropdownControlled, TextControlled } from '@/common/components/form';
 import { Filters, Table } from '@/common/components/table';
-import { CONTENT_SIZES, ENTITIES, FIELD_LABELS, PAGES } from "@/common/constants";
-import { createFilter } from '@/common/utils';
+import { CONTENT_SIZES, FIELD_LABELS, PAGES, SORTING } from "@/common/constants";
 import { useListPageSideActions } from "@/components/layout";
-import { useFilters } from "@/hooks";
-import { useCallback, useMemo } from "react";
 import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
-import { CUSTOMERS_FILTERS_KEY, CUSTOMER_STATES_OPTIONS, EMPTY_FILTERS, HEADERS, LIST_CUSTOMERS_QUERY_KEY } from "../customers.constants";
+import { CUSTOMER_SORT_FIELDS, CUSTOMER_STATES_OPTIONS, HEADERS } from "../customers.constants";
 
-const CustomersPage = ({ customers = [], isLoading, onRefetch, onDownloadExcel, sideActions = [] }) => {
+const CustomersPage = ({ customers = [], isLoading, list, total, sideActions = [] }) => {
   const {
     onRestoreFilters,
     onSubmit,
-    filters,
-    setFilters,
     methods,
     appliedCount,
     hydrated
-  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: CUSTOMERS_FILTERS_KEY });
+  } = list;
 
-  const onFilter = useMemo(() => createFilter(filters, { name: {}, state: { fullMatch: true } }), [filters]);
-  const { useSideActions, handleFilteredElementsChange } = useListPageSideActions({
-    sideActions,
-    onRefetch,
-    onDownloadExcel,
-    entity: ENTITIES.CUSTOMERS,
-    queryKey: LIST_CUSTOMERS_QUERY_KEY,
-    pageName: PAGES.CUSTOMERS.NAME,
-    updateTooltip: "Actualizar clientes",
-    downloadTooltip: "Descargar clientes en Excel",
-  });
-  const handleFilteredCustomersChange = useCallback(handleFilteredElementsChange, [handleFilteredElementsChange]);
+  useListPageSideActions({ sideActions });
 
   return (
     <>
       <FormProvider {...methods}>
-        <Form onSubmit={onSubmit} key={JSON.stringify(filters)}>
+        <Form onSubmit={onSubmit}>
           <Filters
-            onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
             appliedCount={appliedCount}
             hydrated={hydrated}
-            entity={ENTITIES.CUSTOMERS}
-            showRefetchAction={!useSideActions}
+            showRefetchAction={false}
           >
             <DropdownControlled
               minWidth="150px"
@@ -51,8 +33,7 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch, onDownloadExcel, 
               name="state"
               label={FIELD_LABELS.STATE}
               options={CUSTOMER_STATES_OPTIONS}
-              value={EMPTY_FILTERS.state}
-              afterChange={onSubmit}
+              clearable
             />
             <TextControlled
               name="name"
@@ -69,12 +50,21 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch, onDownloadExcel, 
         headers={HEADERS}
         page={PAGES.CUSTOMERS}
         elements={customers}
-        onFilter={onFilter}
         paginate
-        filters={filters}
-        setFilters={setFilters}
-        onDownloadExcel={useSideActions ? undefined : onDownloadExcel}
-        onFilteredElementsChange={useSideActions ? handleFilteredCustomersChange : undefined}
+        serverPagination={{
+          hydrated,
+          pageNumber: list.pageNumber,
+          pageSize: list.pageSize,
+          total,
+          sorting: {
+            key: Object.keys(CUSTOMER_SORT_FIELDS).find((key) => CUSTOMER_SORT_FIELDS[key] === list.sort),
+            direction: list.order === "desc" ? SORTING.DESC : SORTING.ASC,
+          },
+          sortFields: CUSTOMER_SORT_FIELDS,
+          onPageChange: list.setPageNumber,
+          onPageSizeChange: list.setPageSize,
+          onSortChange: list.setSorting,
+        }}
       />
     </>
   );
