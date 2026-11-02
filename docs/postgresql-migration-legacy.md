@@ -1,6 +1,6 @@
 # Legacy de la migración PostgreSQL
 
-Registro único de piezas revisadas durante la migración. PR actual: **PR6 — Gastos server-side; Historial, Usuarios y Cajas conservan consumidores legacy**.
+Registro único de piezas revisadas durante la migración. PR actual: **PR7 — Usuarios + Cajas, BLOQUEADA POR BACKEND** según pruebas reales del 02/11/2026. Historial, Usuarios y Cajas conservan sus consumidores legacy; no se implementa migración parcial.
 
 - Con consumidores runtime: conservar y actualizar consumidores, motivo y PR prevista.
 - Al retirar el último consumidor: buscar globalmente, eliminar código/imports/tests/comentarios huérfanos y marcar **ELIMINADO** en la misma PR.
@@ -16,6 +16,8 @@ Registro único de piezas revisadas durante la migración. PR actual: **PR6 — 
 | `src/api/products.js` — `useListProducts` y sus keys/carga de listado local. | 0. Crear/borrador de Ventas, `BudgetDeliveries` e importaciones pasan a `useProductCatalog`; listado usa `usePagedProducts`. | Retirados hook, keys `LIST_PRODUCTS_QUERY_KEY` / `LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY`, parámetro de invalidación batch sin consumidores e imports asociados. `LIST_ATTRIBUTES` de Productos se conserva: `BudgetForm` deriva de ella los atributos del producto que guarda el presupuesto, excluyendo `stockControl`. | PR4 — retirado sólo listado legacy; contrato compartido de atributos conservado. | ELIMINADO |
 | `src/api/products.js` — `useHasProductsByBrandId`: asociación descargando catálogo global. | 0. Detalle Marca usa exclusivamente `hasProducts` booleano backend. | Eliminado hook y loading dependiente del catálogo; flag ausente/inválido bloquea eliminación, sin fallback. | PR4 — retirado. | ELIMINADO |
 | `src/api/products.js` — `useProductsBySupplierId`: catálogo global y filtro por prefijo. | 0. Detalle Proveedor usa `hasProducts`; herramientas cargan `/products?supplierId=...` bajo demanda. | Retirados hook, filtro local y refetch al montar. No existe hook `useHasProductsBySupplierId` ni botón manual de precarga en esta base. | PR4 — retirado. | ELIMINADO |
+| `src/api/users.js` — `useListUsers`: listado/catálogo legacy de Usuarios. | `/usuarios`; selector de vendedores de `/historial-ventas`. `/ventas` mantiene input temporal y no consulta este hook. | Prueba real 02/11/2026: GET /users ignora paginación numérica, filtros probados y sorts username/id/lastName. Página 2 repite la colección completa de página 1, incluso con pageSize=1. Conservar flujo legacy; no compensar con paginación local. | PR7 — BLOQUEADA POR BACKEND hasta disponer del contrato remoto necesario. | PENDIENTE |
+| `src/api/cashBalances.js` — `useListCashBalances`: listado legacy de Cajas. | `/cajas`. | Prueba real 02/11/2026: pageSize, count, filtro id y dirección por id funcionan, pero pageNumber no avanza; estado y métodos no filtran. Conservar flujo legacy sin migración parcial, híbrido cursor/pageNumber ni paginación local compensatoria. | PR7 — BLOQUEADA POR BACKEND hasta disponer del contrato remoto necesario. | PENDIENTE |
 | `src/api/common.js` — `entityList` / `LastEvaluatedKey`. | `listItems`; `useListBudgetsHistory` en `src/api/budgets.js`. | Historial continúa por decisión de alcance; Usuarios y Cajas todavía usan cursor indirectamente. Ventas, Gastos y catálogo Clientes ya no lo usan. | Retiro de Historial después de las 7 PR + migración de entidades restantes. | PENDIENTE |
 | `src/api/common.js` — `listItems`: sincronización incremental y lectura Dexie. | APIs `users`, `cashBalances`. | Dos consumidores runtime restantes tras migrar Gastos; conservar hasta migrarlos. | PR7 y cierre posterior; distribución a definir. | PENDIENTE |
 | `src/api/common.js` — `activeVersion`, `LAST_UPDATED_AT`, `hardReset`, `startDate`/`updatedAt` de sincronización. | `listItems`; `src/hooks/useRestoreEntity.js` usa `LAST_UPDATED_AT` para restauración. | Determinan actualización incremental y reinicio de cache de consumidores legacy. Las pantallas remotas no los usan como fuente visual. | Retirada de sincronización Dexie tras últimos catálogos/listados. | PENDIENTE |
@@ -43,7 +45,7 @@ Registro único de piezas revisadas durante la migración. PR actual: **PR6 — 
 | `useCustomerCatalog` — colección completa TRANSITORIA. | Crear presupuesto, editar borrador, Configuración → Presupuestos → cliente por defecto. | Catálogo numérico completo, publicación atómica y cache React Query; requerido para conservar selectores actuales sin cursor. No usa Dexie. Solución actual aceptada y transitoria. | Patrón común de búsquedas/selectores remotos después de las 7 PR; parámetros aún por definir. | PENDIENTE |
 | `useProductCatalog` — colección completa TRANSITORIA. | Ventas crear/borrador, entregas e importaciones identificadas en evidencia PR4. | Catálogo completo actual conservado; solución transitoria, no patrón final para selectores de colecciones grandes. | Búsqueda/selector remoto de Productos dentro del patrón común posterior a las 7 PR; revisar consumidores antes de retirar el catálogo. | PENDIENTE |
 | Catálogos completos de Marcas/Proveedores en Productos. | Crear Producto → selectores de Marca y Proveedor. | Mantienen selectores actuales; evaluar estos casos junto con las demás colecciones grandes, sin rediseñarlos en PR5. | Patrón común de búsquedas/selectores remotos después de las 7 PR. | PENDIENTE |
-| Catálogo de vendedores de Ventas. | `/ventas` no consulta `useListUsers`; filtro funcional `createdBy` mediante input de nombre completo temporalmente. Historial y `/usuarios` conservan `useListUsers` legacy. | Dropdown completo no implementado: falta confirmar contrato numérico de GET /users. Shape utilizado: id/username/firstName/lastName/state/role; identidad de createdBy conservada como firstName + espacio + lastName. No cambiar política de inactivos. | Pregunta GET /users ya enviada a backend. Recuperar selector con todos los usuarios que corresponda, preferentemente dentro del patrón común posterior. No bloquea PR5; `/usuarios` fuera de alcance. | PENDIENTE |
+| Catálogo de vendedores de Ventas. | `/ventas` no consulta `useListUsers`; filtro funcional `createdBy` mediante input de nombre completo temporalmente. Historial y `/usuarios` conservan `useListUsers` legacy. | Prueba real 02/11/2026: GET /users devuelve colecciones pequeñas completas, pero no ofrece paginación numérica confiable. Shape id/username/firstName/lastName/state/role confirmado; identidad de createdBy conservada como firstName + espacio + lastName. No crear catálogo basado en pocos usuarios actuales; inclusión de INACTIVE no comprobada. | Pendiente backend: paginación real, política ACTIVE/INACTIVE y filtros/identidad. Input temporal aceptado hasta resolver patrón global de búsquedas/selectores posterior a las 7 PR; no bloquea PR5. | PENDIENTE |
 | Exports server-side, incluidos Ventas y Gastos, con snapshots históricos. | `/ventas` y `/gastos` muestran acción deshabilitada; exportador legacy sigue sólo en Historial y otros flujos conservan sus implementaciones actuales. | Pendiente transversal: colección filtrada completa, paginación server-side, snapshots históricos y comportamiento consistente entre entidades. No exportar sólo página visible ni reconstruir snapshots desde catálogo actual. | Resolver transversalmente después de las 7 PR; definir contratos/estrategia de export entonces. | PENDIENTE |
 | `paymentStatus` remoto. | Ventas envía PAID/PENDING sólo con state=CONFIRMED. | **PENDIENTE BACKEND**. Mapping frontend confirmado: Pagados → PAID, Pendientes → PENDING. Según prueba real reportada por usuario, backend devuelve el mismo dataset para ambos. Sin compensación local. | Corrección backend y posterior validación; no implementar workaround frontend. | PENDIENTE |
 | `skipStorageUpdate` en helpers CRUD compartidos. | Entidades sin tabla local, pagos/stock y mutaciones de Clientes y Gastos; otras entidades aún escriben Dexie. | Distingue escritores locales de mutaciones remotas. No puede retirarse globalmente mientras Usuarios/Cajas y bindings legacy conserven almacenamiento. | Cierre del último escritor local, no esta PR. | PENDIENTE |
@@ -104,7 +106,7 @@ Antes de implementar, definir de forma común: mínimo de caracteres; debounce v
 
 ### 2. Vendedor en Ventas — PENDIENTE, NO BLOQUEA PR5
 
-Estado actual: filtro funcional mediante input de nombre completo. Dropdown completo pendiente de confirmar paginación numérica de GET /users; pregunta ya enviada a backend.
+Estado actual: filtro funcional mediante input de nombre completo. Dropdown completo pendiente. La prueba real del 02/11/2026 confirmó que GET /users no ofrece paginación numérica confiable; las colecciones pequeñas completas actuales no constituyen un contrato para construir el catálogo. Pendientes backend: paginación real, política ACTIVE/INACTIVE y filtros/identidad. Input temporal aceptado hasta resolver el patrón global de búsquedas/selectores posterior a las 7 PR.
 
 Requisito futuro: volver a selector/dropdown con todos los usuarios que corresponda, preferentemente dentro del mismo patrón común de búsquedas/selectores remotos. Conservar identidad esperada por `createdBy` y definir política de activos/inactivos sin cambios implícitos.
 
@@ -149,3 +151,90 @@ Budgets mantiene adaptación **local**: ASC → `order=true`; DESC → `order=fa
 - Crear/clonar, editar y anular Expense omiten Dexie e invalidan páginas/count mediante invalidateServerLists. Se conservan invalidaciones de detalle existentes. Crear/editar/eliminar pagos sólo agrega esa invalidación cuando entity=expense y statusOk; payloads, endpoints e invalidación de pagos se conservan, sin ampliar comportamiento de otras entidades.
 - Export de Gastos queda deshabilitado, sin handler, export parcial ni carga de todas las páginas. Continúa pendiente transversal posterior a las 7 PR, junto con Ventas y demás exports.
 - Búsqueda global posterior: useListExpenses y LIST_EXPENSES_QUERY_KEY sin consumidores runtime; ExpensesPage es único consumidor de sus HEADERS. listItems/getDefaultListParams continúan en Users/CashBalances; entityList además en Historial. LAST_UPDATED_AT, Dexie, skipStorageUpdate, useFilters/useFilterParams, restore y Table local se conservan por consumidores reales. Sin nuevo legacy innecesario.
+
+## PR7 — Usuarios + Cajas — evidencia backend real del 02/11/2026
+
+**ESTADO: BLOQUEADA POR BACKEND. USERS: C — BLOQUEADO POR BACKEND. CASH: C — BLOQUEADO POR BACKEND.**
+
+No es un bloqueo de infraestructura frontend: ya existen `pagedLists`, `useServerListFilters` y `Table.serverPagination`. La migración podrá retomarse cuando los endpoints cumplan el contrato remoto necesario. No implementar migración parcial, workarounds frontend ni cambios de infraestructura para compensar estos resultados.
+
+Las pruebas se realizaron mediante HTTP autenticado contra el backend real configurado, desde la experimental `590-test-staging` (commit `ccbeec23d76bb5081b8bd3d77a93497a665c5523`). Este registro documenta sus resultados en la branch limpia `598-usuarios-cajas`; no traslada implementación experimental.
+
+### Users — bloqueo backend
+
+Requests de paginación probadas, sin reenviar cursor:
+
+- `GET /users?pageNumber=1&pageSize=1&count=true`
+- `GET /users?pageNumber=2&pageSize=1&count=false`
+
+**CONFIRMADO:** `count=true` devuelve el total como `number`; `count=false` omite `count`. La respuesta incluye `id`, `username`, `firstName`, `lastName`, `state` y `role`.
+
+**NO FUNCIONAL:** `pageNumber`; `pageSize` como paginación real; filtros `username`, `id`, `firstName`, `lastName`, `state`; sorts `username`, `id`, `lastName` con `order=true/false`.
+
+Evidencia concreta:
+
+- Cuenta `callixto`: ambas páginas devuelven los mismos 6 usuarios, en el mismo orden, aunque pageSize=1; primera respuesta count=6, segunda sin count. Sin LastEvaluatedKey.
+- Cuenta `maderera-las-tapias`: mismo comportamiento con 9 usuarios; primera respuesta count=9. Página 2 repite exactamente la colección de página 1. Confirma el fallo en otra cuenta.
+- Con pageNumber=1/pageSize=500/count=true, username e id se probaron individualmente con `miltonbarraza90@gmail.com`, firstName con `Milton`, lastName con `Barraza`: todos devuelven los 6 usuarios y count=6. `state=ACTIVE` y `state=INACTIVE` devuelven los mismos 6 ACTIVE.
+- Sort username/id conserva orden descendente incluso con order=true; lastName no queda ordenado en ninguna dirección. Sort state: **INDETERMINADO POR DATASET**, todos los usuarios observados son ACTIVE.
+
+Conclusión: `/usuarios` no puede migrarse correctamente a `Table.serverPagination` hasta que backend propague y aplique paginación, filtros y sorts. No implementar paginación local sobre la respuesta completa como compensación.
+
+### Seller catalog — pendiente
+
+El dropdown completo de vendedores de Ventas sigue pendiente. GET /users devuelve hoy colecciones pequeñas completas, con el shape requerido, pero carece de contrato numérico paginable confiable. Con pageSize=500, count=true en primera página y count=false en segunda, la segunda repite los mismos 6/9 usuarios; no permite construir un catálogo general completo sin cursor. No crear catálogo basado en el comportamiento accidental de que actualmente haya pocos usuarios.
+
+Pendientes backend: paginación real, política ACTIVE/INACTIVE y filtros/identidad. No hubo usuarios INACTIVE observables; su inclusión permanece **INDETERMINADA POR DATASET**. El input temporal de nombre completo en Ventas sigue aceptado hasta resolver el patrón global de búsquedas/selectores posterior a las 7 PR.
+
+### Cash — bloqueo backend
+
+Requests de paginación probadas, sin reenviar cursor:
+
+- `GET /cash-balances?pageNumber=1&pageSize=1&count=true`
+- `GET /cash-balances?pageNumber=2&pageSize=1&count=false`
+
+**CONFIRMADO:** pageSize funciona; count=true devuelve total `number`; count=false omite count; filtro id funciona; sort=id y order=true/false funcionan para ID.
+
+**NO FUNCIONAL:** pageNumber; state=OPEN/CLOSED; paymentMethod; paymentMethods; sorts updatedAt, startDate, initialAmount, currentAmount y closeDate.
+
+**INDETERMINADO POR DATASET:** sorts state y createdAt. En los registros disponibles coinciden con el orden por ID; esa correlación no confirma que backend aplique el sort solicitado. No equiparar startDate con createdAt.
+
+Evidencia concreta:
+
+- Cuenta `maderera-las-tapias`: páginas 1 y 2 devuelven A0017, ambas con LastEvaluatedKey={"id":"A0017"}; primera count=17, segunda sin count. pageSize=500 devuelve 17 cajas.
+- Cuenta `callixto`: páginas 1 y 2 devuelven A0003 y cursor A0003; total numérico 2. id=A0002 restringe a esa única caja y count=1.
+- En ambas cuentas, state=OPEN y state=CLOSED devuelven la colección con los dos estados, sin restringirla.
+- La experimental envía `paymentMethods` como string escalar. Se probaron individualmente `paymentMethod=Mercado+Pago+Adri` y `paymentMethods=Mercado+Pago+Adri` en Callixto: ambos devuelven las 2 cajas, incluida A0002 con sólo Efectivo. Parámetros ignorados, sin error.
+- En Maderera, ambos candidatos con Efectivo devuelven las 17 cajas, incluida A0004 con sólo Transferencia Bancaria. Existen 11 cajas con paymentMethods=[]; no aparecieron cajas con paymentMethods=null. El parámetro ignorado impide concluir semántica de [] como comodín; semántica de null no probada.
+- Todos los sorts se probaron con order=true y order=false. ID devuelve A0001…A0017 y su reverso; los sorts no funcionales mantienen esa secuencia aunque sus fechas/importes quedan desordenados.
+
+Conclusión: aunque algunas capacidades funcionan, `/cash-balances` no puede migrarse correctamente mientras pageNumber no avance. LastEvaluatedKey puede venir por compatibilidad, pero la migración nueva no debe volver a cursor. No implementar híbrido cursor/pageNumber ni paginar localmente una colección completa como reemplazo.
+
+### Necesidades pendientes de backend
+
+USERS:
+
+- Habilitar propagación/aplicación real de pageNumber/pageSize.
+- Definir filtro canónico Usuario.
+- Soportar firstName/lastName/state.
+- Definir whitelist de sorts/order.
+- Definir política ACTIVE/INACTIVE para catálogo de vendedores.
+
+CASH:
+
+- Habilitar pageNumber.
+- Soportar state.
+- Definir paymentMethod vs paymentMethods y semántica de []/null.
+- Definir whitelist definitiva de sorts.
+
+### Legacy conservado — PENDIENTE
+
+No se retiró ningún consumidor runtime en PR7. Mantener como **PENDIENTE**, con los consumidores de la tabla principal:
+
+- `useListUsers`: `/usuarios` y selector de vendedores de Historial.
+- `useListCashBalances`: `/cajas`.
+- `listItems`: APIs Users y CashBalances.
+- `entityList` y `LastEvaluatedKey`: listItems y useListBudgetsHistory.
+- Dexie `users`/`cashBalances`, `lastUpdatedAt`, sincronización y restore legacy relacionado: listados y bindings activos de restauración; no retirar helpers compartidos.
+
+Historial de Ventas sigue siendo consumidor legacy. Su eliminación posterior mantiene la decisión de producto registrada en PR5: incorporar consulta por fecha/rango en Ventas y después eliminar Historial. No eliminar legacy para avanzar artificialmente una PR bloqueada ni introducir legacy nuevo.
