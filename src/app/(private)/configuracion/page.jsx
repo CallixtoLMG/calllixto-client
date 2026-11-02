@@ -7,7 +7,7 @@ import { ALL, BUTTON_TEXTS, COLORS, ENTITIES, ICONS, INFO, PAGES, SETTINGS_TAB_M
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SettingsTabs from "@/components/settings";
 import { ENTITY_MAPPER, GET_SETTING_QUERY_KEY, LIST_SETTINGS_QUERY_KEY, sortSettingsByEntityOrder, SUPPORTED_SETTINGS } from "@/components/settings/settings.constants";
-import { useKeyboardShortcuts, useRestoreEntity, useUnsavedChanges } from "@/hooks";
+import { useKeyboardShortcuts, useUnsavedChanges } from "@/hooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { pick } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -19,7 +19,7 @@ const Settings = () => {
   const { push } = useRouter();
   const { setLabels } = useBreadcrumContext();
   const { setActions, setInfo } = useNavActionsContext();
-  const { data, isLoading: isLoadingSettings } = useListSettings();
+  const { data, isLoading: isLoadingSettings, refetch } = useListSettings();
   const editSetting = useEditSetting();
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
@@ -45,30 +45,17 @@ const Settings = () => {
     },
   });
 
-  const restoreSettings = useRestoreEntity({
-    entity: ENTITIES.SETTINGS,
-    key: LIST_SETTINGS_QUERY_KEY,
-  });
-  const restoreSettingsRef = useRef(restoreSettings);
-
   const handleSettingsRefresh = useCallback(async () => {
     setIsLoading(true)
-    if (typeof restoreSettingsRef.current !== "function") {
-      return;
-    }
     try {
-      await restoreSettingsRef.current();
+      await refetch({ throwOnError: true });
       toast.success("Configuración actualizada correctamente.");
     } catch (error) {
       console.error("Error al actualizar configuración:", error);
       toast.error("Hubo un error al actualizar la configuración.");
     }
     setIsLoading(false)
-  }, []);
-
-  useEffect(() => {
-    restoreSettingsRef.current = restoreSettings;
-  }, [restoreSettings]);
+  }, [refetch]);
 
   const settingsActions = useMemo(() => [
     {

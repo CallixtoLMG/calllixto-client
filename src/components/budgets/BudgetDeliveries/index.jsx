@@ -1,4 +1,4 @@
-import { useListProducts } from "@/api/products";
+import { useProductCatalog } from "@/api/productCatalogs";
 import { useConsumeStock } from "@/api/stock";
 import { IconedButton } from "@/common/components/buttons";
 import { Box, FieldsContainer, Flex, OverflowWrapper } from "@/common/components/custom";
@@ -66,7 +66,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
   const [deliveryNote, setDeliveryNote] = useState("");
   const [mode, setMode] = useState(null);
   const { isMobile, showText } = useBudgetActionButtonMode();
-  const { data: currentProductsData } = useListProducts();
+  const { data: currentProductsData } = useProductCatalog();
 
   const watchedProducts = useWatch({ control, name: "products" });
 

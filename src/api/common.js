@@ -1,7 +1,7 @@
 import { ALL, DATE_FORMATS, HARD_DELETED, LAST_UPDATED_AT } from "@/common/constants";
 import { getDefaultAttributes } from "@/common/utils";
 import { getDateWithOffset, getDayDifference, now } from "@/common/utils/dates";
-import { bulkPutStorageItems, clearStorageTable, getAllStorageItems, getStorageItem, removeStorageItem, removeStorageItemById, updateOrCreateStorageItem } from "@/db";
+import { bulkPutStorageItems, clearStorageTable, getAllStorageItems, getStorageItem, removeStorageItem, updateOrCreateStorageItem } from "@/db";
 import { useQueryClient } from "@tanstack/react-query";
 import { pick } from 'lodash';
 import { getInstance } from './axios';
@@ -218,21 +218,15 @@ export function useDeleteItem() {
 };
 
 export function useBatchDeleteItem() {
-  const invalidate = useInvalidateQueries();
-
   const batchDeleteItem = async ({
-    entity,
     url,
     ids,
-    deleteCondition = () => true,
-    invalidateQueries = [],
   }) => {
     if (!Array.isArray(ids) || ids.length === 0) {
       console.warn("[BatchDelete] No hay IDs válidos para eliminar.");
       return { statusOk: true, deletedCount: 0 };
     }
 
-    const successfulDeletes = [];
     let deletedCount = 0;
 
     for (const id of ids) {
@@ -240,9 +234,6 @@ export function useBatchDeleteItem() {
         const { data } = await getInstance().delete(`${url}/${id}`);
         if (data.statusOk) {
           deletedCount++;
-          if (deleteCondition(data)) {
-            successfulDeletes.push(id);
-          }
         } else {
           console.warn(`[BatchDelete] No se pudo eliminar el ID ${id}:`, data.error);
         }
@@ -250,16 +241,6 @@ export function useBatchDeleteItem() {
         console.error(`[BatchDelete] Error al eliminar ID ${id}:`, error);
       }
     }
-
-    if (successfulDeletes.length > 0) {
-      await Promise.all(
-        successfulDeletes.map((id) =>
-          removeStorageItemById({ entity, id })
-        )
-      );
-    }
-
-    invalidate(invalidateQueries);
 
     return { statusOk: true, deletedCount };
   };

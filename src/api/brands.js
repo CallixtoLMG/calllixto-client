@@ -1,10 +1,9 @@
 import { ENTITIES, INACTIVE, IN_MS, SET_STATE } from "@/common/constants";
-import { getDefaultListParams } from '@/common/utils';
-import { GET_BRAND_QUERY_KEY, LIST_ATTRIBUTES, LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
+import { GET_BRAND_QUERY_KEY, LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getInstance } from "./axios";
-import { listItems, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from './common';
+import { useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from './common';
 import { fetchAllListPages, invalidateServerLists, usePagedList } from './pagedLists';
 
 export const usePagedBrands = (state) => usePagedList({ ...state, entity: ENTITIES.BRANDS, url: PATHS.BRANDS });
@@ -16,11 +15,10 @@ export const fetchBrandsForExport = ({ appliedFilters, sort, order }) => fetchAl
 export function useListBrands() {
   const query = useQuery({
     queryKey: [LIST_BRANDS_QUERY_KEY],
-    queryFn: () => listItems({
-      entity: ENTITIES.BRANDS,
-      url: PATHS.BRANDS,
-      params: getDefaultListParams(LIST_ATTRIBUTES)
-    }),
+    queryFn: async ({ signal }) => ({ brands: await fetchAllListPages({
+      entity: ENTITIES.BRANDS, url: PATHS.BRANDS, signal,
+    }) }),
+    retry: false,
     staleTime: IN_MS.ONE_DAY,
   });
 
@@ -55,6 +53,7 @@ export const useCreateBrand = () => {
   const createBrand = async (brand) => {
     const data = await createItem({
       entity: ENTITIES.BRANDS,
+      skipStorageUpdate: true,
       url: PATHS.BRANDS,
       value: brand,
       responseEntity: ENTITIES.BRAND,
@@ -74,6 +73,7 @@ export const useDeleteBrand = () => {
   const deleteBrand = async (id) => {
     const data = await deleteItem({
       entity: ENTITIES.BRANDS,
+      skipStorageUpdate: true,
       id,
       url: `${PATHS.BRANDS}/${id}`,
       invalidateQueries: [[LIST_BRANDS_QUERY_KEY]]
@@ -92,6 +92,7 @@ export const useEditBrand = () => {
   const editBrand = async (brand) => {
     const data = await editItem({
       entity: ENTITIES.BRANDS,
+      skipStorageUpdate: true,
       url: `${PATHS.BRANDS}/${brand.id}`,
       value: brand,
       responseEntity: ENTITIES.BRAND,
@@ -111,6 +112,7 @@ export const useSetBrandState = () => {
   const setBrandState = async ({ id, state, inactiveReason }) => {
     const data = await updateItem({
       entity: ENTITIES.BRANDS,
+      skipStorageUpdate: true,
       url: `${PATHS.BRANDS}/${id}/${SET_STATE}`,
       value: {
         id,
@@ -122,7 +124,6 @@ export const useSetBrandState = () => {
         [LIST_BRANDS_QUERY_KEY],
         [GET_BRAND_QUERY_KEY, id],
       ],
-      attributes: LIST_ATTRIBUTES,
     });
     if (data?.statusOk) await invalidateServerLists(queryClient, ENTITIES.BRANDS);
     return data;

@@ -27,8 +27,7 @@ for (const [count, expected] of [
       chunk,
       PATHS: { PRODUCTS: "products" },
       EDIT_BATCH: "edit-batch",
-      LIST_PRODUCTS_QUERY_KEY: "list-products",
-      ALL: "all",
+      invalidateProductData: async () => {},
       useQueryClient: () => ({ invalidateQueries: () => {} }),
       setTimeout: (callback) => callback(),
       getInstance: () => ({
@@ -55,3 +54,30 @@ for (const [count, expected] of [
     assert.deepEqual(calls.flatMap((call) => call.body.update), products);
   });
 }
+
+test("product batch cache invalidation waits for remaining writes after a rejection", async () => {
+  let completeSecond;
+  let posts = 0;
+  let invalidations = 0;
+  const context = {
+    module: { exports: {} }, chunk, PATHS: { PRODUCTS: "products" }, EDIT_BATCH: "edit-batch",
+    useQueryClient: () => ({ invalidateQueries() {} }),
+    invalidateProductData: async () => { invalidations++; },
+    setTimeout: (callback) => callback(),
+    getInstance: () => ({ post: () => {
+      posts++;
+      if (posts === 1) return Promise.reject(new Error("First batch failed"));
+      return new Promise((resolve) => { completeSecond = () => resolve({ data: { statusOk: true } }); });
+    } }),
+  };
+  vm.runInNewContext(`${batchSource}\nmodule.exports = { useEditBatch };`, context);
+  const result = context.module.exports.useEditBatch()(Array.from({ length: 501 }, (_, id) => ({ id: `VA${id}` })));
+  const rejected = assert.rejects(result, /First batch failed/);
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.equal(posts, 2);
+  assert.equal(invalidations, 0);
+  completeSecond();
+  await rejected;
+  assert.equal(invalidations, 1);
+});
