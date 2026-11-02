@@ -1,36 +1,32 @@
-import { DATE_FORMATS, ENTITIES, IN_MS } from "@/common/constants";
-import { getDefaultListParams } from '@/common/utils';
-import { getDateWithOffset } from "@/common/utils/dates";
-import { GET_BUDGET_QUERY_KEY, LIST_ATTRIBUTES, LIST_BUDGETS_HISTORY_QUERY_KEY, LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
+import { ALL, ENTITIES, IN_MS } from "@/common/constants";
+import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_HISTORY_QUERY_KEY } from "@/components/budgets/budgets.constants";
 import { CANCEL, CONFIRM, PATHS, URL } from "@/fetchUrls";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getInstance } from './axios';
-import { entityList, listItems, useCreateItem, useEditItem, usePatchItem } from "./common";
+import { invalidateServerLists, usePagedList } from "./pagedLists";
+import { entityList, useCreateItem, useEditItem, usePatchItem } from "./common";
 
-export function useListBudgets({ defaultPageDateRange, enabled = true } = {}) {
-  return useQuery({
-    queryKey: [
-      LIST_BUDGETS_QUERY_KEY,
-      defaultPageDateRange,
-    ],
-    queryFn: () =>
-      listItems({
-        entity: ENTITIES.BUDGETS,
-        url: PATHS.BUDGETS,
-        params: {
-          ...getDefaultListParams(LIST_ATTRIBUTES),
-          sort: "createdAt",
-          startDate: getDateWithOffset({
-            offset: -defaultPageDateRange,
-            unit: "month",
-            format: DATE_FORMATS.ISO,
-          }),
-        },
-      }),
-    staleTime: IN_MS.ONE_DAY,
-    enabled
-  });
+export const getBudgetListState = (state, { startDate, settingsReady }) => {
+  const applied = state.appliedFilters;
+  const filters = {
+    id: applied.id,
+    customerName: applied.customer,
+    createdBy: applied.createdBy,
+    state: applied.state,
+    paymentStatus: applied.state === "CONFIRMED" ? applied.paymentStatus : "",
+  };
+  return {
+    ...state,
+    appliedFilters: {
+      ...Object.fromEntries(Object.entries(filters).filter(([, value]) => value && value !== ALL)),
+      startDate,
+    },
+    order: state.order === "asc",
+    hydrated: state.hydrated && settingsReady,
+  };
 };
+
+export const usePagedBudgets = (state) => usePagedList({ ...state, entity: ENTITIES.BUDGETS, url: PATHS.BUDGETS });
 
 export function useListBudgetsHistory({ startDate, endDate }) {
   return useQuery({
@@ -78,16 +74,19 @@ export function useGetBudget(id) {
 };
 
 export const useCreateBudget = () => {
+  const queryClient = useQueryClient();
   const createItem = useCreateItem();
 
-  const createBudget = (budget) => {
-    return createItem({
+  const createBudget = async (budget) => {
+    const data = await createItem({
       entity: ENTITIES.BUDGETS,
       url: PATHS.BUDGETS,
       value: budget,
       responseEntity: ENTITIES.BUDGET,
-      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY]],
+      invalidateQueries: [],
     });
+    if (data?.statusOk) await invalidateServerLists(queryClient, ENTITIES.BUDGETS);
+    return data;
   };
 
   return createBudget;
@@ -135,42 +134,49 @@ export const getPublicBudget = async ({ accountId, publicHash }) => {
 };
 
 export const useEditBudget = () => {
+  const queryClient = useQueryClient();
   const editItem = useEditItem();
 
-  const editBudget = (budget) => {
-    return editItem({
+  const editBudget = async (budget) => {
+    const data = await editItem({
       entity: ENTITIES.BUDGETS,
       url: `${PATHS.BUDGETS}/${budget.id}`,
       value: budget,
       responseEntity: ENTITIES.BUDGET,
-      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY], [GET_BUDGET_QUERY_KEY, budget.id]]
+      invalidateQueries: [[GET_BUDGET_QUERY_KEY, budget.id]]
     });
+    if (data?.statusOk) await invalidateServerLists(queryClient, ENTITIES.BUDGETS);
+    return data;
   };
 
   return editBudget;
 };
 
 export const useConfirmBudget = () => {
+  const queryClient = useQueryClient();
   const editItem = useEditItem();
 
-  const confirmBudget = (budget, id) => {
-    return editItem({
+  const confirmBudget = async (budget, id) => {
+    const data = await editItem({
       entity: ENTITIES.BUDGETS,
       url: `${PATHS.BUDGETS}/${id}/${CONFIRM}`,
       value: budget,
       responseEntity: ENTITIES.BUDGET,
-      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY], [GET_BUDGET_QUERY_KEY, id]]
+      invalidateQueries: [[GET_BUDGET_QUERY_KEY, id]]
     });
+    if (data?.statusOk) await invalidateServerLists(queryClient, ENTITIES.BUDGETS);
+    return data;
   };
 
   return confirmBudget
 };
 
 export const useConfirmBudgetDiscount = () => {
+  const queryClient = useQueryClient();
   const patchItem = usePatchItem();
 
-  const confirmBudgetDiscount = ({ id, postConfirmDiscount }) => {
-    return patchItem({
+  const confirmBudgetDiscount = async ({ id, postConfirmDiscount }) => {
+    const data = await patchItem({
       entity: ENTITIES.BUDGETS,
       url: `${PATHS.BUDGETS}/${id}/confirmed`,
       value: {
@@ -178,10 +184,11 @@ export const useConfirmBudgetDiscount = () => {
       },
       responseEntity: ENTITIES.BUDGET,
       invalidateQueries: [
-        [LIST_BUDGETS_QUERY_KEY],
         [GET_BUDGET_QUERY_KEY, id]
       ]
     });
+    if (data?.statusOk) await invalidateServerLists(queryClient, ENTITIES.BUDGETS);
+    return data;
   };
 
   return confirmBudgetDiscount;
@@ -189,17 +196,20 @@ export const useConfirmBudgetDiscount = () => {
 
 
 export const useCancelBudget = () => {
+  const queryClient = useQueryClient();
   const editItem = useEditItem();
 
-  const cancelBudget = ({ cancelData, id }) => {
-    return editItem({
+  const cancelBudget = async ({ cancelData, id }) => {
+    const data = await editItem({
       entity: ENTITIES.BUDGETS,
       url: `${PATHS.BUDGETS}/${id}/${CANCEL}`,
       value: cancelData,
       responseEntity: ENTITIES.BUDGET,
-      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY], [GET_BUDGET_QUERY_KEY, id]],
+      invalidateQueries: [[GET_BUDGET_QUERY_KEY, id]],
       skipStorageUpdate: true,
     });
+    if (data?.statusOk) await invalidateServerLists(queryClient, ENTITIES.BUDGETS);
+    return data;
   };
 
   return cancelBudget;

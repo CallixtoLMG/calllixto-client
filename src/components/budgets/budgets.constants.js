@@ -17,23 +17,8 @@ export const LIST_BUDGETS_HISTORY_QUERY_KEY = 'getBudgetsHistory';
 export const GET_BUDGET_QUERY_KEY = 'getBudget';
 export const BUDGETS_FILTERS_KEY = 'budgetsFilters';
 export const BUDGETS_HISTORY_FILTERS_KEY = 'budgetsHistoryFilters';
-export const LIST_ATTRIBUTES = [
-  "id",
-  "customer",
-  "state",
-  "products",
-  "globalDiscount",
-  "additionalCharge",
-  "createdBy",
-  "total",
-  "confirmedAt",
-  "confirmedBy",
-  "cancelledAt",
-  "cancelledBy",
-  "comments",
-  "paidAmount",
-  "customPDFDisclaimer"
-];
+export const SALES_FILTERS = { id: "", customer: "", createdBy: "", state: "", paymentStatus: "" };
+export const BUDGET_SORT_FIELDS = { id: "id", date: "createdAt" };
 export const BUDGETS_VIEW_MONTHS = 3;
 
 export const BUDGET_STATES = {

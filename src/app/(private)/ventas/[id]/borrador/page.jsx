@@ -2,7 +2,7 @@
 
 import { useUserContext } from "@/User";
 import { useConfirmBudget, useEditBudget, useGetBudget, } from "@/api/budgets";
-import { useListCustomers } from "@/api/customers";
+import { useCustomerCatalog } from "@/api/customers";
 import { useProductCatalog } from "@/api/productCatalogs";
 import { useGetSetting } from "@/api/settings";
 import { useConsumeStock } from "@/api/stock";
@@ -32,7 +32,7 @@ const BudgetDraft = ({ params }) => {
   const { resetActions } = useNavActionsContext();
   const { data: budget, isLoading: loadingBudget } = useGetBudget(id);
   const { data: productsData, isLoading: loadingProducts, refetch: refetchProductsData, } = useProductCatalog();
-  const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
+  const { data: customersData, isLoading: loadingCustomers } = useCustomerCatalog();
   const { data: paymentMethods, refetch: refetchPaymentMethods } = useGetSetting(ENTITIES.GENERAL);
   const { data: budgetSettings } = useGetSetting(ENTITIES.BUDGET);
   const editBudget = useEditBudget();

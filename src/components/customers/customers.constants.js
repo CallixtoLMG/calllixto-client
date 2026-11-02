@@ -3,11 +3,10 @@ import { CONTENT_SIZES, FIELD_LABELS } from "@/common/constants";
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/common/utils";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "../../common/components/tooltips";
 
-export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
+export const CUSTOMER_CATALOG_QUERY_KEY = 'customerCatalog';
 export const GET_CUSTOMER_QUERY_KEY = 'getCustomer';
 export const CUSTOMERS_FILTERS_KEY = 'customersFilters';
 export const CUSTOMER_SORT_FIELDS = { id: 'id', name: 'name', state: 'state' };
-export const LIST_ATTRIBUTES = ['id', 'name', 'addresses', 'phoneNumbers', 'comments', "state", "tags"];
 
 export const HEADERS = [
   {
