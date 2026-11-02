@@ -24,7 +24,7 @@ export const applyServerListFilters = (state, values, defaultFilters) => ({
   ...state, appliedFilters: normalizeFilters(values, defaultFilters), pageNumber: 1,
 });
 
-const useServerListFilters = ({ key: initialKey, defaultFilters: initialFilters, sortFields: initialSortFields, onApply }) => {
+const useServerListFilters = ({ key: initialKey, defaultFilters: initialFilters, sortFields: initialSortFields, onApply, ready = true, getDefaultFilters }) => {
   const [configuration] = useState(() => ({
     key: initialKey, defaultFilters: { ...initialFilters }, sortFields: { ...initialSortFields },
   }));
@@ -33,18 +33,25 @@ const useServerListFilters = ({ key: initialKey, defaultFilters: initialFilters,
     ...getServerListState(configuration), hydrated: false,
   }));
   const methods = useForm({ defaultValues: defaultFilters });
-  const { reset, handleSubmit } = methods;
+  const { reset, handleSubmit, resetField, setValue } = methods;
 
   useEffect(() => {
+    if (!ready || state.hydrated) return;
     let stored = {};
     try {
       stored = JSON.parse(window.localStorage.getItem(key) || "{}") || {};
     } catch {
     }
-    const restored = getServerListState(configuration, stored);
+    // Dynamic defaults (e.g. a date range resolved from Settings) start a new dataset.
+    const defaults = getDefaultFilters?.();
+    const restored = getServerListState(configuration, {
+      ...stored, ...defaults, ...(defaults && { page: 1 }),
+    });
     reset(restored.appliedFilters);
-    setState({ ...restored, hydrated: true });
-  }, [configuration, key, reset]);
+    const initialState = { ...restored, hydrated: true };
+    if (defaults) onApply?.(initialState);
+    setState(initialState);
+  }, [configuration, key, reset, ready, state.hydrated, getDefaultFilters, onApply]);
 
   const { appliedFilters, pageNumber, pageSize, sort, order, hydrated } = state;
   useEffect(() => {
@@ -60,11 +67,23 @@ const useServerListFilters = ({ key: initialKey, defaultFilters: initialFilters,
   }, [key, appliedFilters, pageNumber, pageSize, sort, order, hydrated, sortFields]);
 
   const applyFilters = useCallback((values) => {
+    if (!ready || !state.hydrated) return;
     const next = applyServerListFilters(state, values, defaultFilters);
     onApply?.(next);
-    reset(next.appliedFilters);
+    reset({ ...values, ...next.appliedFilters });
     setState(next);
-  }, [state, defaultFilters, onApply, reset]);
+  }, [state, defaultFilters, onApply, reset, ready]);
+
+  const applyFilterGroup = useCallback((values) => {
+    if (!ready || !state.hydrated) return;
+    const next = applyServerListFilters(state, { ...state.appliedFilters, ...values }, defaultFilters);
+    onApply?.(next);
+    Object.entries(values).forEach(([name, value]) => {
+      setValue(name, value);
+      resetField(name, { defaultValue: value });
+    });
+    setState(next);
+  }, [state, defaultFilters, onApply, ready, setValue, resetField]);
 
   const refresh = useCallback(() => {
     onApply?.(state);
@@ -88,7 +107,8 @@ const useServerListFilters = ({ key: initialKey, defaultFilters: initialFilters,
     ...state,
     methods,
     onSubmit: handleSubmit(applyFilters),
-    onRestoreFilters: () => applyFilters(defaultFilters),
+    onRestoreFilters: () => applyFilters({ ...defaultFilters, ...getDefaultFilters?.() }),
+    applyFilterGroup,
     appliedCount: Object.keys(defaultFilters).filter((field) => appliedFilters[field] !== defaultFilters[field]).length,
     setPageNumber,
     setPageSize,

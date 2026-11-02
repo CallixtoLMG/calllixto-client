@@ -20,7 +20,7 @@ test("sidebar tooltips depend on collapsed, disabled, and real truncation state"
 });
 
 test("sales sidebar uses specific Excel label without old generic text", () => {
-  const budgetsPage = read("src", "components", "budgets", "BudgetsPage", "index.jsx");
+  const budgetsPage = read("src", "app", "(private)", "ventas", "page.jsx");
 
   assert.match(budgetsPage, /text: "Descargar ventas en Excel"/);
   assert.match(budgetsPage, /text: "Descargar ventas en Excel"[\s\S]*showTooltipWhenExpanded: true/);
@@ -34,7 +34,6 @@ test("requested expanded tooltip exceptions are opt-in on action definitions", (
   const productDetailPage = read("src", "app", "(private)", "productos", "[id]", "page.client.jsx");
   const saleDetailPage = read("src", "app", "(private)", "ventas", "[id]", "page.client.jsx");
   const settingsPage = read("src", "app", "(private)", "configuracion", "page.jsx");
-  const historyPage = read("src", "app", "(private)", "historial-ventas", "page.jsx");
 
   assert.match(useListPageSideActions, /text: downloadTooltip \|\| "Descargar Excel"[\s\S]*showTooltipWhenExpanded: true/);
   assert.match(suppliersPage, /text: "Actualizar proveedores"[\s\S]*showTooltipWhenExpanded: true/);
@@ -45,5 +44,4 @@ test("requested expanded tooltip exceptions are opt-in on action definitions", (
   assert.match(saleDetailPage, /collapsedTooltip: `Enviar venta por \$\{channelText\} a \$\{text\}`,[\s\S]*showTooltipWhenExpanded: true/);
   assert.match(saleDetailPage, /text: 'Descargar PDF de la venta'[\s\S]*showTooltipWhenExpanded: true/);
   assert.match(settingsPage, /text: "Actualizar configuración"[\s\S]*showTooltipWhenExpanded: true/);
-  assert.match(historyPage, /text: "Descargar historial de ventas en Excel"[\s\S]*showTooltipWhenExpanded: true/);
 });

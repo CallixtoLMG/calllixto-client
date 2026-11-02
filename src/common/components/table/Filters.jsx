@@ -1,7 +1,6 @@
 import { Button as CustomButton, DropdownItem, Flex, Label } from '@/common/components/custom';
 import ModalAction from '@/common/components/modals/ModalAction';
 import { POPUP_POSITIONS, CONTENT_SIZES, BUTTON_TEXTS, COLORS, ENTITIES, ICONS, PAGES, SIZES } from "@/common/constants";
-import { LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
 import { LIST_CASH_BALANCES_QUERY_KEY } from '@/components/cashBalances/cashBalances.constants';
 import { LIST_USERS_QUERY_KEY } from '@/components/users/users.constants';
 import { useRestoreEntity } from '@/hooks';
@@ -13,7 +12,6 @@ import { DesktopRestoreAction, FiltersActions, FiltersContainer, FiltersSearchAc
 
 const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, hydrated, showRefetchAction = true }) => {
   const ENTITY_MAPPING = {
-    [ENTITIES.BUDGETS]: { queryKey: LIST_BUDGETS_QUERY_KEY, text: PAGES.BUDGETS.NAME },
     [ENTITIES.USERS]: { queryKey: LIST_USERS_QUERY_KEY, text: PAGES.USERS.NAME },
     [ENTITIES.CASHBALANCES]: { queryKey: LIST_CASH_BALANCES_QUERY_KEY, text: PAGES.CASH_BALANCES.NAME },
   };

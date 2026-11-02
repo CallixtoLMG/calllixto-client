@@ -1,12 +1,13 @@
 import { ALL, ENTITIES, IN_MS } from "@/common/constants";
-import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_HISTORY_QUERY_KEY } from "@/components/budgets/budgets.constants";
+import { GET_BUDGET_QUERY_KEY } from "@/components/budgets/budgets.constants";
+import { getBudgetDateRangeError } from "@/components/budgets/salesDateRange";
 import { CANCEL, CONFIRM, PATHS, URL } from "@/fetchUrls";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getInstance } from './axios';
 import { invalidateServerLists, usePagedList } from "./pagedLists";
-import { entityList, useCreateItem, useEditItem, usePatchItem } from "./common";
+import { useCreateItem, useEditItem, usePatchItem } from "./common";
 
-export const getBudgetListState = (state, { startDate, settingsReady }) => {
+export const getBudgetListState = (state, { settingsReady }) => {
   const applied = state.appliedFilters;
   const filters = {
     id: applied.id,
@@ -19,31 +20,15 @@ export const getBudgetListState = (state, { startDate, settingsReady }) => {
     ...state,
     appliedFilters: {
       ...Object.fromEntries(Object.entries(filters).filter(([, value]) => value && value !== ALL)),
-      startDate,
+      startDate: applied.startDate,
+      endDate: applied.endDate,
     },
     order: state.order === "asc",
-    hydrated: state.hydrated && settingsReady,
+    hydrated: state.hydrated && settingsReady && !getBudgetDateRangeError(applied),
   };
 };
 
 export const usePagedBudgets = (state) => usePagedList({ ...state, entity: ENTITIES.BUDGETS, url: PATHS.BUDGETS });
-
-export function useListBudgetsHistory({ startDate, endDate }) {
-  return useQuery({
-    queryKey: [LIST_BUDGETS_HISTORY_QUERY_KEY, JSON.stringify({ startDate, endDate })],
-    queryFn: () => entityList({
-      entity: ENTITIES.BUDGETS,
-      url: PATHS.BUDGETS,
-      params: {
-        sort: 'createdAt',
-        startDate,
-        endDate
-      }
-    }),
-    staleTime: IN_MS.ONE_DAY,
-    enabled: !!startDate && !!endDate,
-  });
-};
 
 export function useGetBudget(id) {
   const getBudget = async (id) => {
@@ -84,6 +69,7 @@ export const useCreateBudget = () => {
       value: budget,
       responseEntity: ENTITIES.BUDGET,
       invalidateQueries: [],
+      skipStorageUpdate: true,
     });
     if (data?.statusOk) await invalidateServerLists(queryClient, ENTITIES.BUDGETS);
     return data;
@@ -143,7 +129,8 @@ export const useEditBudget = () => {
       url: `${PATHS.BUDGETS}/${budget.id}`,
       value: budget,
       responseEntity: ENTITIES.BUDGET,
-      invalidateQueries: [[GET_BUDGET_QUERY_KEY, budget.id]]
+      invalidateQueries: [[GET_BUDGET_QUERY_KEY, budget.id]],
+      skipStorageUpdate: true,
     });
     if (data?.statusOk) await invalidateServerLists(queryClient, ENTITIES.BUDGETS);
     return data;
@@ -162,7 +149,8 @@ export const useConfirmBudget = () => {
       url: `${PATHS.BUDGETS}/${id}/${CONFIRM}`,
       value: budget,
       responseEntity: ENTITIES.BUDGET,
-      invalidateQueries: [[GET_BUDGET_QUERY_KEY, id]]
+      invalidateQueries: [[GET_BUDGET_QUERY_KEY, id]],
+      skipStorageUpdate: true,
     });
     if (data?.statusOk) await invalidateServerLists(queryClient, ENTITIES.BUDGETS);
     return data;
@@ -185,7 +173,8 @@ export const useConfirmBudgetDiscount = () => {
       responseEntity: ENTITIES.BUDGET,
       invalidateQueries: [
         [GET_BUDGET_QUERY_KEY, id]
-      ]
+      ],
+      skipStorageUpdate: true,
     });
     if (data?.statusOk) await invalidateServerLists(queryClient, ENTITIES.BUDGETS);
     return data;

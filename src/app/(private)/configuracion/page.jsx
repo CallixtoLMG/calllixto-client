@@ -91,7 +91,7 @@ const Settings = () => {
     onSuccess: () => {
       toast.success("Cambios guardados correctamente.");
       methods.reset(methods.getValues());
-      queryClient.invalidateQueries({ queryKey: [[GET_SETTING_QUERY_KEY]], refetchType: ALL })
+      queryClient.invalidateQueries({ queryKey: [GET_SETTING_QUERY_KEY], refetchType: ALL })
     },
     onError: (error) => {
       toast.error(`Error al guardar cambios: ${error.message || error}`);

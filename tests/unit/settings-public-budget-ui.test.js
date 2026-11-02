@@ -22,11 +22,11 @@ test("settings budget general exposes and persists publicEnabled checkbox", () =
   assert.doesNotMatch(settingsConstants, /TODO: incluir publicEnabled/);
 });
 
-test("settings budget history date ranges delete icon shows pointer cursor", () => {
-  const historyRanges = read("src", "components", "settings", "Entities", "Budgets", "General", "HistoryDateRangesControlled.jsx");
+test("settings sales date ranges delete icon shows pointer cursor", () => {
+  const salesRanges = read("src", "components", "settings", "Entities", "Budgets", "General", "SalesDateRangesControlled.jsx");
 
-  assert.match(historyRanges, /<Icon[\s\S]*\$pointer[\s\S]*name=\{ICONS\.TRASH\}[\s\S]*onClick=\{\(\) => remove\(index\)\}/);
-  assert.doesNotMatch(historyRanges, /pointer="true"/);
+  assert.match(salesRanges, /<Icon[\s\S]*\$pointer[\s\S]*name=\{ICONS\.TRASH\}[\s\S]*onClick=\{\(\) => remove\(index\)\}/);
+  assert.doesNotMatch(salesRanges, /pointer="true"/);
 });
 
 test("sidebar actions use specific labels instead of redundant generic tooltips", () => {
@@ -40,12 +40,10 @@ test("sidebar actions use specific labels instead of redundant generic tooltips"
     read("src", "app", "(private)", "cajas", "page.jsx"),
     read("src", "app", "(private)", "usuarios", "page.jsx"),
     read("src", "app", "(private)", "ventas", "[id]", "page.client.jsx"),
-    read("src", "components", "budgets", "BudgetsPage", "index.jsx"),
   ].join("\n");
 
   [
     "Crear venta",
-    "Historial de ventas",
     "Crear cliente",
     "Crear proveedor",
     "Crear producto",

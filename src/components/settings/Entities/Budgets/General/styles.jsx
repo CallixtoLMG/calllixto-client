@@ -2,7 +2,7 @@ import { Label as SLabel, List as SList } from "semantic-ui-react";
 import styled from 'styled-components';
 import { FlexColumn } from "@/common/components/custom";
 
-const HistoryDateRangesContainer = styled(FlexColumn)`
+const SalesDateRangesContainer = styled(FlexColumn)`
   @media (max-width: 767px) {
     width: 100% !important;
     min-width: 0;
@@ -34,5 +34,5 @@ const Label = styled(SLabel)`
   line-height: 20px!important;
 `;
 
-export { HistoryDateRangesContainer, Label, List, ListItem };
+export { SalesDateRangesContainer, Label, List, ListItem };
 

@@ -4,12 +4,12 @@ import { DropdownField } from "@/common/components/form";
 import { POPUP_POSITIONS, BUTTON_TEXTS, COLORS, FIELD_LABELS, ICONS } from "@/common/constants";
 import { formatCount, formatLastCount } from "@/common/utils/pluralization";
 import SettingsFieldLabel from "@/components/settings/Common/SettingsFieldLabel";
-import { BASE_HISTORY_RANGES, BUDGETS_RANGE_DATE_UNIT_CONFIG, BUDGETS_RANGE_DATE_UNIT_OPTIONS, SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
+import { BASE_SALES_RANGES, BUDGETS_RANGE_DATE_UNIT_CONFIG, BUDGETS_RANGE_DATE_UNIT_OPTIONS, SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useMemo, useRef, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Form, Popup } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
-import { HistoryDateRangesContainer, Label, List, ListItem } from "./styles";
+import { SalesDateRangesContainer, Label, List, ListItem } from "./styles";
 
 const getRangeLabel = ({ value, unit }) => {
   if (!unit || !value) return "";
@@ -17,7 +17,7 @@ const getRangeLabel = ({ value, unit }) => {
   return formatLastCount(value, unit);
 };
 
-export const HistoryDateRangesControlled = () => {
+export const SalesDateRangesControlled = () => {
   const { control } = useFormContext();
 
   const { fields, append, remove } = useFieldArray({
@@ -61,15 +61,15 @@ export const HistoryDateRangesControlled = () => {
   };
 
   return (
-    <HistoryDateRangesContainer width="50%" $rowGap="15px">
+    <SalesDateRangesContainer width="50%" $rowGap="15px">
       <FlexColumn>
         <Label>
-          <SettingsFieldLabel helpText={SETTINGS_HELP_TEXTS.BUDGET_HISTORY_DATE_RANGES}>
-            Opciones de fechas Historial Ventas
+          <SettingsFieldLabel helpText={SETTINGS_HELP_TEXTS.BUDGET_SALES_DATE_RANGES}>
+            Opciones de fechas Ventas
           </SettingsFieldLabel>
         </Label>
         <List divided verticalAlign="middle">
-          {BASE_HISTORY_RANGES.map(range => (
+          {BASE_SALES_RANGES.map(range => (
             <ListItem key={range.key}>
               <List.Content>
                 {range.label}
@@ -145,6 +145,6 @@ export const HistoryDateRangesControlled = () => {
           </FlexColumn>
         </Form>
       </Popup>
-    </HistoryDateRangesContainer>
+    </SalesDateRangesContainer>
   );
 };
