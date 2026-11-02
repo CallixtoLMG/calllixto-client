@@ -1,69 +1,65 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useListExpenses } from "@/api/expenses";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
-import { downloadExcel } from "@/common/utils";
+import { getExpenseListState, usePagedExpenses } from "@/api/expenses";
+import { useRefreshServerList } from "@/api/pagedLists";
+import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import ExpensesPage from "@/components/expenses/ExpensesPage";
-import { EXPENSE_STATES } from "@/components/expenses/expenses.constants";
+import { EMPTY_FILTERS, EXPENSES_FILTERS_KEY, EXPENSE_SORT_FIELDS } from "@/components/expenses/expenses.constants";
 import { useBreadcrumContext } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks";
+import useServerListFilters from "@/hooks/useServerListFilters";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
+import { toast } from "react-hot-toast";
 
 const Expenses = () => {
-  const { data, isLoading, isRefetching, refetch } = useListExpenses();
+  const refreshList = useRefreshServerList(ENTITIES.EXPENSES);
+  const applyList = useCallback((state) => refreshList(getExpenseListState(state)), [refreshList]);
+  const list = useServerListFilters({
+    key: EXPENSES_FILTERS_KEY, defaultFilters: EMPTY_FILTERS, sortFields: EXPENSE_SORT_FIELDS, onApply: applyList,
+  });
+  const requestState = getExpenseListState(list);
+  const { data, total, isFetching, error } = usePagedExpenses(requestState);
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { push } = useRouter();
+  const { hydrated, pageNumber, pageSize, setPageNumber, refresh } = list;
 
   useEffect(() => {
     setLabels([{ name: PAGES.EXPENSES.NAME }]);
-    refetch();
-  }, [setLabels, refetch]);
+  }, [setLabels]);
+  useEffect(() => {
+    if (!hydrated || isFetching || total === null) return;
+    const lastPage = Math.max(1, Math.ceil(total / pageSize));
+    if (pageNumber > lastPage) setPageNumber(lastPage);
+  }, [hydrated, isFetching, total, pageNumber, pageSize, setPageNumber]);
+  useEffect(() => {
+    if (error) toast.error(error.message);
+  }, [error]);
 
-  const expenses = useMemo(() => data?.expenses, [data]);
-  const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
-
-  const handleDownloadExcel = useCallback((elements) => {
-    if (!elements.length) return;
-    const headers = ['ID', 'Nombre', 'Categorias', 'Monto', 'Estado', 'Comentarios'];
-    const mappedExpenses = elements.map(expense => {
-      const expenseState = EXPENSE_STATES[expense.state]?.singularTitle || expense.state;
-      return [
-        expense.id,
-        expense.name,
-        expense.categories?.map(cat => cat.name).join(', ') ?? '',
-        expense.amount,
-        expenseState,
-        expense.comments,
-      ];
-    });
-    downloadExcel([headers, ...mappedExpenses], "Lista de Gastos");
-  }, []);
-
-  const sideActions = useMemo(() => RULES.canCreate[role] ? [
-      {
-        id: 1,
-        icon: ICONS.ADD,
-        color: COLORS.GREEN,
-        onClick: () => { push(PAGES.EXPENSES.CREATE) },
-        text: 'Crear gasto',
-      }
-    ] : [], [push, role]);
+  const sideActions = useMemo(() => [
+    ...(RULES.canCreate[role] ? [{
+      id: 1, icon: ICONS.ADD, color: COLORS.GREEN,
+      onClick: () => push(PAGES.EXPENSES.CREATE), text: "Crear gasto",
+    }] : []),
+    {
+      id: "update", icon: ICONS.REFRESH, color: COLORS.BLUE, text: "Actualizar gastos",
+      onClick: refresh, disabled: !hydrated || isFetching,
+    },
+    {
+      id: "download-excel", icon: ICONS.FILE_EXCEL, color: COLORS.BLUE, text: "Descargar gastos en Excel",
+      disabled: true, tooltip: "La exportación completa no está disponible por el momento.",
+      showTooltipWhenExpanded: true,
+    },
+  ], [push, role, refresh, hydrated, isFetching]);
 
   useKeyboardShortcuts(() => push(PAGES.EXPENSES.CREATE), SHORTKEYS.ENTER);
 
-  return (
-    <ExpensesPage
-      onRefetch={refetch}
-      isLoading={loading}
-      expenses={loading ? [] : expenses}
-      role={role}
-      onDownloadExcel={handleDownloadExcel}
-      sideActions={sideActions}
-    />
-  );
+  return <ExpensesPage
+    isLoading={!hydrated || isFetching} expenses={data?.items ?? []}
+    list={{ ...list, appliedCount: Object.keys(requestState.appliedFilters).length }} total={total} sideActions={sideActions}
+  />;
 };
 
 export default Expenses;
