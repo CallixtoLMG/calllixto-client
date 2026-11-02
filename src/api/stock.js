@@ -1,11 +1,12 @@
 import { ENTITIES, IN_MS } from "@/common/constants";
-import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
+import { GET_BUDGET_QUERY_KEY } from "@/components/budgets/budgets.constants";
 import { GET_PRODUCT_QUERY_KEY, GET_STOCK_FLOW_QUERY_KEY, LIST_STOCK_FLOWS_QUERY_KEY } from "@/components/products/products.constants";
 import { GET_SUPPLIER_QUERY_KEY } from "@/components/suppliers/suppliers.constants";
 import { ADD, CONSUME, PATHS } from "@/fetchUrls";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getInstance } from "./axios";
 import { invalidateProductData } from "./productCatalogs";
+import { invalidateServerLists } from "./pagedLists";
 import { useCreateItem, useInvalidateQueries, usePostUpdateItem } from "./common";
 
 export const MAX_STOCK_BATCH_FLOWS = 250;
@@ -154,10 +155,10 @@ export const useConsumeStock = () => {
       skipStorageUpdate: true,
       invalidateQueries: [
         [GET_BUDGET_QUERY_KEY, budgetId],
-        [LIST_BUDGETS_QUERY_KEY],
         [LIST_STOCK_FLOWS_QUERY_KEY, budgetId],
       ],
     });
+    if (data?.statusOk) await invalidateServerLists(queryClient, ENTITIES.BUDGETS);
     if (data?.statusOk && flows?.length) await invalidateProductData(queryClient, { ids: flows.map((flow) => flow.productId) });
     return data;
   };

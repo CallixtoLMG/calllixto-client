@@ -20,11 +20,11 @@ const load = (file, dependencies) => {
   const { outputText } = ts.transpileModule(fs.readFileSync(path.join(root, file), "utf8"), {
     fileName: file, compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, jsx: ts.JsxEmit.ReactJSX },
   });
-  const module = { exports: {} };
-  vm.runInNewContext(outputText, { module, exports: module.exports, console,
+  const loaded = { exports: {} };
+  vm.runInNewContext(outputText, { module: loaded, exports: loaded.exports, console,
     require: (name) => Object.hasOwn(dependencies, name) ? dependencies[name] : require(name),
   }, { filename: file });
-  return module.exports;
+  return loaded.exports;
 };
 const plain = (value) => JSON.parse(JSON.stringify(value));
 const productUtils = load("src/components/products/products.utils.js", { "./products.constants": { PRODUCT_STATES: {} } });
@@ -246,7 +246,7 @@ test("ProductsPage binds a remote page and keeps draft controls passive", (t) =>
   const Page = load("src/components/products/ProductsPage/index.jsx", {
     "@/User": { useUserContext: () => ({ role: "viewer" }) }, "@/api/products": a.api,
     "@/common/components/buttons": { IconedButton: Box }, "@/common/components/custom": { Flex: Box },
-    "@/common/components/custom/PrintBarCodes": { default: React.forwardRef(() => null) },
+    "@/common/components/custom/PrintBarCodes": { default: React.forwardRef(function RefStub() { return null; }) },
     "@/common/components/form": { TextControlled: Box, DropdownControlled: (props) => { dropdown = props; return null; } },
     "@/common/components/modals": { ModalAction: () => null, ModalMultiDelete: () => null },
     "@/common/components/table": { Filters: Box, Table: (props) => { table = props; return null; } },
@@ -282,7 +282,7 @@ test("stock changes invalidate supplier cache even after a partially successful 
   const stock = load("src/api/stock.js", {
     "@/common/constants": constants, "@/fetchUrls": { PATHS: { STOCK_FLOWS: "stockFlows" }, ADD: "add" },
     "@/components/products/products.constants": productConstants, "@/components/budgets/budgets.constants": {},
-    "@/components/suppliers/suppliers.constants": {}, "./productCatalogs": a.catalogs,
+    "@/components/suppliers/suppliers.constants": {}, "./productCatalogs": a.catalogs, "./pagedLists": a.paged,
     "./common": { ...a.common, useInvalidateQueries: () => () => {} },
     "./axios": { getInstance: () => ({ post: async () => ({ data: { statusOk: ++posts === 1 } }) }) },
   });
@@ -314,14 +314,14 @@ test("Brand/Supplier initial render never starts a product catalog for associati
     "@/common/components/form": { TextField: Box }, "@/common/components/modals": { ModalAction: () => null },
     "@/common/components/modals/ModalAction": { default: () => null },
     "@/common/components/modals/ModalUnsavedChanges": { default: () => null },
-    "@/common/components/custom/PrintBarCodes": { default: React.forwardRef(() => null) },
+    "@/common/components/custom/PrintBarCodes": { default: React.forwardRef(function RefStub() { return null; }) },
     "@/common/utils": { isItemInactive: () => false },
     "@/components/layout": { OnlyPrint: () => null, useBreadcrumContext: () => ({ setLabels: noop }),
       useNavActionsContext: () => ({ resetActions: noop, setActions: noop }) },
     "@/components/products/products.constants": productConstants, "@/components/products/products.utils": productUtils,
     "@/components/products/BatchImportStock": { BatchImportStock: Box },
-    "@/components/brands/BrandForm": { default: React.forwardRef(() => null) },
-    "@/components/suppliers/SupplierForm": { default: React.forwardRef(() => null) },
+    "@/components/brands/BrandForm": { default: React.forwardRef(function RefStub() { return null; }) },
+    "@/components/suppliers/SupplierForm": { default: React.forwardRef(function RefStub() { return null; }) },
     "@/components/suppliers/suppliers.constants": {},
     "@/hooks": { useAllowUpdate: () => ({}), useProtectedAction: () => ({}), useUnsavedChanges: () => ({}) },
     "@/roles": { RULES: { canUpdate: {}, canRemove: {} } },
