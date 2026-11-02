@@ -1,6 +1,6 @@
 # Legacy de la migración PostgreSQL
 
-Registro único de piezas revisadas durante la migración. PR actual: **PR7 — Usuarios + Cajas, BLOQUEADA POR BACKEND** según pruebas reales del 02/11/2026. Historial, Usuarios y Cajas conservan sus consumidores legacy; no se implementa migración parcial.
+Registro único de piezas revisadas durante la migración. Cambio actual: **Historial de Ventas ELIMINADO; rango de fechas trasladado a `/ventas`**. PR7 — Usuarios + Cajas continúa **BLOQUEADA POR BACKEND** según pruebas reales del 02/11/2026; sin migración parcial. Las secciones PR4–PR7 conservan evidencia histórica de sus cierres; la tabla y el cierre actual reflejan consumidores vigentes.
 
 - Con consumidores runtime: conservar y actualizar consumidores, motivo y PR prevista.
 - Al retirar el último consumidor: buscar globalmente, eliminar código/imports/tests/comentarios huérfanos y marcar **ELIMINADO** en la misma PR.
@@ -16,18 +16,18 @@ Registro único de piezas revisadas durante la migración. PR actual: **PR7 — 
 | `src/api/products.js` — `useListProducts` y sus keys/carga de listado local. | 0. Crear/borrador de Ventas, `BudgetDeliveries` e importaciones pasan a `useProductCatalog`; listado usa `usePagedProducts`. | Retirados hook, keys `LIST_PRODUCTS_QUERY_KEY` / `LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY`, parámetro de invalidación batch sin consumidores e imports asociados. `LIST_ATTRIBUTES` de Productos se conserva: `BudgetForm` deriva de ella los atributos del producto que guarda el presupuesto, excluyendo `stockControl`. | PR4 — retirado sólo listado legacy; contrato compartido de atributos conservado. | ELIMINADO |
 | `src/api/products.js` — `useHasProductsByBrandId`: asociación descargando catálogo global. | 0. Detalle Marca usa exclusivamente `hasProducts` booleano backend. | Eliminado hook y loading dependiente del catálogo; flag ausente/inválido bloquea eliminación, sin fallback. | PR4 — retirado. | ELIMINADO |
 | `src/api/products.js` — `useProductsBySupplierId`: catálogo global y filtro por prefijo. | 0. Detalle Proveedor usa `hasProducts`; herramientas cargan `/products?supplierId=...` bajo demanda. | Retirados hook, filtro local y refetch al montar. No existe hook `useHasProductsBySupplierId` ni botón manual de precarga en esta base. | PR4 — retirado. | ELIMINADO |
-| `src/api/users.js` — `useListUsers`: listado/catálogo legacy de Usuarios. | `/usuarios`; selector de vendedores de `/historial-ventas`. `/ventas` mantiene input temporal y no consulta este hook. | Prueba real 02/11/2026: GET /users ignora paginación numérica, filtros probados y sorts username/id/lastName. Página 2 repite la colección completa de página 1, incluso con pageSize=1. Conservar flujo legacy; no compensar con paginación local. | PR7 — BLOQUEADA POR BACKEND hasta disponer del contrato remoto necesario. | PENDIENTE |
+| `src/api/users.js` — `useListUsers`: listado legacy de Usuarios. | Sólo `/usuarios`; consumidor Historial eliminado. `/ventas` mantiene input temporal y no consulta este hook. | GET /users ignora paginación numérica, filtros y sorts probados. Conservar flujo legacy; no compensar localmente. | PR7 — BLOQUEADA POR BACKEND. | PENDIENTE |
 | `src/api/cashBalances.js` — `useListCashBalances`: listado legacy de Cajas. | `/cajas`. | Prueba real 02/11/2026: pageSize, count, filtro id y dirección por id funcionan, pero pageNumber no avanza; estado y métodos no filtran. Conservar flujo legacy sin migración parcial, híbrido cursor/pageNumber ni paginación local compensatoria. | PR7 — BLOQUEADA POR BACKEND hasta disponer del contrato remoto necesario. | PENDIENTE |
-| `src/api/common.js` — `entityList` / `LastEvaluatedKey`. | `listItems`; `useListBudgetsHistory` en `src/api/budgets.js`. | Historial continúa por decisión de alcance; Usuarios y Cajas todavía usan cursor indirectamente. Ventas, Gastos y catálogo Clientes ya no lo usan. | Retiro de Historial después de las 7 PR + migración de entidades restantes. | PENDIENTE |
+| `src/api/common.js` — `entityList` / `LastEvaluatedKey`. | Sólo `listItems`, desde APIs Users/CashBalances. | Historial ya no consume cursor; helpers compartidos siguen necesarios para Usuarios/Cajas. | PR7 — BLOQUEADA POR BACKEND. | PENDIENTE |
 | `src/api/common.js` — `listItems`: sincronización incremental y lectura Dexie. | APIs `users`, `cashBalances`. | Dos consumidores runtime restantes tras migrar Gastos; conservar hasta migrarlos. | PR7 y cierre posterior; distribución a definir. | PENDIENTE |
 | `src/api/common.js` — `activeVersion`, `LAST_UPDATED_AT`, `hardReset`, `startDate`/`updatedAt` de sincronización. | `listItems`; `src/hooks/useRestoreEntity.js` usa `LAST_UPDATED_AT` para restauración. | Determinan actualización incremental y reinicio de cache de consumidores legacy. Las pantallas remotas no los usan como fuente visual. | Retirada de sincronización Dexie tras últimos catálogos/listados. | PENDIENTE |
-| `src/db.js` — tablas Dexie restantes y helpers de lectura/escritura/borrado. | Usuarios, Cajas; mutaciones de Budgets y bindings de restauración de `BudgetsPage`/`Filters` legacy. `lastUpdatedAt` mantiene sincronización/restauración. | Customers retirado por versión 3; Expenses por versión 4. Mutaciones de ambos omiten escrituras locales. Budgets conserva acoplamiento legacy de restauración/CRUD; ya no es fuente visual de Ventas. No se refactorizó Historial. | Últimos consumidores locales; revisar Budgets al retirar Historial. | PENDIENTE |
+| `src/db.js` — tablas Dexie restantes y helpers. | Usuarios, Cajas y `lastUpdatedAt` de sincronización/restauración. | Budgets retirado por versión 5; CRUD Budgets omite escrituras. Customers/Expenses ya retirados por versiones 3/4. Mantener helpers por Users/Cash. | Últimos consumidores locales, PR7 bloqueada por backend. | PENDIENTE |
 | `src/common/utils/index.js` — `getDefaultListParams`: proyección `attributes`. | APIs `users`, `cashBalances`. | Conserva dos consumidores. Proyecciones legacy de Budgets/Customers retiradas en PR5 y Expenses en PR6. | Migración de entidades restantes. | PENDIENTE |
 | `src/components/customers/customers.constants.js` — `LIST_CUSTOMERS_QUERY_KEY` y `LIST_ATTRIBUTES`. | 0. Catálogo nuevo usa `CUSTOMER_CATALOG_QUERY_KEY`; mutaciones ya no proyectan/escriben Dexie. | Eliminados exports/imports antiguos tras búsqueda global. Contrato de atributos de Productos usado por `BudgetForm` se conserva. | PR5 — retirado. | ELIMINADO |
-| `src/hooks/useFilters.js` — formulario y filtros locales. | `BudgetsPage` sólo para Historial; `ProductStock`, `UserPage`, `CashBalancesPage`, `CashBalanceMovements`. | Ventas y Gastos usan `useServerListFilters`. Consumidores legacy/embebidos siguen activos. | Entidades restantes + retiro de Historial después de las 7 PR. | PENDIENTE |
-| `src/hooks/useFilterParams.js` — preferencias locales. | `useFilters`; `historial-ventas/page.jsx`. | Sigue activo en consumidores no migrados. Historial no se modifica en PR5. | Entidades restantes + retiro posterior de Historial. | PENDIENTE |
-| `src/hooks/useRestoreEntity.js` — restauración de cache/fecha local. | `Filters.jsx`, `useListPageSideActions.jsx`, `BudgetsPage` legacy utilizado por Historial. | Ventas nuevas no activa ramas de restore; bindings legacy y otras entidades continúan. | Listados restantes y retiro posterior de Historial. | PENDIENTE |
-| `Filters.jsx` y `useListPageSideActions.jsx` — actualización/export de colección filtrada local. | Historial a través de `BudgetsPage`; listados Usuarios y Cajas. El registro de acciones también sirve a páginas remotas. | Ventas y Gastos sólo registran acciones explícitas: sin export de página ni restore local. | Entidades restantes y retiro posterior de Historial. | PENDIENTE |
+| `src/hooks/useFilters.js` — formulario y filtros locales. | `ProductStock`, `UserPage`, `CashBalancesPage`, `CashBalanceMovements`. | Consumidor BudgetsPage/Historial eliminado; Ventas/Gastos usan `useServerListFilters`. | Entidades restantes; conservar tablas embebidas legítimas. | PENDIENTE |
+| `src/hooks/useFilterParams.js` — preferencias locales. | `useFilters`. | Consumidor directo Historial eliminado; sigue activo para consumidores locales restantes. | Entidades restantes. | PENDIENTE |
+| `src/hooks/useRestoreEntity.js` — restauración de cache/fecha local. | `Filters.jsx`, `useListPageSideActions.jsx`, para Usuarios/Cajas. | Bindings Budgets eliminados; helpers globales continúan por consumidores reales. | PR7 — BLOQUEADA POR BACKEND. | PENDIENTE |
+| `Filters.jsx` y `useListPageSideActions.jsx` — actualización/export de colección local. | Usuarios/Cajas; registro de acciones también usado por páginas remotas. | Historial/BudgetsPage eliminado. Ventas/Gastos sólo registran acciones explícitas, sin restore ni export local. | Entidades restantes. | PENDIENTE |
 | `src/common/components/table/Table.jsx` — modo local (`filter`/`sort`/`slice`, `header.sortValue`). | Listados aún locales y tablas embebidas de contactos, movimientos y detalles de caja. | No todo modo local es deuda: formularios/tablas embebidas tienen usos legítimos aunque se migren todos los listados. Su retirada global requiere distinguir consumidores. | Cierre de listados: decidir qué bindings retirar conservando tablas locales legítimas. | NECESITA DECISIÓN |
 | Bindings legacy de `/clientes`: `useListCustomers` en `src/app/(private)/clientes/page.jsx`; `useFilters`, `createFilter`, callbacks de colección local en `CustomersPage/index.jsx`. | 0 en el listado visual; catálogo compartido y hook local general continúan en filas anteriores. | Eliminados por PR3; pantalla y export ahora usan paginación numérica y filtros applied. | PR3 — retirado. | ELIMINADO |
 | Bindings legacy de `/proveedores`: `useListSuppliers` en `src/app/(private)/proveedores/page.jsx`; `useFilters`, `createFilter`, callbacks de colección local en `SuppliersPage/index.jsx`. | 0 en el listado visual; catálogo compartido numérico continúa; asociación y detalle se migraron en PR4. | Eliminados por PR3; pantalla y export ya no recorren cursor. | PR3 — retirado. | ELIMINADO |
@@ -40,13 +40,16 @@ Registro único de piezas revisadas durante la migración. PR actual: **PR7 — 
 | `LIST_ATTRIBUTES` de Marcas/Proveedores y escritura proyectada asociada. | 0. | Eliminadas definiciones/imports; catálogos completos HTTP ya no necesitan proyección para Dexie. | PR4 — retirado. | ELIMINADO |
 | Settings: `listItems`, restauración Dexie y refs de esa restauración en Configuración. | 0. | Una GET directa devuelve `settings`; sin contrato count/cursor. Refetch vuelve a ejecutar esa misma GET. | PR4 — retirado. | ELIMINADO |
 | `removeStorageItemById` en `src/db.js` y rama `successfulDeletes` / `deleteCondition` de `useBatchDeleteItem`. | 0 consumidores después de retirar almacenamiento local de Productos; único llamador del batch helper era `useBatchDeleteProducts`. | Eliminados helper vacío, colección intermedia, condición, imports y parámetros de cache sin consumidores. Se conserva helper de DELETE por ID, recorrido y conteo de respuestas. | PR4 — retirado. | ELIMINADO |
-| `src/api/budgets.js` — `useListBudgets` y proyección `budgets.constants.LIST_ATTRIBUTES` del listado completo. | 0. `/ventas` usa `usePagedBudgets`. | Eliminados hook, carga visual por cursor/Dexie y proyección sin otros consumidores. `LIST_BUDGETS_QUERY_KEY` permanece sólo en bindings de restauración del componente legacy. | PR5 — retirado listado normal. | ELIMINADO |
-| `src/components/budgets/BudgetsPage` — filtros/sort/export locales y restauración Budgets. | `/historial-ventas` continúa usando componente y exportador legacy. | Se conserva intacto: no migrar ni refactorizar Historial en PR5. Tabla Budgets y key antigua mantienen estos bindings y sus mutaciones; no se declara ausencia de consumidores. Con PostgreSQL/server-side no hace falta una pantalla separada sólo para períodos históricos. | Después de las 7 PR: incorporar rango de fechas en `/ventas` según UX común y eliminar Historial cuando esté disponible. | PENDIENTE |
+| `src/api/budgets.js` — `useListBudgets` y proyección legacy `LIST_ATTRIBUTES`. | 0. `/ventas` usa `usePagedBudgets`. | Hook/proyección eliminados en PR5; ahora también se elimina `LIST_BUDGETS_QUERY_KEY`, último binding de restore sin consumidores. | PR5 + eliminación de Historial. | ELIMINADO |
+| `src/components/budgets/BudgetsPage` — filtros/sort/export locales y restore Budgets. | 0. | Eliminados componente, exportador, callbacks `sortValue` sin consumidores, mapping de restore y key antigua; ninguna UI alternativa. | Eliminación de Historial. | ELIMINADO |
+| Historial de Ventas: ruta, navegación, ayuda y keys exclusivas. | 0. | Pantalla, `BudgetsHistoryFilters`, `useListBudgetsHistory`, query key, localStorage keys y entity/path/PAGES retirados. Única referencia runtime a URL antigua: redirect en next.config.js a `/ventas`, siguiendo patrón existente. | Eliminación de Historial. | ELIMINADO |
+| Budgets History: cursor `entityList`/`LastEvaluatedKey`, tabla/escrituras Dexie y restore específico. | 0. | Hook eliminado; migración Dexie v5 retira budgets; mutaciones usan skipStorageUpdate. Helpers globales conservados por Users/Cash. | Eliminación de Historial. | ELIMINADO |
+| Fechas de Historial y Setting `budget.historyDateRanges`. | `/ventas`; Configuración → Ventas. | Trasladados Desde/Hasta y presets existentes. Key backend conservada por contrato, con consumidor y textos de Ventas; no es runtime de Historial. | Eliminación de Historial. | TRASLADADO |
 | `useCustomerCatalog` — colección completa TRANSITORIA. | Crear presupuesto, editar borrador, Configuración → Presupuestos → cliente por defecto. | Catálogo numérico completo, publicación atómica y cache React Query; requerido para conservar selectores actuales sin cursor. No usa Dexie. Solución actual aceptada y transitoria. | Patrón común de búsquedas/selectores remotos después de las 7 PR; parámetros aún por definir. | PENDIENTE |
 | `useProductCatalog` — colección completa TRANSITORIA. | Ventas crear/borrador, entregas e importaciones identificadas en evidencia PR4. | Catálogo completo actual conservado; solución transitoria, no patrón final para selectores de colecciones grandes. | Búsqueda/selector remoto de Productos dentro del patrón común posterior a las 7 PR; revisar consumidores antes de retirar el catálogo. | PENDIENTE |
 | Catálogos completos de Marcas/Proveedores en Productos. | Crear Producto → selectores de Marca y Proveedor. | Mantienen selectores actuales; evaluar estos casos junto con las demás colecciones grandes, sin rediseñarlos en PR5. | Patrón común de búsquedas/selectores remotos después de las 7 PR. | PENDIENTE |
-| Catálogo de vendedores de Ventas. | `/ventas` no consulta `useListUsers`; filtro funcional `createdBy` mediante input de nombre completo temporalmente. Historial y `/usuarios` conservan `useListUsers` legacy. | Prueba real 02/11/2026: GET /users devuelve colecciones pequeñas completas, pero no ofrece paginación numérica confiable. Shape id/username/firstName/lastName/state/role confirmado; identidad de createdBy conservada como firstName + espacio + lastName. No crear catálogo basado en pocos usuarios actuales; inclusión de INACTIVE no comprobada. | Pendiente backend: paginación real, política ACTIVE/INACTIVE y filtros/identidad. Input temporal aceptado hasta resolver patrón global de búsquedas/selectores posterior a las 7 PR; no bloquea PR5. | PENDIENTE |
-| Exports server-side, incluidos Ventas y Gastos, con snapshots históricos. | `/ventas` y `/gastos` muestran acción deshabilitada; exportador legacy sigue sólo en Historial y otros flujos conservan sus implementaciones actuales. | Pendiente transversal: colección filtrada completa, paginación server-side, snapshots históricos y comportamiento consistente entre entidades. No exportar sólo página visible ni reconstruir snapshots desde catálogo actual. | Resolver transversalmente después de las 7 PR; definir contratos/estrategia de export entonces. | PENDIENTE |
+| Catálogo de vendedores de Ventas. | `/ventas`: input temporal de nombre completo para `createdBy`; sólo `/usuarios` conserva `useListUsers`. | Consumidor Historial eliminado. Catálogo remoto pendiente de paginación real Users, política ACTIVE/INACTIVE y filtros/identidad; no inventar catálogo con respuesta completa accidental. | Backend + patrón global posterior de búsquedas/selectores. | PENDIENTE |
+| Exports server-side, incluidos Ventas y Gastos, con snapshots históricos. | Ventas/Gastos: acción deshabilitada. Export de Historial eliminado; otros flujos conservan sus implementaciones. | Pendiente transversal: colección filtrada completa, paginación y snapshots históricos. No exportar página visible ni reconstruir snapshots desde catálogo actual. | Tarea transversal posterior a las 7 PR. | PENDIENTE |
 | `paymentStatus` remoto. | Ventas envía PAID/PENDING sólo con state=CONFIRMED. | **PENDIENTE BACKEND**. Mapping frontend confirmado: Pagados → PAID, Pendientes → PENDING. Según prueba real reportada por usuario, backend devuelve el mismo dataset para ambos. Sin compensación local. | Corrección backend y posterior validación; no implementar workaround frontend. | PENDIENTE |
 | `skipStorageUpdate` en helpers CRUD compartidos. | Entidades sin tabla local, pagos/stock y mutaciones de Clientes y Gastos; otras entidades aún escriben Dexie. | Distingue escritores locales de mutaciones remotas. No puede retirarse globalmente mientras Usuarios/Cajas y bindings legacy conserven almacenamiento. | Cierre del último escritor local, no esta PR. | PENDIENTE |
 | Gastos: `useListExpenses`, `LIST_EXPENSES_QUERY_KEY`, `LIST_ATTRIBUTES` y carga visual por cursor/Dexie. | 0: `/gastos` usa `usePagedExpenses`. | Búsqueda global confirmó último consumidor migrado. Eliminados loader, key, proyección y dependencias de sincronización del listado. | PR6 — retirado. | ELIMINADO |
@@ -71,7 +74,7 @@ Registro único de piezas revisadas durante la migración. PR actual: **PR7 — 
 - Sort remoto Productos: `id`, `name`. `stock`/`price` no se ofrecen como sort remoto; sus callbacks se conservan para tablas locales de selección/recuperación. Export usa filtros applied y orden, no draft ni página visible.
 - Sin nueva infraestructura cursor/Dexie. Los únicos consumidores auxiliares conservados tienen usos runtime identificados arriba.
 
-## Validación y alcance PR5
+## Evidencia histórica: validación y alcance PR5
 
 - Base inicial limpia: branch `596-ventas-historial`, HEAD = origin/staging `b95c371c`, 0/0. PR1–PR4 presentes.
 - `/ventas` reutiliza `pagedLists`, `useServerListFilters` y `Table.serverPagination`. No se copió infraestructura experimental. `getBudgetListState` traduce customer → customerName y adapta order a booleano exclusivamente para Budgets, también antes de refresh para conservar la misma query key.
@@ -83,7 +86,7 @@ Registro único de piezas revisadas durante la migración. PR actual: **PR7 — 
 - Producto/catálogos PR4 y batching 500/250/500 intactos. Sólo se ajusta invalidación de página Ventas tras consumo de stock; no se toca algoritmo de batching.
 - Búsqueda global posterior: sin consumidores runtime de useListCustomers/useListBudgets ni sus proyecciones eliminadas. getBudgetColumns conserva callbacks sortValue porque Historial todavía los ejecuta localmente. LIST_ATTRIBUTES de Productos sigue en BudgetForm y no se elimina.
 
-## Pendientes funcionales al cierre de PR5
+## Pendientes registrados al cierre de PR5 (actualización de Historial debajo)
 
 Registro de decisiones y pendientes, sin diseño ni implementación en PR5. Las pruebas manuales mencionadas aquí fueron informadas por el usuario.
 
@@ -114,11 +117,9 @@ Requisito futuro: volver a selector/dropdown con todos los usuarios que correspo
 
 Frontend confirmado: Pagados → `paymentStatus=PAID`; Pendientes → `paymentStatus=PENDING`, sólo cuando corresponde a `state=CONFIRMED`. Backend real actualmente devuelve el mismo dataset para ambos según prueba manual informada. Pendiente backend; no compensar localmente.
 
-### 4. Historial de Ventas — PENDIENTE DE ELIMINACIÓN
+### 4. Historial de Ventas — ELIMINADO
 
-Decisión de producto: eliminar `/historial-ventas` posteriormente. PostgreSQL/server-side permite consultar períodos históricos sin mantener una pantalla separada sólo para ese propósito.
-
-Después de las 7 PR, incorporar filtro/rango de fechas directamente en `/ventas`; la consulta usará fecha/rango según UX que se defina. Eliminar Historial cuando esa funcionalidad esté disponible. No migrarlo ahora ni retirar sus dependencias mientras tenga consumidores.
+Rango de fechas y presets trasladados a `/ventas`, conservando `defaultPageDateRange` y la key contractual `historyDateRanges`. Eliminados UI, datos, filtros/export locales y dependencias exclusivas de Historial. URL antigua sólo redirige; no conserva pantalla. Ver auditoría y cierre actual debajo.
 
 ### 5. Exports — PENDIENTE TRANSVERSAL POSTERIOR A LAS 7 PR
 
@@ -138,7 +139,7 @@ Export de Ventas queda pendiente. Resolver exports transversalmente entre entida
 
 Budgets mantiene adaptación **local**: ASC → `order=true`; DESC → `order=false`. Infraestructura global sin cambios; sin compensación mediante sort local.
 
-## Validación y alcance PR6 — Gastos
+## Evidencia histórica: validación y alcance PR6 — Gastos
 
 - Base limpia: branch `597-gastos-filtros-especiales`, HEAD = origin/staging `36a273ed`; PR5 incluida. Sin copiar infraestructura experimental ni modificar pagedLists, useServerListFilters o Table.
 - Evidencia previa real: GET /expenses pageNumber=1/pageSize=1/count=true devolvió un gasto y count numérico 2; página 2 con count=false devolvió otro gasto y omitió count. LastEvaluatedKey puede aparecer como compatibilidad, pero se ignora y nunca se reenvía en el flujo nuevo. Navegación UI a página 2 no pudo validarse entonces: sólo dos gastos y mínimo visual 20.
@@ -227,14 +228,78 @@ CASH:
 - Definir paymentMethod vs paymentMethods y semántica de []/null.
 - Definir whitelist definitiva de sorts.
 
-### Legacy conservado — PENDIENTE
+### Legacy conservado — PENDIENTE (consumidores actualizados tras eliminar Historial)
 
-No se retiró ningún consumidor runtime en PR7. Mantener como **PENDIENTE**, con los consumidores de la tabla principal:
+PR7 sigue bloqueada. Consumidores actuales, también registrados en tabla principal:
 
-- `useListUsers`: `/usuarios` y selector de vendedores de Historial.
+- `useListUsers`: sólo `/usuarios`; consumidor Historial eliminado.
 - `useListCashBalances`: `/cajas`.
 - `listItems`: APIs Users y CashBalances.
-- `entityList` y `LastEvaluatedKey`: listItems y useListBudgetsHistory.
+- `entityList` y `LastEvaluatedKey`: sólo `listItems` de Users/CashBalances.
 - Dexie `users`/`cashBalances`, `lastUpdatedAt`, sincronización y restore legacy relacionado: listados y bindings activos de restauración; no retirar helpers compartidos.
 
-Historial de Ventas sigue siendo consumidor legacy. Su eliminación posterior mantiene la decisión de producto registrada en PR5: incorporar consulta por fecha/rango en Ventas y después eliminar Historial. No eliminar legacy para avanzar artificialmente una PR bloqueada ni introducir legacy nuevo.
+Historial de Ventas ya no es consumidor legacy. Su eliminación no desbloquea PR7; Users/Cash conservan infraestructura necesaria, sin nuevas compensaciones frontend.
+
+## Auditoría y cierre actual — eliminación de Historial (02/11/2026)
+
+- Base verificada: `608-599-eliminar-historial-y-fechas-ventas`, HEAD = origin/staging `ac33c6778032a78f5819e3b45630b86fe9ba1a28`, divergencia 0/0 y working tree inicialmente limpio. Nombre de branch confirmado por usuario como correcto.
+- Historial antes del retiro: DatePickerControlled Desde/Hasta (`dd-MM-yyyy`), sin reglas required/orden; defaults null/null desde useFilterParams, persistencia `budgets-history-date-range`. Buscar sólo rechazaba ambos vacíos y convertía con getDateUTC a ISO UTC con Z/milisegundos; no normalizaba límites manuales. Reset vaciaba fechas y ocultaba listado. Hook exigía ambas fechas truthy, sort fijo createdAt y recorría cursor; estado/cliente/vendedor/pago y sort/export se procesaban localmente en BudgetsPage. Tests anteriores cubrían HARD_DELETED y stacking del DatePicker, no contrato temporal server-side.
+- Clasificación: exclusivos de Historial eliminados (ruta/page, componentes, hook, export, filtros/keys, navegación/ayuda/entity/path y restore Budgets); compartidos conservados (detalle/formulario/columnas Budgets, Settings y helpers Users/Cash); fechas/presets trasladados a Ventas. Sin permisos exclusivos adicionales encontrados. No había page.client separado.
+- Settings reales: budget.defaultPageDateRange.value determina meses iniciales y Reset. Valor positivo entero; default existente 3 sólo tras respuesta real resuelta si falta/es inválido. budget.historyDateRanges sí existe: presets personalizados día/semana/mes. Consumidor y UI renombrados a Ventas; se mantiene key del contrato backend, sin Setting nuevo. Presets base existentes: Hoy/Esta semana/Este mes/Este año.
+- PR5 conservada: useServerListFilters espera éxito real de Settings, sin placeholder ni fetch pendiente. Recién entonces resuelve un único instante: Hasta=ahora y Desde=ese instante menos N meses. No request con fallback transitorio; primera consulta pageNumber=1/count=true. Al entrar se ignoran fechas/página persistidas; se conservan otros filtros, pageSize y sort válidos. Rango aplicado se persiste en budgetsFilters; una nueva entrada siempre recalcula automático. Reset usa Setting y hora actuales.
+- Fechas aplicadas forman parte de useServerListFilters → getBudgetListState/usePagedBudgets → pagedLists. Formato uniforme UTC `YYYY-MM-DDTHH:mm:ss`, sin sufijo ni milisegundos, igual al startDate funcional de PR5. Parseo del picker interpreta ese formato explícitamente como UTC, sin cambiar timezone global. Edición manual Desde usa inicio del día local, Hasta fin del día local (23:59:59), ambos serializados a UTC en ese formato. Inicial/presets Hasta usan instante de resolución/selección. Presets personalizados calculan fechas al seleccionarse, sin congelar fecha al montar.
+- Validación: ambas fechas obligatorias, parseables y Desde <= Hasta. Campo requerido reutiliza mensaje existente; rango inválido no aplica ni consulta. Guard adicional en getBudgetListState deshabilita query sin rango válido. Cambiar fecha/preset: cero requests; Buscar/Enter: draft → applied, página 1 y recount, incluida búsqueda repetida. Reset fechas: sólo rango automático actual/preset, nunca vacío, página 1/recount; conserva filtros comerciales draft/applied. Reset filtros: sólo limpia comerciales, página 1/recount; conserva fechas/preset draft y fechas applied. Paginar conserva rango y usa count=false con total conocido; sort ID/Fecha conserva rango. Sin cambios en pagedLists, filtros locales ni cursor/Dexie nuevos.
+- Única pantalla de consulta: /ventas. URL /historial-ventas redirige temporalmente mediante next.config.js, patrón existente; ningún link interno la usa. Export legacy de Historial retirado; Ventas sigue deshabilitado. PaymentStatus PAID/PENDING y seller input temporal conservados; búsquedas/selectores y exports siguen tareas posteriores. Users/Cash continúan PENDIENTE/BLOQUEADO BACKEND.
+- Retiro final Budgets: LIST_BUDGETS_HISTORY_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, BUDGETS_HISTORY_FILTERS_KEY y DATE_RANGE_KEY sin consumidores; definiciones eliminadas. Tabla Budgets retirada por migración Dexie v5 y CRUD omite almacenamiento. Versiones antiguas de esquema son historial necesario de migración. entityList/LastEvaluatedKey, listItems, useFilters/useFilterParams, useRestoreEntity, Dexie Users/Cash/lastUpdatedAt siguen por consumidores reales.
+- Cobertura focalizada: requests de Ventas y catálogo compartido, fecha/validación/presets y fixture de componente con React/react-hook-form reales (sin servidor Next ni backend): espera Settings, draft, Buscar/Enter, rechazo de vacíos/invertido, Reset con Setting/hora actual, paginación/sort y ausencia de runtime/navigation Historial. No build ni E2E completo.
+
+### Archivos de este cambio
+
+Inventario completo (renombre de Settings aparece como baja/alta porque no se hizo git add):
+
+| Estado | Archivo |
+|---|---|
+| Modificado | `docs/postgresql-migration-legacy.md` |
+| Modificado | `next.config.js` |
+| Modificado | `src/api/budgets.js` |
+| Eliminado | `src/app/(private)/historial-ventas/page.jsx` |
+| Modificado | `src/app/(private)/ventas/page.jsx` |
+| Modificado | `src/app/(private)/configuracion/page.jsx` |
+| Modificado | `src/common/components/table/Filters.jsx` |
+| Modificado | `src/common/constants/entities.js` |
+| Modificado | `src/common/constants/index.js` |
+| Eliminado | `src/components/budgets/BudgetsHistoryFilters/index.jsx` |
+| Eliminado | `src/components/budgets/BudgetsHistoryFilters/styles.js` |
+| Eliminado | `src/components/budgets/BudgetsPage/index.jsx` |
+| Modificado | `src/components/budgets/ServerBudgetsPage.jsx` |
+| Modificado | `src/components/budgets/budgets.constants.js` |
+| Modificado | `src/components/layout/Breadcrumb.jsx` |
+| Eliminado | `src/components/settings/Entities/Budgets/General/HistoryDateRangesControlled.jsx` |
+| Modificado | `src/components/settings/Entities/Budgets/General/index.jsx` |
+| Modificado | `src/components/settings/Entities/Budgets/General/styles.jsx` |
+| Modificado | `src/components/settings/settings.constants.js` |
+| Modificado | `src/db.js` |
+| Modificado | `src/fetchUrls.js` |
+| Modificado | `src/hooks/useServerListFilters.js` |
+| Eliminado | `tests/unit/budgets-history-hard-deleted-filter.test.js` |
+| Modificado | `tests/unit/nav-actions-sidebar-tooltips.test.js` |
+| Modificado | `tests/unit/sales-server-list.test.js` |
+| Modificado | `tests/unit/settings-public-budget-ui.test.js` |
+| Nuevo | `src/components/budgets/SalesDateFilters.jsx` |
+| Nuevo | `src/components/budgets/salesDateRange.js` |
+| Nuevo | `src/components/settings/Entities/Budgets/General/SalesDateRangesControlled.jsx` |
+| Nuevo | `tests/unit/sales-date-range.test.js` |
+
+Validación actual: 66 tests focalizados/relacionados aprobados; ESLint de todos los JS/JSX tocados aprobado; git diff --check aprobado. Sin build ni E2E completo ni requests a backend real en esta tarea. Búsqueda estática: URL antigua sólo en redirect, tests de ausencia y documentación histórica/actual; historyDateRanges permanece exclusivamente como key del contrato de Settings utilizada por Ventas. No hay deuda/runtime muerto de Historial. Sin add, commit, push, cambio de branch ni worktrees.
+
+## Ajustes de testing manual — Settings y bloques de filtros (02/11/2026)
+
+- Causa de cache obsoleta: useGetSetting(BUDGET) usa [getSetting, "budget"] con staleTime de una hora; Configuración guarda con entity=BUDGETS, cuya invalidación individual no coincide. La invalidación adicional de Configuración usaba por error [[getSetting]], tampoco coincide. Corregida a [getSetting] (prefijo plano); refetchType=all incluye queries inactivas. No se cambia endpoint, payload ni contrato de Settings.
+- Causa de desacople: useServerListFilters hidrata una única vez. Cambiar el callback de defaults no actualizaba draft/applied después de hydrated=true. Ventas ahora recuerda el valor efectivo de meses aplicado; si cambia después de resolver Settings, aplica una vez el rango automático actual. Mientras falta sincronizar, la query Budgets permanece deshabilitada. Entrada/reentrada recalcula normalmente; sin request de rango anterior/fallback ni loop.
+- Protección de edición manual: render/refetch con mismos meses no resetea nada, aunque cambie identidad del objeto Settings. Cambio efectivo de meses sí reconstruye fechas; conserva comerciales draft/applied. Reset fechas explícito usa Setting/hora actuales.
+- UI local: dos segmentos con estilos existentes HeaderSegment/FiltersContainer, separados por 10 px. Superior: reset circular existente, presets, Desde y Hasta. Inferior: reset comercial existente, Estado/ID/Cliente/Vendedor/pago condicional y único Buscar. Un FormProvider y un form: Buscar/Enter aplica ambos grupos en una sola query; editar cualquiera mantiene cero requests. Sin cambios globales en Table/pagedLists ni componentes globales nuevos.
+- applyFilterGroup reutiliza normalización/paginación/refresh existentes: modifica sólo campos de su grupo en applied y en formulario; los otros drafts quedan intactos. Reset fechas conserva comerciales aplicados y borradores; Reset filtros conserva rango aplicado, draft de fechas y preset. Ambos vuelven a página 1/recount con una aplicación. Buscar conserva también selección visual del preset, sin enviarla a API.
+- Responsive comprobado mediante render de componentes/estilos reales en fixture aislado: desktop 1366x768 y mobile 390x1100, dos segmentos con gap 10 px, scrollWidth igual a ancho visible y un solo Buscar. Capturas guardadas en carpeta de visualizaciones de esta sesión; sin servidor Next/backend ni E2E completo.
+- Archivos de este ajuste: src/app/(private)/configuracion/page.jsx; src/app/(private)/ventas/page.jsx; src/components/budgets/ServerBudgetsPage.jsx; src/hooks/useServerListFilters.js; tests/unit/sales-server-list.test.js; tests/unit/sales-date-range.test.js; este documento. Tests: regresión real de cache React Query, cambio efectivo de meses sin consulta previa obsoleta, refetch irrelevante conserva manual, resets independientes (draft/applied), Buscar único con ambos grupos. Contratos, UTC, sorts, paymentStatus, Historial eliminado y export conservan estado previo.
+
+Validación del ajuste: 66 tests focalizados/relacionados aprobados; ESLint de los seis archivos JS/JSX de este ajuste y git diff --check aprobados. Sin cambios backend ni en Table/pagedLists global; Historial sigue eliminado. Sin add/commit/push, cambio de branch ni worktrees.

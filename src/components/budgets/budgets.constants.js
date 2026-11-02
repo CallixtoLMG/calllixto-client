@@ -1,9 +1,7 @@
 import { Box, Flex, OverflowWrapper } from "@/common/components/custom";
-import { ALL, COLORS, CONTENT_SIZES, DATE_FORMATS, FIELD_LABELS, ICONS, POPUP_POSITIONS, SELECT_ALL_OPTION, SORTING } from "@/common/constants";
+import { ALL, COLORS, CONTENT_SIZES, DATE_FORMATS, FIELD_LABELS, ICONS, POPUP_POSITIONS, SELECT_ALL_OPTION } from "@/common/constants";
 import { getLabelColor } from "@/common/utils";
-import { getDateWithOffset, getFormatedDate, getStartOfUnit, now } from "@/common/utils/dates";
-import { formatLastCount } from "@/common/utils/pluralization";
-import { parse } from "date-fns";
+import { getFormatedDate } from "@/common/utils/dates";
 import { Label, Popup } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 import { NumberField, PriceLabel, TextField } from "../../common/components/form";
@@ -12,14 +10,10 @@ import { PRODUCT_STATES } from "../products/products.constants";
 import { normalizeBudgetProductFractionConfig } from "../products/products.utils";
 import { getBudgetListPopupContent, isBudgetCancelled, isBudgetConfirmed } from "./budgets.utils";
 
-export const LIST_BUDGETS_QUERY_KEY = 'listAllBudgets';
-export const LIST_BUDGETS_HISTORY_QUERY_KEY = 'getBudgetsHistory';
 export const GET_BUDGET_QUERY_KEY = 'getBudget';
 export const BUDGETS_FILTERS_KEY = 'budgetsFilters';
-export const BUDGETS_HISTORY_FILTERS_KEY = 'budgetsHistoryFilters';
-export const SALES_FILTERS = { id: "", customer: "", createdBy: "", state: "", paymentStatus: "" };
+export const SALES_FILTERS = { id: "", customer: "", createdBy: "", state: "", paymentStatus: "", startDate: "", endDate: "" };
 export const BUDGET_SORT_FIELDS = { id: "id", date: "createdAt" };
-export const BUDGETS_VIEW_MONTHS = 3;
 
 export const BUDGET_STATES = {
   CONFIRMED: {
@@ -110,8 +104,7 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
             </Flex>
           </Box>
         );
-      },
-      sortValue: (budget) => budget.id ?? ""
+      }
     },
     {
       id: 2,
@@ -128,8 +121,7 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
           </OverflowWrapper>
           {budget.comments && <CommentTooltip $lowTooltip comment={budget.comments} />}
         </Flex>
-      ),
-      sortValue: (budget) => budget.customer.name ?? ""
+      )
     },
     {
       id: 3,
@@ -139,8 +131,7 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
       whiteSpace: "nowrap",
       width: 1,
       href: (budget) => budget.href,
-      value: (budget) => getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME),
-      sortValue: (budget) => budget.createdAt ?? ""
+      value: (budget) => getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)
     },
     {
       id: 4,
@@ -149,8 +140,7 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
       sortable: true,
       width: 2,
       href: (budget) => budget.href,
-      value: ({ total }) => <PriceLabel value={total ?? 0} />,
-      sortValue: ({ total }) => total ?? 0
+      value: ({ total }) => <PriceLabel value={total ?? 0} />
     },
   ];
 
@@ -163,8 +153,7 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
         sortable: true,
         width: 2,
         href: (budget) => budget.href,
-        value: (budget) => <PriceLabel value={budget.paidAmount ?? 0} />,
-        sortValue: (budget) => budget.paidAmount ?? 0
+        value: (budget) => <PriceLabel value={budget.paidAmount ?? 0} />
       },
       {
         id: 6,
@@ -176,9 +165,7 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
         value: (budget) => {
           const pending = (budget.total ?? 0) - (budget.paidAmount ?? 0);
           return <PriceLabel value={Math.max(pending, 0)} />;
-        },
-        sortValue: (budget) =>
-          (budget.total ?? 0) - (budget.paidAmount ?? 0)
+        }
       }
     );
   }
@@ -195,8 +182,7 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
       <OverflowWrapper maxWidth="25vw" popupContent={budget.createdBy}>
         {budget.createdBy}
       </OverflowWrapper>
-    ),
-    sortValue: (budget) => budget.createdBy ?? ""
+    )
   });
 
   return columns;
@@ -237,7 +223,6 @@ export const RETURN = "return"
 
 export const DELIVERY = "delivery"
 
-export const EMPTY_FILTERS = { id: '', customer: '', createdBy: '', paymentStatus: '', state: SELECT_ALL_OPTION.value, sorting: { key: 'id', direction: SORTING.DESC } };
 export const BUDGET_STATES_OPTIONS = [
   SELECT_ALL_OPTION,
   ...Object.values(BUDGET_STATES).map(({ id, title, color }) => (
@@ -280,90 +265,6 @@ export const PAYMENT_STATES_OPTIONS = [
       value: id,
     }))
 ];
-
-export const BUDGET_STATE_TRANSLATIONS = {
-  CONFIRMED: BUDGET_STATES.CONFIRMED,
-  PENDING: BUDGET_STATES.PENDING,
-  EXPIRED: BUDGET_STATES.EXPIRED,
-  CANCELLED: BUDGET_STATES.CANCELLED,
-  DRAFT: BUDGET_STATES.DRAFT
-};
-
-export const BASE_BUDGETS_HISTORY_RANGES = [
-  {
-    label: "Hoy",
-    value: "base_today",
-    getRange: () => ({
-      startDate: getStartOfUnit(now(), "day"),
-      endDate: now(),
-    }),
-  },
-  {
-    label: "Esta semana",
-    value: "base_week",
-    getRange: () => ({
-      startDate: getStartOfUnit(now(), "week"),
-      endDate: now(),
-    }),
-  },
-  {
-    label: "Este mes",
-    value: "base_month",
-    getRange: () => ({
-      startDate: getStartOfUnit(now(), "month"),
-      endDate: now(),
-    }),
-  },
-  {
-    label: "Este año",
-    value: "base_year",
-    getRange: () => ({
-      startDate: getStartOfUnit(now(), "year"),
-      endDate: now(),
-    }),
-  },
-];
-
-export const buildCustomHistoryRanges = (historyDateRanges = []) => {
-  return historyDateRanges
-    .filter(r => r.unit && r.value)
-    .map((range) => {
-      const valueNum = Number(range.value);
-
-      const offset =
-        range.unit === 'week'
-          ? -valueNum * 7
-          : -valueNum;
-
-      const unit =
-        range.unit === 'week'
-          ? 'day'
-          : range.unit;
-
-      const raw = getDateWithOffset({
-        offset,
-        unit,
-        format: DATE_FORMATS.ONLY_DATE,
-      });
-
-      const parsedDate = parse(
-        raw,
-        "dd-MM-yyyy",
-        new Date()
-      );
-
-      return {
-        label: formatLastCount(valueNum, range.unit),
-        value: `custom_${range.unit}_${valueNum}`,
-        getRange: () => ({
-          startDate: parsedDate,
-          endDate: new Date(),
-        }),
-      };
-    });
-};
-
-export const DATE_RANGE_KEY = "budgets-history-date-range";
 
 export const DEFAULT_DATE_RANGE_VALUE = 3;
 

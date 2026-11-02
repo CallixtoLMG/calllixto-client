@@ -107,9 +107,6 @@ export const PAGES = {
     SHORTKEYS: 'Control+8',
     BADGE: isNewFeature('2026-01-01') ? 'new' : undefined
   },
-  BUDGETS_HISTORY: {
-    BASE: "/historial-ventas",
-  },
   PUBLIC: {
     BUDGETS: {
       BASE: PUBLIC_BUDGETS_PAGE,
@@ -244,13 +241,7 @@ export const getNavigationItems = (role) => {
       id: "budgets",
       label: "Ventas",
       icon: ICONS.SHOPPING_CART,
-      children: buildEntityChildren(PAGES.BUDGETS, [
-        {
-          id: "budgets-history",
-          label: "Historial de ventas",
-          href: PAGES.BUDGETS_HISTORY.BASE,
-        },
-      ]),
+      children: buildEntityChildren(PAGES.BUDGETS),
       badge: PAGES.BUDGETS.BADGE,
     },
     {
@@ -813,7 +804,7 @@ export const INFO = {
                   Listado de ventas según los filtros activos.
                 </ListItem>
                 <ListItem>
-                  En esta pantalla solo se muestran ventas de los últimos 3 meses. Si necesitás datos anteriores, podés hacer clic en el botón <Accent>Historial</Accent> y definir rangos de fechas específicos.
+                  El rango inicial usa los meses configurados en Ventas. Podés cambiar <Accent>Desde</Accent> y <Accent>Hasta</Accent>, o elegir un rango predefinido, y presionar <Accent>Buscar</Accent>. Restaurar filtros vuelve al rango configurado.
                 </ListItem>
                 <ListItem>
                   En ventas confirmadas, pasando el cursor sobre el <Accent>ID</Accent>, se podrá visualizar quién y cuándo se confirmó la venta. Si la venta está pagada en su totalidad, aparecerá el icono <span><Icon name={ICONS.DOLLAR} color={COLORS.GREEN} /></span>.
@@ -871,30 +862,6 @@ export const INFO = {
                       Anular la venta con el botón <Accent>Anular</Accent>, ingresando un motivo.
                     </ListItem>
                   </List>
-                </ListItem>
-              </List>
-            </StyledModalContent>
-          </>
-        ),
-      },
-      [ENTITIES.BUDGETS_HISTORY]: {
-        LIST: (
-          <>
-            <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.CLIPBOARD} color={COLORS.BLUE} /> <strong>Historial de ventas</strong></StyledListHeader>
-              <List relaxed bulleted as="ol">
-                <ListItem>
-                  Consultá ventas dentro de un período determinado. Podés elegir un rango predefinido o ingresar manualmente las fechas Desde y Hasta, y luego ejecutar la búsqueda.
-                </ListItem>
-                <ListItem>
-                  Después de cargar los resultados, podés filtrarlos por Estado, Id, Cliente o Vendedor.
-                </ListItem>
-                <PageActionsInfo />
-                <ListItem>
-                  La acción <Accent>Actualizar</Accent> vuelve a ejecutar la consulta actual sin limpiar las fechas ni los filtros aplicados.
-                </ListItem>
-                <ListItem>
-                  <Accent>Descargar Excel</Accent> exporta todas las ventas filtradas y ordenadas, no solamente las filas visibles en la página actual.
                 </ListItem>
               </List>
             </StyledModalContent>

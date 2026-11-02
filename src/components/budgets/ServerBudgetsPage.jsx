@@ -1,14 +1,41 @@
+import { Button, Icon } from "@/common/components/custom";
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
-import { CONTENT_SIZES, PAGES, SORTING } from "@/common/constants";
+import { FiltersContainer, HeaderSegment } from "@/common/components/table/styles";
+import { CONTENT_SIZES, ICONS, PAGES, SORTING } from "@/common/constants";
 import { useListPageSideActions } from "@/components/layout";
 import { useEffect, useMemo } from "react";
 import { FormProvider, useWatch } from "react-hook-form";
-import { Form } from "semantic-ui-react";
+import { Form, Popup } from "semantic-ui-react";
+import styled from "styled-components";
+import SalesDateFilters from "./SalesDateFilters";
 import { BUDGET_SORT_FIELDS, BUDGET_STATES, BUDGET_STATES_OPTIONS, PAYMENT_STATES_OPTIONS, getBudgetColumns } from "./budgets.constants";
 
-const ServerBudgetsPage = ({ budgets = [], list, total, isLoading, actions, sideActions }) => {
-  const { methods, onSubmit, onRestoreFilters, hydrated, appliedCount } = list;
+const SalesFiltersForm = styled(Form)`
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  .react-datepicker-popper { z-index: 31; }
+`;
+
+const FilterFields = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+  min-width: 0;
+  .field { margin: 0 !important; }
+  .react-datepicker-wrapper, .react-datepicker__input-container { width: 100%; }
+  @media (max-width: 767px) {
+    width: 100%;
+    > .field { width: 100% !important; }
+  }
+`;
+
+const ServerBudgetsPage = ({ budgets = [], list, total, isLoading, actions, sideActions, datePresets }) => {
+  const { methods, onSubmit, onRestoreDates, onRestoreFilters, hydrated, appliedCount } = list;
   const draftState = useWatch({ control: methods.control, name: "state" });
   const { setValue } = methods;
   useEffect(() => {
@@ -22,23 +49,39 @@ const ServerBudgetsPage = ({ budgets = [], list, total, isLoading, actions, side
   return (
     <>
       <FormProvider {...methods}>
-        <Form onSubmit={onSubmit}>
+        <SalesFiltersForm onSubmit={onSubmit}>
+          <HeaderSegment role="group" aria-label="Fechas de ventas">
+            <FiltersContainer>
+              <Popup content="Restaurar fechas" trigger={(
+                <Button circular icon type="button" aria-label="Restaurar fechas" disabled={!hydrated}
+                  $marginBottom="2px" $alignSelf="flex-end" width={CONTENT_SIZES.FIT}
+                  $fontSize="14px" $paddingLeft="11px" padding="11px" onClick={onRestoreDates}>
+                  <Icon name={ICONS.UNDO} />
+                </Button>
+              )} />
+              <FilterFields>
+                <SalesDateFilters presets={datePresets} disabled={!hydrated} />
+              </FilterFields>
+            </FiltersContainer>
+          </HeaderSegment>
           <Filters onRestoreFilters={onRestoreFilters} hydrated={hydrated} appliedCount={appliedCount} showRefetchAction={false}>
-            <DropdownControlled
-              name="state" label="Estado" options={BUDGET_STATES_OPTIONS}
-              width={CONTENT_SIZES.MIN} minWidth="150px" clearable
-            />
-            <TextControlled name="id" label="Id" placeholder="MI525" width="8vw" minWidth="100px" />
-            <TextControlled name="customer" label="Cliente" placeholder="Martín Bueno" width="13vw" minWidth="120px" />
-            <TextControlled name="createdBy" label="Vendedor" placeholder="Nombre completo" width="13vw" minWidth="125px" />
-            {draftState === BUDGET_STATES.CONFIRMED.id && (
+            <FilterFields>
               <DropdownControlled
-                name="paymentStatus" label="Estado de pago" options={PAYMENT_STATES_OPTIONS}
-                width="130px" minWidth={CONTENT_SIZES.MIN} clearable
+                name="state" label="Estado" options={BUDGET_STATES_OPTIONS}
+                width={CONTENT_SIZES.MIN} minWidth="150px" clearable
               />
-            )}
+              <TextControlled name="id" label="Id" placeholder="MI525" width="8vw" minWidth="100px" />
+              <TextControlled name="customer" label="Cliente" placeholder="Martín Bueno" width="13vw" minWidth="120px" />
+              <TextControlled name="createdBy" label="Vendedor" placeholder="Nombre completo" width="13vw" minWidth="125px" />
+              {draftState === BUDGET_STATES.CONFIRMED.id && (
+                <DropdownControlled
+                  name="paymentStatus" label="Estado de pago" options={PAYMENT_STATES_OPTIONS}
+                  width="130px" minWidth={CONTENT_SIZES.MIN} clearable
+                />
+              )}
+            </FilterFields>
           </Filters>
-        </Form>
+        </SalesFiltersForm>
       </FormProvider>
       <Table
         elements={budgets} headers={headers} page={PAGES.BUDGETS} actions={actions}

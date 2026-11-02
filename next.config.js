@@ -10,6 +10,11 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: "/historial-ventas",
+        destination: "/ventas",
+        permanent: false,
+      },
+      {
         source: "/",
         destination: "/ventas",
         permanent: false,
