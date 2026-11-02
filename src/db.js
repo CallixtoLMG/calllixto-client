@@ -20,6 +20,12 @@ if (typeof window !== "undefined") {
     [ENTITIES.SETTINGS]: 'entity, updatedAt',
     [LAST_UPDATED_AT]: 'id',
   });
+  db.version(2).stores({
+    [ENTITIES.BRANDS]: null,
+    [ENTITIES.SUPPLIERS]: null,
+    [ENTITIES.PRODUCTS]: null,
+    [ENTITIES.SETTINGS]: null,
+  });
 };
 
 export { db };
@@ -55,10 +61,4 @@ export async function removeStorageItem({ entity, id }) {
 
 export async function clearStorageTable(entity) {
   await db[entity].clear();
-};
-
-export async function removeStorageItemById({ entity, id }) {
-  if (!entity || id === undefined || id === null || id === "") {
-    return;
-  }
 };

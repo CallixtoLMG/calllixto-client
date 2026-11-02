@@ -1,10 +1,11 @@
 import { ENTITIES, IN_MS } from "@/common/constants";
 import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
-import { GET_PRODUCT_QUERY_KEY, GET_STOCK_FLOW_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, LIST_STOCK_FLOWS_QUERY_KEY } from "@/components/products/products.constants";
+import { GET_PRODUCT_QUERY_KEY, GET_STOCK_FLOW_QUERY_KEY, LIST_STOCK_FLOWS_QUERY_KEY } from "@/components/products/products.constants";
 import { GET_SUPPLIER_QUERY_KEY } from "@/components/suppliers/suppliers.constants";
 import { ADD, CONSUME, PATHS } from "@/fetchUrls";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getInstance } from "./axios";
+import { invalidateProductData } from "./productCatalogs";
 import { useCreateItem, useInvalidateQueries, usePostUpdateItem } from "./common";
 
 export const MAX_STOCK_BATCH_FLOWS = 250;
@@ -92,10 +93,11 @@ export function useGetStockFlow(productId, { enabled = true } = {}) {
 };
 
 export const useCreateStockFlow = () => {
+  const queryClient = useQueryClient();
   const createItem = useCreateItem();
 
-  return ({ product, ...stockFlow }) => {
-    return createItem({
+  return async ({ product, ...stockFlow }) => {
+    const data = await createItem({
       entity: ENTITIES.STOCK_FLOWS,
       url: `/${PATHS.STOCK_FLOWS}/${product.id}`,
       value: stockFlow,
@@ -103,12 +105,16 @@ export const useCreateStockFlow = () => {
       responseEntity: ENTITIES.STOCK_FLOW,
       invalidateQueries: [
         [GET_STOCK_FLOW_QUERY_KEY, product.id],
+        [GET_PRODUCT_QUERY_KEY, product.id],
       ],
     });
+    if (data?.statusOk) await invalidateProductData(queryClient, { ids: [product.id] });
+    return data;
   };
 };
 
 export const useAddSupplierStock = () => {
+  const queryClient = useQueryClient();
   const invalidate = useInvalidateQueries();
 
   const addSupplierStock = async ({ supplierId, inflow, flows, }) => {
@@ -118,15 +124,12 @@ export const useAddSupplierStock = () => {
       inflow,
       flows,
       post: (...args) => getInstance().post(...args),
+    }).finally(async () => {
+      if (hasFlows) {
+        await invalidateProductData(queryClient, { supplierIds: [supplierId] });
+        invalidate([[GET_PRODUCT_QUERY_KEY], [GET_SUPPLIER_QUERY_KEY, supplierId]]);
+      }
     });
-
-    if (hasFlows && data?.statusOk) {
-      invalidate([
-        [LIST_PRODUCTS_QUERY_KEY],
-        [GET_PRODUCT_QUERY_KEY],
-        [GET_SUPPLIER_QUERY_KEY, supplierId],
-      ]);
-    }
 
     return data;
   };
@@ -135,10 +138,11 @@ export const useAddSupplierStock = () => {
 };
 
 export const useConsumeStock = () => {
+  const queryClient = useQueryClient();
   const updateItem = usePostUpdateItem();
 
-  const consumeStock = ({ budgetId, flows, inflow, deliveryNote }) => {
-    return updateItem({
+  const consumeStock = async ({ budgetId, flows, inflow, deliveryNote }) => {
+    const data = await updateItem({
       entity: ENTITIES.PRODUCTS,
       url: `/${PATHS.STOCK_FLOWS}/${budgetId}/${CONSUME}`,
       value: {
@@ -154,6 +158,8 @@ export const useConsumeStock = () => {
         [LIST_STOCK_FLOWS_QUERY_KEY, budgetId],
       ],
     });
+    if (data?.statusOk && flows?.length) await invalidateProductData(queryClient, { ids: flows.map((flow) => flow.productId) });
+    return data;
   };
 
   return consumeStock;

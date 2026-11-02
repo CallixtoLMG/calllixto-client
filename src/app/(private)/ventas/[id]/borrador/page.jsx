@@ -3,7 +3,7 @@
 import { useUserContext } from "@/User";
 import { useConfirmBudget, useEditBudget, useGetBudget, } from "@/api/budgets";
 import { useListCustomers } from "@/api/customers";
-import { useListProducts } from "@/api/products";
+import { useProductCatalog } from "@/api/productCatalogs";
 import { useGetSetting } from "@/api/settings";
 import { useConsumeStock } from "@/api/stock";
 import { UnsavedChangesModal } from "@/common/components/modals";
@@ -31,7 +31,7 @@ const BudgetDraft = ({ params }) => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const { data: budget, isLoading: loadingBudget } = useGetBudget(id);
-  const { data: productsData, isLoading: loadingProducts, refetch: refetchProductsData, } = useListProducts();
+  const { data: productsData, isLoading: loadingProducts, refetch: refetchProductsData, } = useProductCatalog();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
   const { data: paymentMethods, refetch: refetchPaymentMethods } = useGetSetting(ENTITIES.GENERAL);
   const { data: budgetSettings } = useGetSetting(ENTITIES.BUDGET);

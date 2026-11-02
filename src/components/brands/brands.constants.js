@@ -7,7 +7,6 @@ export const GET_BRAND_QUERY_KEY = 'getBrand';
 export const LIST_BRANDS_QUERY_KEY = 'listBrands';
 export const BRANDS_FILTERS_KEY = 'brandsFilters';
 export const BRAND_SORT_FIELDS = { id: 'id', name: 'name', state: 'state' };
-export const LIST_ATTRIBUTES = ['id', 'name', 'comments',  'state', 'inactiveReason'];
 
 export const BRAND_COLUMNS = [
   {

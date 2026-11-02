@@ -1,21 +1,36 @@
 "use client"
 import { useUserContext } from "@/User";
-import { useListProducts } from "@/api/products";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { fetchProductsForExport, usePagedProducts } from "@/api/products";
+import { useRefreshServerList } from "@/api/pagedLists";
+import useServerListFilters from "@/hooks/useServerListFilters";
+import { toast } from "react-hot-toast";
+import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel } from "@/common/utils";
 import { useBreadcrumContext } from "@/components/layout";
 import { BatchImportProducts } from "@/components/products/BatchImportProducts";
 import ProductsPage from "@/components/products/ProductsPage";
-import { EXAMPLE_TEMPLATE_DATA, PRODUCT_STATES } from "@/components/products/products.constants";
+import { EMPTY_FILTERS, EXAMPLE_TEMPLATE_DATA, PRODUCTS_FILTERS_KEY, PRODUCT_SORT_FIELDS, PRODUCT_STATES } from "@/components/products/products.constants";
 import { getFormatedMargin } from "@/components/products/products.utils";
 import { useKeyboardShortcuts } from "@/hooks";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 const Products = () => {
   const { role } = useUserContext();
-  const { data, isLoading, isRefetching, refetch } = useListProducts();
+  const refreshList = useRefreshServerList(ENTITIES.PRODUCTS);
+  const list = useServerListFilters({
+    key: PRODUCTS_FILTERS_KEY, defaultFilters: EMPTY_FILTERS, sortFields: PRODUCT_SORT_FIELDS, onApply: refreshList,
+  });
+  const { data, total, isFetching, error } = usePagedProducts(list);
+  const [isExporting, setIsExporting] = useState(false);
+  const { hydrated, pageNumber, pageSize, setPageNumber, appliedFilters, sort, order, refresh } = list;
+  useEffect(() => {
+    if (!hydrated || isFetching || total === null) return;
+    const lastPage = Math.max(1, Math.ceil(total / pageSize));
+    if (pageNumber > lastPage) setPageNumber(lastPage);
+  }, [hydrated, isFetching, total, pageNumber, pageSize, setPageNumber]);
+  useEffect(() => { if (error) toast.error(error.message); }, [error]);
   const { setLabels } = useBreadcrumContext();
   const { push } = useRouter();
 
@@ -23,28 +38,34 @@ const Products = () => {
     setLabels([{ name: 'Productos' }]);
   }, [setLabels]);
 
-  const products = useMemo(() => data?.products, [data]);
-  const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
-
-  const handleDownloadExcel = useCallback((elements) => {
-    if (!elements.length) return;
-    const headers = ['Id', 'Nombre', 'Marca', 'Proveedor', 'Costo', 'Precio', 'Margen', 'Estado', 'Comentarios'];
-    const mappedPRoducts = elements.map(product => {
-      const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
-      return [
-        product.id,
-        product.name,
-        product.brandName,
-        product.supplierName,
-        product.cost,
-        product.price,
-        getFormatedMargin(product.price, product.cost),
-        productState,
-        product.comments
-      ];
-    });
-    downloadExcel([headers, ...mappedPRoducts], "Lista de Productos");
-  }, []);
+  const handleDownloadExcel = useCallback(async () => {
+    if (isExporting) return;
+    setIsExporting(true);
+    try {
+      const elements = await fetchProductsForExport({ appliedFilters, sort, order });
+      if (!elements.length) return;
+      const headers = ['Id', 'Nombre', 'Marca', 'Proveedor', 'Costo', 'Precio', 'Margen', 'Estado', 'Comentarios'];
+      const mappedPRoducts = elements.map(product => {
+        const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
+        return [
+          product.id,
+          product.name,
+          product.brandName,
+          product.supplierName,
+          product.cost,
+          product.price,
+          getFormatedMargin(product.price, product.cost),
+          productState,
+          product.comments
+        ];
+      });
+      downloadExcel([headers, ...mappedPRoducts], "Lista de Productos");
+    } catch (error) {
+      toast.error(error.message || "No se pudieron exportar los productos.");
+    } finally {
+      setIsExporting(false);
+    }
+  }, [appliedFilters, sort, order, isExporting]);
 
   const sideActions = useMemo(() => {
     const actions = [];
@@ -91,8 +112,19 @@ const Products = () => {
       });
     }
 
+    const downloadAction = {
+      id: "download-excel", icon: ICONS.DOWNLOAD, color: COLORS.BLUE,
+      text: "Descargar productos en Excel", onClick: handleDownloadExcel,
+      disabled: !hydrated || isFetching || total === null || total === 0 || isExporting,
+      loading: isExporting,
+    };
+    const excelMenu = actions.find((action) => action.id === 2);
+    if (excelMenu) excelMenu.items.push(downloadAction);
+    else actions.push(downloadAction);
+    actions.push({ id: "update", icon: ICONS.REFRESH, color: COLORS.BLUE,
+      text: "Actualizar productos", onClick: refresh, disabled: !hydrated || isFetching });
     return actions;
-  }, [role]);
+  }, [role, refresh, hydrated, isFetching, total, isExporting, handleDownloadExcel]);
 
   const createProductShortcuts = useMemo(() => ([
     {
@@ -107,10 +139,10 @@ const Products = () => {
   return (
     <>
       <ProductsPage
-        onRefetch={refetch}
-        isLoading={loading}
-        products={loading ? [] : products}
-        onDownloadExcel={handleDownloadExcel}
+        isLoading={!hydrated || isFetching}
+        products={data?.items ?? []}
+        list={list}
+        total={total}
         sideActions={sideActions}
       />
     </>

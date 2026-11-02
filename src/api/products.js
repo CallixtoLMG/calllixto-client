@@ -1,6 +1,5 @@
-import { ACTIVE, ALL, DELETE, ENTITIES, HARD_DELETED, INACTIVE, IN_MS, RECOVER, SET_STATE } from "@/common/constants";
-import { getDefaultListParams } from '@/common/utils';
-import { GET_PRODUCT_QUERY_KEY, LIST_ATTRIBUTES, LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, MAIN_KEY } from "@/components/products/products.constants";
+import { ACTIVE, ENTITIES, INACTIVE, IN_MS, RECOVER, SET_STATE } from "@/common/constants";
+import { GET_PRODUCT_QUERY_KEY, MAIN_KEY } from "@/components/products/products.constants";
 import {
   BATCH,
   EDIT_BATCH,
@@ -9,35 +8,16 @@ import {
 } from "@/fetchUrls";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { chunk } from "lodash";
-import { useMemo } from "react";
-import { db } from "../db";
 import { getInstance } from "./axios";
-import { listItems, useBatchDeleteItem, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from "./common";
+import { fetchAllListPages, usePagedList } from "./pagedLists";
+import { invalidateProductData } from "./productCatalogs";
+import { useBatchDeleteItem, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from "./common";
 
-export function useListProducts() {
-  const query = useQuery({
-    queryKey: [LIST_PRODUCTS_QUERY_KEY],
-    queryFn: () => listItems({
-      entity: ENTITIES.PRODUCTS,
-      url: PATHS.PRODUCTS,
-      params: getDefaultListParams(LIST_ATTRIBUTES)
-    }),
-    staleTime: IN_MS.ONE_DAY,
-  });
+export const usePagedProducts = (state) => usePagedList({ ...state, entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS });
 
-  return query;
-};
-
-export function useHasProductsByBrandId(brandId) {
-  const { data: products, isLoading: isLoadingProducts } = useListProducts();
-
-  const hasAssociatedProducts = useMemo(() => {
-    if (!products?.products || !brandId) return false;
-    return products.products.some(({ id }) => id?.substring(2, 4) === String(brandId));
-  }, [products, brandId]);
-
-  return { hasAssociatedProducts, isLoadingProducts };
-}
+export const fetchProductsForExport = ({ appliedFilters, sort, order }) => fetchAllListPages({
+  entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, filters: appliedFilters, sort, order,
+});
 
 export function useGetProduct(id) {
   const getProduct = async (id) => {
@@ -61,85 +41,76 @@ export function useGetProduct(id) {
 };
 
 export const useCreateProduct = () => {
+  const queryClient = useQueryClient();
   const createItem = useCreateItem();
 
-  const createProduct = (product) => {
-    return createItem({
+  const createProduct = async (product) => {
+    const data = await createItem({
       entity: ENTITIES.PRODUCTS,
+      skipStorageUpdate: true,
       url: PATHS.PRODUCTS,
       value: product,
       responseEntity: ENTITIES.PRODUCT,
-      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY]],
+      invalidateQueries: [],
     });
+    if (data?.statusOk) await invalidateProductData(queryClient, { ids: [product.id] });
+    return data;
   };
 
   return createProduct;
 };
 
 export const useDeleteProduct = () => {
+  const queryClient = useQueryClient();
   const deleteItem = useDeleteItem();
 
-  const deleteProduct = (id) => {
-    return deleteItem({
+  const deleteProduct = async (id) => {
+    const data = await deleteItem({
       entity: ENTITIES.PRODUCTS,
+      skipStorageUpdate: true,
       id: id,
       url: `${PATHS.PRODUCTS}/${id}`,
-      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY]]
+      invalidateQueries: []
     });
+    if (data?.statusOk) await invalidateProductData(queryClient, { ids: [id] });
+    return data;
   };
 
   return deleteProduct;
 };
 
 export const useBatchDeleteProducts = () => {
+  const queryClient = useQueryClient();
   const batchDeleteItem = useBatchDeleteItem();
 
-  const deleteProducts = (ids) => {
-    return batchDeleteItem({
-      entity: ENTITIES.PRODUCTS,
-      url: PATHS.PRODUCTS,
-      ids,
-      deleteCondition: (data) => {
-        const state = data.product?.state;
-        return state === DELETE || state === HARD_DELETED;
-      },
-      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY]],
-    });
+  const deleteProducts = async (ids) => {
+    const data = await batchDeleteItem({ url: PATHS.PRODUCTS, ids });
+    if (data?.deletedCount > 0) await invalidateProductData(queryClient, { ids });
+    return data;
   };
 
   return deleteProducts;
 };
 
 export const useEditProduct = () => {
+  const queryClient = useQueryClient();
   const editItem = useEditItem();
 
   const editProduct = async ({ previousVersions, ...rest }) => {
-    return editItem({
+    const data = await editItem({
       entity: ENTITIES.PRODUCTS,
+      skipStorageUpdate: true,
       url: `${PATHS.PRODUCTS}/${rest.id}`,
       value: rest,
       key: MAIN_KEY,
       responseEntity: ENTITIES.PRODUCT,
-      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, rest.id]]
+      invalidateQueries: [[GET_PRODUCT_QUERY_KEY, rest.id]]
     });
+    if (data?.statusOk) await invalidateProductData(queryClient, { ids: [rest.id] });
+    return data;
   };
 
   return editProduct;
-};
-
-export function useProductsBySupplierId(supplierId) {
-  const listBySupplierId = async () => {
-    const { products } = await listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, key: MAIN_KEY });
-    return products.filter((product) => product.id.startsWith(supplierId));
-  }
-
-  const query = useQuery({
-    queryKey: [LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, supplierId],
-    queryFn: () => listBySupplierId(),
-    staleTime: IN_MS.ONE_DAY,
-  });
-
-  return query;
 };
 
 export const useCreateBatch = () => {
@@ -162,7 +133,11 @@ export const useCreateBatch = () => {
       });
     });
 
-    const responses = await Promise.all(promises);
+    const completion = Promise.allSettled(promises);
+    const responses = await Promise.all(promises).finally(async () => {
+      await completion;
+      await invalidateProductData(queryClient, { ids: products.map((product) => product.id) });
+    });
 
     const data = {
       statusOk: true,
@@ -171,10 +146,6 @@ export const useCreateBatch = () => {
         .flat()
         .filter((item) => item),
     };
-
-    if (data.statusOk) {
-      queryClient.invalidateQueries({ queryKey: [[LIST_PRODUCTS_QUERY_KEY]], refetchType: ALL })
-    }
 
     return { data };
   };
@@ -187,7 +158,7 @@ const MAX_PRODUCT_BATCH_SIZE = 500;
 export const useEditBatch = () => {
   const queryClient = useQueryClient();
 
-  const editBatch = async (products, invalidateQueries = [[LIST_PRODUCTS_QUERY_KEY]]) => {
+  const editBatch = async (products) => {
     const chunks = chunk(products, MAX_PRODUCT_BATCH_SIZE);
     let delay = 0;
     const delayIncrement = 1000;
@@ -199,7 +170,11 @@ export const useEditBatch = () => {
       );
     });
 
-    const responses = await Promise.all(promises);
+    const completion = Promise.allSettled(promises);
+    const responses = await Promise.all(promises).finally(async () => {
+      await completion;
+      await invalidateProductData(queryClient, { ids: products.map((product) => product.id) });
+    });
 
     const data = {
       statusOk: true,
@@ -208,12 +183,6 @@ export const useEditBatch = () => {
         .flat()
         .filter((item) => item),
     };
-
-    if (data.statusOk) {
-      invalidateQueries.forEach((query) =>
-        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL })
-      );
-    }
 
     return { data };
   };
@@ -229,15 +198,8 @@ export const useDeleteBySupplierId = () => {
     const { data } = await getInstance().delete(`${PATHS.PRODUCTS}/${SUPPLIER}/${supplierId}`);
 
     if (data.statusOk) {
-
-      await db[ENTITIES.PRODUCTS]
-        .where("id")
-        .startsWith(supplierId)
-        .delete();
-
-      queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, supplierId], refetchType: ALL });
-      queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY], refetchType: ALL });
-      queryClient.invalidateQueries({ queryKey: [GET_PRODUCT_QUERY_KEY], refetchType: ALL });
+      await invalidateProductData(queryClient, { supplierIds: [supplierId] });
+      queryClient.invalidateQueries({ queryKey: [GET_PRODUCT_QUERY_KEY], refetchType: "none" });
     }
 
     return data;
@@ -247,11 +209,13 @@ export const useDeleteBySupplierId = () => {
 };
 
 export const useSetProductState = () => {
+  const queryClient = useQueryClient();
   const updateItem = usePostUpdateItem();
 
-  const setProductState = ({ id, state, inactiveReason }) => {
-    return updateItem({
+  const setProductState = async ({ id, state, inactiveReason }) => {
+    const data = await updateItem({
       entity: ENTITIES.PRODUCTS,
+      skipStorageUpdate: true,
       url: `${PATHS.PRODUCTS}/${id}/${SET_STATE}`,
       value: {
         id,
@@ -260,27 +224,31 @@ export const useSetProductState = () => {
       },
       responseEntity: ENTITIES.PRODUCT,
       invalidateQueries: [
-        [LIST_PRODUCTS_QUERY_KEY],
         [GET_PRODUCT_QUERY_KEY, id],
       ],
-      attributes: LIST_ATTRIBUTES,
     });
+    if (data?.statusOk) await invalidateProductData(queryClient, { ids: [id] });
+    return data;
   };
 
   return setProductState;
 };
 
 export const useRecoverProduct = () => {
+  const queryClient = useQueryClient();
   const recoverItem = usePostUpdateItem();
 
-  const recoverProduct = ({ id }) => {
-    return recoverItem({
+  const recoverProduct = async ({ id }) => {
+    const data = await recoverItem({
       entity: ENTITIES.PRODUCTS,
+      skipStorageUpdate: true,
       url: `${PATHS.PRODUCTS}/${id}/${RECOVER}`,
       key: MAIN_KEY,
       responseEntity: ENTITIES.PRODUCT,
-      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, id]]
+      invalidateQueries: [[GET_PRODUCT_QUERY_KEY, id]]
     });
+    if (data?.statusOk) await invalidateProductData(queryClient, { ids: [id] });
+    return data;
   };
 
   return recoverProduct;

@@ -190,7 +190,7 @@ test("BudgetDeliveries checks consume response before showing success toast", ()
   assert.match(source, /if\s*\(hasConsumeStockResponseError\(response\)\)\s*\{[\s\S]*toast\.error\(getConsumeStockErrorMessage\(response\)\)/);
   assert.match(source, /const warningMessage = getConsumeStockWarningMessage\(response\);/);
   assert.doesNotMatch(source, /setStockControlWarningRowIds|stockControlWarningRowIds|getStockControlWarningRowIds/);
-  assert.match(source, /useListProducts\(\)/);
+  assert.match(source, /useProductCatalog\(\)/);
   assert.match(source, /new Set\(getStockControlDisabledProductIds\(currentProductsData\?\.products \?\? \[\]\)\)/);
   assert.match(source, /stockControlDisabledProductIds,/);
   assert.match(source, /if\s*\(warningMessage\)\s*\{[\s\S]*showWarningToast\(warningMessage\)/);
