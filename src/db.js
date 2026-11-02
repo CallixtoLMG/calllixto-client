@@ -29,6 +29,9 @@ if (typeof window !== "undefined") {
   db.version(3).stores({
     [ENTITIES.CUSTOMERS]: null,
   });
+  db.version(4).stores({
+    [ENTITIES.EXPENSES]: null,
+  });
 };
 
 export { db };
