@@ -139,7 +139,7 @@ export const SENSITIVE_VALUE = "*****";
 
 export const PANDORA_URL = 'https://pandora-glm.netlify.app/';
 
-export const PAGE_ACTIONS_INFO_TEXT = "Las acciones disponibles de esta sección, como Crear, Actualizar o Descargar Excel, se encuentran en la barra lateral derecha. Usá el botón de acciones para expandirla o contraerla.";
+export const PAGE_ACTIONS_INFO_TEXT = "Las acciones disponibles de esta sección, como Crear o Descargar Excel, se encuentran en la barra lateral derecha. Usá el botón de acciones para expandirla o contraerla.";
 
 const PageActionsInfo = () => (
   <ListItem>
@@ -461,7 +461,6 @@ export const ICONS = {
   ADDRESS_CARD: "address card",
   ARCHIVE: "archive",
   OPTIONS: "options",
-  REFRESH: "refresh",
   MAIL_SQUARE: "mail square",
   PERCENT: 'percent',
   SETTINGS: "settings",
@@ -490,8 +489,6 @@ export const ICONS = {
   CARET_DOWN: "caret down",
   SIGN_OUT: "sign out",
   SYNC_ALTERNATE: "sync alternate",
-  BOLT: "bolt",
-  CLOUD_DOWNLOAD: "cloud download",
   HISTORY: "history"
 };
 
@@ -1033,7 +1030,6 @@ export const INFO = {
                 <ListItem>
                   Las etiquetas y categorías sirven para catalogar elementos. Para crear una etiqueta o categoría, ingresa un nombre, selecciona un color y agrega una descripción opcional. Luego, haz clic en el botón <Accent>Agregar</Accent>. Cuando hayas terminado, usá el botón <Accent>Actualizar</Accent> para guardar los cambios.
                 </ListItem>
-                <PageActionsInfo />
                 <ListItem>
                   Los productos bloqueados son una lista de IDs que no podrán ser agregados o creados. Para más información, pasa el mouse por encima del icono <Icon name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />.
                 </ListItem>

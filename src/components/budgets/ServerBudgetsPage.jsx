@@ -64,7 +64,7 @@ const ServerBudgetsPage = ({ budgets = [], list, total, isLoading, actions, side
               </FilterFields>
             </FiltersContainer>
           </HeaderSegment>
-          <Filters onRestoreFilters={onRestoreFilters} hydrated={hydrated} appliedCount={appliedCount} showRefetchAction={false}>
+          <Filters onRestoreFilters={onRestoreFilters} hydrated={hydrated} appliedCount={appliedCount}>
             <FilterFields>
               <DropdownControlled
                 name="state" label="Estado" options={BUDGET_STATES_OPTIONS}

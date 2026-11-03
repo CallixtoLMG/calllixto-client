@@ -29,7 +29,7 @@ const Brands = () => {
     setLabels([{ name: PAGES.BRANDS.NAME }]);
   }, [setLabels]);
 
-  const { hydrated, pageNumber, pageSize, setPageNumber, appliedFilters, sort, order, refresh } = list;
+  const { hydrated, pageNumber, pageSize, setPageNumber, appliedFilters, sort, order } = list;
   useEffect(() => {
     if (!hydrated || isFetching || total === null) return;
     const lastPage = Math.max(1, Math.ceil(total / pageSize));
@@ -78,16 +78,13 @@ const Brands = () => {
     }
 
     actions.push({
-      id: "update", icon: ICONS.REFRESH, color: COLORS.BLUE,
-      text: "Actualizar marcas", onClick: refresh, disabled: !hydrated || isFetching,
-    }, {
       id: "download-excel", icon: ICONS.FILE_EXCEL, color: COLORS.BLUE,
       text: "Descargar marcas en Excel", onClick: handleDownloadExcel,
       disabled: !hydrated || isFetching || total === null || total === 0 || isExporting,
       loading: isExporting, showTooltipWhenExpanded: true,
     });
     return actions;
-  }, [push, role, refresh, hydrated, isFetching, total, isExporting, handleDownloadExcel]);
+  }, [push, role, hydrated, isFetching, total, isExporting, handleDownloadExcel]);
 
   useKeyboardShortcuts(() => push(PAGES.BRANDS.CREATE), SHORTKEYS.ENTER);
 

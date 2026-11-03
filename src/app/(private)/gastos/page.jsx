@@ -24,7 +24,7 @@ const Expenses = () => {
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { push } = useRouter();
-  const { hydrated, pageNumber, pageSize, setPageNumber, refresh } = list;
+  const { hydrated, pageNumber, pageSize, setPageNumber } = list;
 
   useEffect(() => {
     setLabels([{ name: PAGES.EXPENSES.NAME }]);
@@ -44,15 +44,11 @@ const Expenses = () => {
       onClick: () => push(PAGES.EXPENSES.CREATE), text: "Crear gasto",
     }] : []),
     {
-      id: "update", icon: ICONS.REFRESH, color: COLORS.BLUE, text: "Actualizar gastos",
-      onClick: refresh, disabled: !hydrated || isFetching,
-    },
-    {
       id: "download-excel", icon: ICONS.FILE_EXCEL, color: COLORS.BLUE, text: "Descargar gastos en Excel",
       disabled: true, tooltip: "La exportación completa no está disponible por el momento.",
       showTooltipWhenExpanded: true,
     },
-  ], [push, role, refresh, hydrated, isFetching]);
+  ], [push, role]);
 
   useKeyboardShortcuts(() => push(PAGES.EXPENSES.CREATE), SHORTKEYS.ENTER);
 

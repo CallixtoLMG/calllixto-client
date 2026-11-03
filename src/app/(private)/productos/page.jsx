@@ -24,7 +24,7 @@ const Products = () => {
   });
   const { data, total, isFetching, error } = usePagedProducts(list);
   const [isExporting, setIsExporting] = useState(false);
-  const { hydrated, pageNumber, pageSize, setPageNumber, appliedFilters, sort, order, refresh } = list;
+  const { hydrated, pageNumber, pageSize, setPageNumber, appliedFilters, sort, order } = list;
   useEffect(() => {
     if (!hydrated || isFetching || total === null) return;
     const lastPage = Math.max(1, Math.ceil(total / pageSize));
@@ -121,10 +121,8 @@ const Products = () => {
     const excelMenu = actions.find((action) => action.id === 2);
     if (excelMenu) excelMenu.items.push(downloadAction);
     else actions.push(downloadAction);
-    actions.push({ id: "update", icon: ICONS.REFRESH, color: COLORS.BLUE,
-      text: "Actualizar productos", onClick: refresh, disabled: !hydrated || isFetching });
     return actions;
-  }, [role, refresh, hydrated, isFetching, total, isExporting, handleDownloadExcel]);
+  }, [role, hydrated, isFetching, total, isExporting, handleDownloadExcel]);
 
   const createProductShortcuts = useMemo(() => ([
     {

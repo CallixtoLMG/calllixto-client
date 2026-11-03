@@ -26,7 +26,7 @@ const Customers = () => {
     setLabels([{ name: PAGES.CUSTOMERS.NAME }]);
   }, [setLabels]);
 
-  const { hydrated, pageNumber, pageSize, setPageNumber, appliedFilters, sort, order, refresh } = list;
+  const { hydrated, pageNumber, pageSize, setPageNumber, appliedFilters, sort, order } = list;
   useEffect(() => {
     if (!hydrated || isFetching || total === null) return;
     const lastPage = Math.max(1, Math.ceil(total / pageSize));
@@ -70,16 +70,12 @@ const Customers = () => {
         text: 'Crear cliente',
       },
       {
-        id: "update", icon: ICONS.REFRESH, color: COLORS.BLUE,
-        text: "Actualizar clientes", onClick: refresh, disabled: !hydrated || isFetching,
-      },
-      {
         id: "download-excel", icon: ICONS.FILE_EXCEL, color: COLORS.BLUE,
         text: "Descargar clientes en Excel", onClick: handleDownloadExcel,
         disabled: !hydrated || isFetching || total === null || total === 0 || isExporting,
         loading: isExporting, showTooltipWhenExpanded: true,
       }
-    ], [push, refresh, hydrated, isFetching, total, isExporting, handleDownloadExcel]);
+    ], [push, hydrated, isFetching, total, isExporting, handleDownloadExcel]);
 
   useKeyboardShortcuts(() => push(PAGES.CUSTOMERS.CREATE), SHORTKEYS.ENTER);
 

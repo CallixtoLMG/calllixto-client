@@ -85,10 +85,6 @@ const useServerListFilters = ({ key: initialKey, defaultFilters: initialFilters,
     setState(next);
   }, [state, defaultFilters, onApply, ready, setValue, resetField]);
 
-  const refresh = useCallback(() => {
-    onApply?.(state);
-  }, [onApply, state]);
-
   const setPageNumber = useCallback((value) => {
     const page = Number(value);
     if (Number.isSafeInteger(page) && page > 0) setState((current) => ({ ...current, pageNumber: page }));
@@ -113,7 +109,6 @@ const useServerListFilters = ({ key: initialKey, defaultFilters: initialFilters,
     setPageNumber,
     setPageSize,
     setSorting,
-    refresh,
   };
 };
 

@@ -67,7 +67,6 @@ const Users = () => {
 
   return (
     <UsersPage
-      onRefetch={refetch}
       isLoading={loading}
       users={loading ? [] : users}
       role={role}

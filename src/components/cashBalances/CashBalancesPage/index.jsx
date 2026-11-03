@@ -1,6 +1,6 @@
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
-import { CONTENT_SIZES, ENTITIES, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
+import { CONTENT_SIZES, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
 import { createFilter } from "@/common/utils";
 import { useListPageSideActions } from "@/components/layout";
 import { useFilters } from "@/hooks";
@@ -11,11 +11,10 @@ import {
   CASH_BALANCES_FILTERS_KEY,
   CASH_BALANCE_STATES_OPTIONS,
   EMPTY_FILTERS,
-  LIST_CASH_BALANCES_QUERY_KEY,
   getCashBalanceColumns
 } from "../cashBalances.constants";
 
-const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOptions, onDownloadExcel, sideActions = [] }) => {
+const CashBalancesPage = ({ cashBalances = [], isLoading, paymentOptions, onDownloadExcel, sideActions = [] }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -36,12 +35,7 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
   const onFilter = useMemo(() => createFilter(filters, { id: {}, paymentMethods: { isArray: true, skipAll: true }, state: { fullMatch: true } }), [filters]);
   const { useSideActions, handleFilteredElementsChange } = useListPageSideActions({
     sideActions,
-    onRefetch,
     onDownloadExcel,
-    entity: ENTITIES.CASHBALANCES,
-    queryKey: LIST_CASH_BALANCES_QUERY_KEY,
-    pageName: PAGES.CASH_BALANCES.NAME,
-    updateTooltip: "Actualizar cajas",
     downloadTooltip: "Descargar cajas en Excel",
   });
   const handleFilteredCashBalancesChange = useCallback(handleFilteredElementsChange, [handleFilteredElementsChange]);
@@ -56,12 +50,9 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
       <FormProvider {...methods}>
         <Form onSubmit={onSubmit}>
           <Filters
-            entity={ENTITIES.CASHBALANCES}
-            onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
             appliedCount={appliedCount}
             hydrated={hydrated}
-            showRefetchAction={!useSideActions}
           >
             <DropdownControlled
               minWidth="150px"

@@ -25,7 +25,6 @@ const BrandsPage = ({ brands = [], isLoading, list, total, sideActions = [] }) =
             onRestoreFilters={onRestoreFilters}
             appliedCount={appliedCount}
             hydrated={hydrated}
-            showRefetchAction={false}
           >
             <DropdownControlled
               minWidth="150px"

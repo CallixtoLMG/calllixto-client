@@ -33,7 +33,19 @@ const productConstants = load("src/components/products/products.constants.js", {
   "@/common/components/custom": { Box, Flex: Box, FlexColumn: Box, Icon: Box, Label: Box, OverflowWrapper: Box },
   "@/common/components/form/Search/styles": { Text: Box }, "@/common/components/tooltips": {},
   "@/common/utils": {}, "@/common/utils/dates": {}, "semantic-ui-react": { Popup: Box },
+  "@/common/utils/numbers": load("src/common/utils/numbers.js", {}),
   "../../common/components/form": { PriceLabel: Box }, "./products.utils": productUtils,
+});
+
+test("stock groups whole quantities while product identifiers and fractions keep their representation", () => {
+  const { PRODUCT_COLUMNS } = productConstants;
+  const stock = PRODUCT_COLUMNS.find(({ key }) => key === "stock");
+  const id = PRODUCT_COLUMNS.find(({ key }) => key === "id");
+  assert.equal(stock.value({ stock: 17838 }), "17.838");
+  assert.equal(stock.value({ stock: 1200.125 }), "1200.125");
+  const identifier = renderToStaticMarkup(id.value({ id: "VABB17838" }));
+  assert.match(identifier, />17838</);
+  assert.doesNotMatch(identifier, /17\.838/);
 });
 
 test("BudgetForm imports successfully and builds attributes from the shared product contract", () => {
@@ -316,6 +328,7 @@ test("Brand/Supplier initial render never starts a product catalog for associati
     "@/common/components/modals/ModalUnsavedChanges": { default: () => null },
     "@/common/components/custom/PrintBarCodes": { default: React.forwardRef(function RefStub() { return null; }) },
     "@/common/utils": { isItemInactive: () => false },
+    "@/common/utils/numbers": load("src/common/utils/numbers.js", {}),
     "@/components/layout": { OnlyPrint: () => null, useBreadcrumContext: () => ({ setLabels: noop }),
       useNavActionsContext: () => ({ resetActions: noop, setActions: noop }) },
     "@/components/products/products.constants": productConstants, "@/components/products/products.utils": productUtils,

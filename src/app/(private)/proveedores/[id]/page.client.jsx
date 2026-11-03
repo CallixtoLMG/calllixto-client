@@ -10,6 +10,7 @@ import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, PLACEHOLDERS, POPUP_POSITIONS } from "@/common/constants";
 import { downloadExcel, isItemInactive } from "@/common/utils";
+import { formatInteger } from "@/common/utils/numbers";
 import { OnlyPrint, useBreadcrumContext, useNavActionsContext, } from "@/components/layout";
 import { BatchImportStock } from "@/components/products/BatchImportStock";
 import { DISCOUNT_STOCK, PRODUCT_STATES, UPLOAD_STOCK } from "@/components/products/products.constants";
@@ -117,7 +118,7 @@ const SupplierPageClient = ({ supplier }) => {
     },
     deleteBatch: {
       header: (
-        <>¿Está seguro que desea eliminar los {products?.length || ""} productos del proveedor <i>{supplier?.name} ({supplier?.id}) </i> ?</>
+        <>¿Está seguro que desea eliminar los {formatInteger(products?.length || "")} productos del proveedor <i>{supplier?.name} ({supplier?.id}) </i> ?</>
       ),
       confirmText: "eliminar",
       icon: ICONS.TRASH,
@@ -348,12 +349,14 @@ const SupplierPageClient = ({ supplier }) => {
             color: COLORS.BLUE,
             text: "Descargar productos del proveedor",
             disabled: productToolsDisabled,
+            tooltip: stockExcelTooltip,
             loading: activeAction === "excel",
             onClick: productToolsDisabled ? undefined : handleDownloadExcel,
           },
           {
             id: "upload-stock",
             disabled: productToolsDisabled,
+            tooltip: stockExcelTooltip,
             text: "Cargar stock del proveedor",
             color: COLORS.GREEN,
             button: (
@@ -369,6 +372,7 @@ const SupplierPageClient = ({ supplier }) => {
           {
             id: "discount-stock",
             disabled: productToolsDisabled,
+            tooltip: stockExcelTooltip,
             text: "Descontar stock del proveedor",
             color: COLORS.RED,
             button: (

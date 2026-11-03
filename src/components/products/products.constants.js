@@ -5,6 +5,7 @@ import { ALL, BUTTON_TEXTS, COLORS, FIELD_LABELS as COMMON_FIELD_LABELS, CONTENT
 import { BUDGETS_PAGE } from "@/common/constants/routes";
 import { getFormatedPrice } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
+import { formatInteger } from "@/common/utils/numbers";
 import { Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
 import { formatProductId, getBrandId, getProductId, getSupplierId } from "./products.utils";
@@ -98,7 +99,7 @@ export const PRODUCT_COLUMNS = [
     sortable: true,
     width: 1,
     align: "end",
-    value: (product) => (product?.stock || 0),
+    value: (product) => formatInteger(product?.stock || 0),
     sortValue: (product) => product.stock ?? ""
   },
   {

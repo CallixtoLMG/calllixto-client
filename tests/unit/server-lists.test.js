@@ -245,24 +245,37 @@ test("Table render bypasses local transformations remotely and retains them loca
 test("page-size selector stays neutral until preferences are ready, then shows the real value", () => {
   let dropdown;
   const { Dropdown } = require("semantic-ui-react");
+  const numbers = load("src/common/utils/numbers.js");
+  const ElementCounter = load("src/common/components/table/ElementCounter.jsx", {
+    "@/common/constants": constants, "@/common/utils/numbers": numbers,
+    "../custom": { Label: ({ children }) => React.createElement("span", null, children) },
+  });
   const Pagination = load("src/common/components/table/Pagination.jsx", {
     "@/common/constants": constants,
+    "@/common/utils/numbers": numbers,
     "../custom": { Dropdown: (props) => { dropdown = props; return React.createElement(Dropdown, props); } },
-    "./ElementCounter": { __esModule: true, default: () => null },
+    "./ElementCounter": ElementCounter,
     "./styles": { PaginationContainer: ({ children, className }) => React.createElement("div", { className }, children) },
   }).default;
   const render = (pageSize, pageSizeReady) => renderToStaticMarkup(React.createElement(Pagination, {
-    activePage: 1, totalItems: 1200, totalPages: 60, pageSize, pageSizeReady,
+    activePage: 1, totalItems: 17838, totalPages: 892, pageSize, pageSizeReady,
   }));
   const pending = render(20, false);
   assert.equal(dropdown.value, "");
   assert.equal(dropdown.disabled, true);
   assert.equal(dropdown.height, "40px");
   assert.match(pending, /class="[^"]*default text">…</);
+  assert.match(pending, /1 - 20 de 17\.838/);
   for (const value of [20, 100]) {
     const ready = render(value, true);
     assert.equal(dropdown.value, value);
     assert.equal(dropdown.disabled, false);
     assert.match(ready, new RegExp('class="[^"]*text">' + value + '<'));
   }
+  const largePage = renderToStaticMarkup(React.createElement(Pagination, {
+    activePage: 1200, totalItems: 50000, totalPages: 2500, pageSize: 20, pageSizeReady: true,
+  }));
+  assert.match(largePage, /23\.981 - 24\.000 de 50\.000/);
+  assert.match(largePage, />1\.200</);
+  for (const missing of [undefined, null, NaN]) assert.equal(numbers.formatInteger(missing), "");
 });
