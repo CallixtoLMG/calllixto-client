@@ -2,8 +2,8 @@
 
 import { useUserContext } from "@/User";
 import { useCreateBudget, useGetBudget } from "@/api/budgets";
-import { useListCustomers } from "@/api/customers";
-import { useListProducts } from "@/api/products";
+import { useCustomerCatalog } from "@/api/customers";
+import { useProductCatalog } from "@/api/productCatalogs";
 import { useGetSetting } from "@/api/settings";
 import { useConsumeStock } from "@/api/stock";
 import { UnsavedChangesModal } from "@/common/components/modals";
@@ -31,8 +31,8 @@ const CreateBudget = () => {
   const { push } = useRouter();
   const createBudget = useCreateBudget();
   const consumeStock = useConsumeStock();
-  const { data: productsData, isLoading: loadingProducts, refetch: refetchProductsData, isRefetching } = useListProducts();
-  const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
+  const { data: productsData, isLoading: loadingProducts, refetch: refetchProductsData, isRefetching } = useProductCatalog();
+  const { data: customersData, isLoading: loadingCustomers } = useCustomerCatalog();
   const { data: paymentMethods, refetch: refetchPaymentMethods } = useGetSetting(ENTITIES.GENERAL);
   const { data: budgetSettings, isLoading: isLoadingBudgetSettings, isRefetching: isRefetchingSettings } = useGetSetting(ENTITIES.BUDGET);
   const cloneId = searchParams.get("clonar");

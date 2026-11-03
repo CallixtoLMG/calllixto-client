@@ -1,4 +1,5 @@
 import { POPUP_POSITIONS, PAGE_SIZE_OPTIONS } from "@/common/constants";
+import { formatInteger } from "@/common/utils/numbers";
 import { Popup, Pagination as SPagination } from "semantic-ui-react";
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
@@ -83,6 +84,7 @@ const PageSizePaginationContainer = styled(PaginationContainer)`
 const Pagination = ({
   activePage,
   pageSize,
+  pageSizeReady = true,
   totalItems,
   totalPages,
   onPageChange,
@@ -133,6 +135,7 @@ const Pagination = ({
         onPageChange={onPageChange}
         siblingRange={isCompactPagination ? 0 : 2}
         boundaryRange={isCompactPagination ? 1 : 2}
+        pageItem={{ children: (Item, props) => <Item {...props} content={formatInteger(props.value)} /> }}
         firstItem={null}
         lastItem={null}
         pointing
@@ -151,7 +154,9 @@ const Pagination = ({
           >
             <PageSizeDropdown
               options={PAGE_SIZE_OPTIONS}
-              value={pageSize}
+              value={pageSizeReady ? pageSize : ""}
+              placeholder="…"
+              disabled={!pageSizeReady}
               onChange={(event, data) => {
                 onPageSizeChange(event, data);
                 setIsPageSizeOpen(false);

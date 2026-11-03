@@ -1,7 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { expectSuccessfulApiResponse, getE2EApiJson, isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
-import { E2E_ACCOUNTS } from "./support/env";
 import {
   addAddress,
   addEmail,
@@ -96,7 +95,7 @@ const expectSupplierName = async (page: Page, name: string) => {
 
 test.describe("suppliers", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
+    await loginAsE2EUser(page);
   });
 
   test("creates, updates, and deletes a supplier", async ({ page }) => {

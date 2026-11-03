@@ -13,9 +13,10 @@ export const getE2ECredentials = () => ({
   password: getRequiredEnv("E2E_USER_PASSWORD"),
 });
 
-export const E2E_ACCOUNTS = {
-  modulesEnabled: getRequiredEnv("E2E_ACCOUNT_MODULES_ENABLED"),
-  modulesDisabled: getRequiredEnv("E2E_ACCOUNT_MODULES_DISABLED"),
-};
+export const E2E_ACCOUNT_SLUG =
+  process.env.E2E_ACCOUNT_SLUG?.trim() || "test-account-modules-activated";
+
+export const getE2EModulesDisabledAccountSlug = () =>
+  getRequiredEnv("E2E_ACCOUNT_MODULES_DISABLED");
 
 export const getE2EApiBaseUrl = () => getRequiredEnv("NEXT_PUBLIC_URL");

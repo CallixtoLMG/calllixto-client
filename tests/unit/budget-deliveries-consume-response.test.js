@@ -148,6 +148,7 @@ test("product stock-control indicator derives disabled products from current pro
     { id: "P2", stockControl: false },
     { id: "P3" },
     { id: "P4", stockControl: false },
+    null,
   ];
 
   assert.deepEqual(toLocalArray(getStockControlDisabledProductIds(currentProducts)), ["P2", "P4"]);
@@ -190,9 +191,6 @@ test("BudgetDeliveries checks consume response before showing success toast", ()
   assert.match(source, /if\s*\(hasConsumeStockResponseError\(response\)\)\s*\{[\s\S]*toast\.error\(getConsumeStockErrorMessage\(response\)\)/);
   assert.match(source, /const warningMessage = getConsumeStockWarningMessage\(response\);/);
   assert.doesNotMatch(source, /setStockControlWarningRowIds|stockControlWarningRowIds|getStockControlWarningRowIds/);
-  assert.match(source, /useListProducts\(\)/);
-  assert.match(source, /new Set\(getStockControlDisabledProductIds\(currentProductsData\?\.products \?\? \[\]\)\)/);
-  assert.match(source, /stockControlDisabledProductIds,/);
   assert.match(source, /if\s*\(warningMessage\)\s*\{[\s\S]*showWarningToast\(warningMessage\)/);
   assert.match(source, /if\s*\(warningMessage\)\s*\{[\s\S]*\}\s*else\s*\{[\s\S]*toast\.success/);
   assert.match(source, /onSuccess\?\.\(\);[\s\S]*resetModalState\(\);[\s\S]*setShowModal\(false\);/);

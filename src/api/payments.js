@@ -1,15 +1,17 @@
 import { ENTITIES, IN_MS } from "@/common/constants";
 import { GET_PAYMENT_QUERY_KEY } from "@/components/payments/payments.constants";
 import { PATHS } from "@/fetchUrls";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getInstance } from "./axios";
 import { useCreateItem, useDeleteItem, useEditItem } from "./common";
+import { invalidateServerLists } from "./pagedLists";
 
 export const useEditPayment = () => {
+  const queryClient = useQueryClient();
   const editItem = useEditItem();
 
-  const editPayment = (payment, entity, entityId) => {
-    return editItem({
+  const editPayment = async (payment, entity, entityId) => {
+    const response = await editItem({
       entity: ENTITIES.PAYMENTS,
       url: `${PATHS.PAYMENTS}/${entity}/${entityId}/${payment.id}`,
       value: payment,
@@ -19,16 +21,19 @@ export const useEditPayment = () => {
       ],
       skipStorageUpdate: true,
     });
+    if (response?.statusOk && entity === ENTITIES.EXPENSE) await invalidateServerLists(queryClient, ENTITIES.EXPENSES);
+    return response;
   };
 
   return editPayment;
 };
 
 export const useDeletePayment = () => {
+  const queryClient = useQueryClient();
   const deleteItem = useDeleteItem();
 
-  const deletePayment = (paymentId, entity, entityId) => {
-    return deleteItem({
+  const deletePayment = async (paymentId, entity, entityId) => {
+    const response = await deleteItem({
       entity: ENTITIES.PAYMENTS,
       id: paymentId,
       url: `${PATHS.PAYMENTS}/${entity}/${entityId}/${paymentId}`,
@@ -37,16 +42,19 @@ export const useDeletePayment = () => {
       ],
       skipStorageUpdate: true,
     });
+    if (response?.statusOk && entity === ENTITIES.EXPENSE) await invalidateServerLists(queryClient, ENTITIES.EXPENSES);
+    return response;
   };
 
   return deletePayment;
 };
 
 export const useCreatePayment = () => {
+  const queryClient = useQueryClient();
   const createItem = useCreateItem();
 
-  const createPayment = (payment, entity, entityId) => {
-    return createItem({
+  const createPayment = async (payment, entity, entityId) => {
+    const response = await createItem({
       entity: ENTITIES.PAYMENTS,
       url: `${PATHS.PAYMENTS}/${entity}/${entityId}`,
       value: payment,
@@ -54,6 +62,8 @@ export const useCreatePayment = () => {
       invalidateQueries: [[GET_PAYMENT_QUERY_KEY, entityId]],
       skipStorageUpdate: true
     });
+    if (response?.statusOk && entity === ENTITIES.EXPENSE) await invalidateServerLists(queryClient, ENTITIES.EXPENSES);
+    return response;
   };
 
   return createPayment;

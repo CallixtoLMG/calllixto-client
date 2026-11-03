@@ -3,11 +3,11 @@ import { useEditSetting, useListSettings } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { Form } from "@/common/components/custom";
 import { UnsavedChangesModal } from "@/common/components/modals";
-import { ALL, BUTTON_TEXTS, COLORS, ENTITIES, ICONS, INFO, PAGES, SETTINGS_TAB_MAP, SETTINGS_TAB_REVERSE_MAP, SHORTKEYS } from "@/common/constants";
+import { ALL, BUTTON_TEXTS, ENTITIES, INFO, PAGES, SETTINGS_TAB_MAP, SETTINGS_TAB_REVERSE_MAP, SHORTKEYS } from "@/common/constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SettingsTabs from "@/components/settings";
-import { ENTITY_MAPPER, GET_SETTING_QUERY_KEY, LIST_SETTINGS_QUERY_KEY, sortSettingsByEntityOrder, SUPPORTED_SETTINGS } from "@/components/settings/settings.constants";
-import { useKeyboardShortcuts, useRestoreEntity, useUnsavedChanges } from "@/hooks";
+import { ENTITY_MAPPER, GET_SETTING_QUERY_KEY, sortSettingsByEntityOrder, SUPPORTED_SETTINGS } from "@/components/settings/settings.constants";
+import { useKeyboardShortcuts, useUnsavedChanges } from "@/hooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { pick } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -22,7 +22,6 @@ const Settings = () => {
   const { data, isLoading: isLoadingSettings } = useListSettings();
   const editSetting = useEditSetting();
   const queryClient = useQueryClient();
-  const [isLoading, setIsLoading] = useState(false);
   const methods = useForm();
   const formRef = useRef(null);
   const searchParams = useSearchParams();
@@ -45,56 +44,14 @@ const Settings = () => {
     },
   });
 
-  const restoreSettings = useRestoreEntity({
-    entity: ENTITIES.SETTINGS,
-    key: LIST_SETTINGS_QUERY_KEY,
-  });
-  const restoreSettingsRef = useRef(restoreSettings);
-
-  const handleSettingsRefresh = useCallback(async () => {
-    setIsLoading(true)
-    if (typeof restoreSettingsRef.current !== "function") {
-      return;
-    }
-    try {
-      await restoreSettingsRef.current();
-      toast.success("Configuración actualizada correctamente.");
-    } catch (error) {
-      console.error("Error al actualizar configuración:", error);
-      toast.error("Hubo un error al actualizar la configuración.");
-    }
-    setIsLoading(false)
-  }, []);
-
   useEffect(() => {
-    restoreSettingsRef.current = restoreSettings;
-  }, [restoreSettings]);
-
-  const settingsActions = useMemo(() => [
-    {
-      id: "settings-update",
-      icon: ICONS.REFRESH,
-      color: COLORS.BLUE,
-      text: "Actualizar configuración",
-      onClick: handleSettingsRefresh,
-      disabled: isLoading,
-      loading: isLoading,
-      showTooltipWhenExpanded: true,
-    },
-  ], [handleSettingsRefresh, isLoading]);
-
-  useEffect(() => {
+    setActions([]);
     setInfo(INFO.HELP.SECTIONS[ENTITIES.SETTINGS].LIST);
     setLabels([{ name: PAGES.SETTINGS.NAME }]);
     return () => {
-      setActions([]);
       setInfo(null);
     };
   }, [setActions, setInfo, setLabels]);
-
-  useEffect(() => {
-    setActions(settingsActions);
-  }, [setActions, settingsActions]);
 
   const { mutate: mutateEdit, isPending } = useMutation({
     mutationFn: (data) => editSetting({
@@ -104,7 +61,7 @@ const Settings = () => {
     onSuccess: () => {
       toast.success("Cambios guardados correctamente.");
       methods.reset(methods.getValues());
-      queryClient.invalidateQueries({ queryKey: [[GET_SETTING_QUERY_KEY]], refetchType: ALL })
+      queryClient.invalidateQueries({ queryKey: [GET_SETTING_QUERY_KEY], refetchType: ALL })
     },
     onError: (error) => {
       toast.error(`Error al guardar cambios: ${error.message || error}`);

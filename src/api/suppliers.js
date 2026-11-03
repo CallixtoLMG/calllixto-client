@@ -1,19 +1,24 @@
 import { ENTITIES, INACTIVE, IN_MS, SET_STATE } from "@/common/constants";
-import { getDefaultListParams } from '@/common/utils';
-import { GET_SUPPLIER_QUERY_KEY, LIST_ATTRIBUTES, LIST_SUPPLIERS_QUERY_KEY } from "@/components/suppliers/suppliers.constants";
+import { GET_SUPPLIER_QUERY_KEY, LIST_SUPPLIERS_QUERY_KEY } from "@/components/suppliers/suppliers.constants";
 import { PATHS } from "@/fetchUrls";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getInstance } from "./axios";
-import { listItems, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from "./common";
+import { useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from "./common";
+import { fetchAllListPages, invalidateServerLists, usePagedList } from "./pagedLists";
+
+export const usePagedSuppliers = (state) => usePagedList({ ...state, entity: ENTITIES.SUPPLIERS, url: PATHS.SUPPLIERS });
+
+export const fetchSuppliersForExport = ({ appliedFilters, sort, order }) => fetchAllListPages({
+  entity: ENTITIES.SUPPLIERS, url: PATHS.SUPPLIERS, filters: appliedFilters, sort, order,
+});
 
 export function useListSuppliers() {
   const query = useQuery({
     queryKey: [LIST_SUPPLIERS_QUERY_KEY],
-    queryFn: () => listItems({
-      entity: ENTITIES.SUPPLIERS,
-      url: PATHS.SUPPLIERS,
-      params: getDefaultListParams(LIST_ATTRIBUTES)
-    }),
+    queryFn: async ({ signal }) => ({ suppliers: await fetchAllListPages({
+      entity: ENTITIES.SUPPLIERS, url: PATHS.SUPPLIERS, signal,
+    }) }),
+    retry: false,
     staleTime: 0,
   });
 
@@ -44,15 +49,19 @@ export function useGetSupplier(id) {
 
 export const useCreateSupplier = () => {
   const createItem = useCreateItem();
+  const queryClient = useQueryClient();
 
-  const createSupplier = (supplier) => {
-    return createItem({
+  const createSupplier = async (supplier) => {
+    const data = await createItem({
       entity: ENTITIES.SUPPLIERS,
+      skipStorageUpdate: true,
       url: PATHS.SUPPLIERS,
       value: supplier,
       responseEntity: ENTITIES.SUPPLIER,
       invalidateQueries: [[LIST_SUPPLIERS_QUERY_KEY]],
     });
+    if (data?.statusOk) await invalidateServerLists(queryClient, ENTITIES.SUPPLIERS);
+    return data;
   };
 
   return createSupplier;
@@ -60,15 +69,18 @@ export const useCreateSupplier = () => {
 
 export const useDeleteSupplier = () => {
   const deleteItem = useDeleteItem();
+  const queryClient = useQueryClient();
 
   const deleteSupplier = async (id) => {
     const response = await deleteItem({
       entity: ENTITIES.SUPPLIERS,
+      skipStorageUpdate: true,
       id,
       url: `${PATHS.SUPPLIERS}/${id}`,
       invalidateQueries: [[LIST_SUPPLIERS_QUERY_KEY]]
     });
 
+    if (response?.statusOk) await invalidateServerLists(queryClient, ENTITIES.SUPPLIERS);
     return response;
   };
 
@@ -77,12 +89,14 @@ export const useDeleteSupplier = () => {
 
 export const useEditSupplier = () => {
   const editItem = useEditItem();
+  const queryClient = useQueryClient();
 
 
   const editSupplier = async (supplier) => {
 
     const response = await editItem({
       entity: ENTITIES.SUPPLIERS,
+      skipStorageUpdate: true,
       url: `${PATHS.SUPPLIERS}/${supplier.id}`,
       value: supplier,
       key: "id",
@@ -90,6 +104,7 @@ export const useEditSupplier = () => {
       invalidateQueries: [[LIST_SUPPLIERS_QUERY_KEY], [GET_SUPPLIER_QUERY_KEY, supplier.id]]
     });
 
+    if (response?.statusOk) await invalidateServerLists(queryClient, ENTITIES.SUPPLIERS);
     return response;
   };
 
@@ -98,10 +113,12 @@ export const useEditSupplier = () => {
 
 export const useSetSupplierState = () => {
   const updateItem = usePostUpdateItem();
+  const queryClient = useQueryClient();
 
-  const setSupplierState = ({ id, state, inactiveReason }) => {
-    return updateItem({
+  const setSupplierState = async ({ id, state, inactiveReason }) => {
+    const data = await updateItem({
       entity: ENTITIES.SUPPLIERS,
+      skipStorageUpdate: true,
       url: `${PATHS.SUPPLIERS}/${id}/${SET_STATE}`,
       value: {
         id,
@@ -113,8 +130,9 @@ export const useSetSupplierState = () => {
         [LIST_SUPPLIERS_QUERY_KEY],
         [GET_SUPPLIER_QUERY_KEY, id],
       ],
-      attributes: LIST_ATTRIBUTES,
     });
+    if (data?.statusOk) await invalidateServerLists(queryClient, ENTITIES.SUPPLIERS);
+    return data;
   };
 
   return setSupplierState;

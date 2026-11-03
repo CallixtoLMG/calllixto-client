@@ -20,13 +20,24 @@ if (typeof window !== "undefined") {
     [ENTITIES.SETTINGS]: 'entity, updatedAt',
     [LAST_UPDATED_AT]: 'id',
   });
+  db.version(2).stores({
+    [ENTITIES.BRANDS]: null,
+    [ENTITIES.SUPPLIERS]: null,
+    [ENTITIES.PRODUCTS]: null,
+    [ENTITIES.SETTINGS]: null,
+  });
+  db.version(3).stores({
+    [ENTITIES.CUSTOMERS]: null,
+  });
+  db.version(4).stores({
+    [ENTITIES.EXPENSES]: null,
+  });
+  db.version(5).stores({
+    [ENTITIES.BUDGETS]: null,
+  });
 };
 
 export { db };
-
-export async function bulkAddStorageItems({ entity, values }) {
-  await db[entity].bulkAdd(values);
-};
 
 export async function bulkPutStorageItems({ entity, values }) {
   await db[entity].bulkPut(values);
@@ -59,10 +70,4 @@ export async function removeStorageItem({ entity, id }) {
 
 export async function clearStorageTable(entity) {
   await db[entity].clear();
-};
-
-export async function removeStorageItemById({ entity, id }) {
-  if (!entity || id === undefined || id === null || id === "") {
-    return;
-  }
 };

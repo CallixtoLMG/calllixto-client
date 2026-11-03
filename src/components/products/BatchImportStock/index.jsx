@@ -24,6 +24,8 @@ export const BatchImportStock = ({
   supplierId,
   products = [],
   triggerClassName,
+  disabled = false,
+  loadProducts,
 }) => {
   const isDiscount = mode === DISCOUNT_STOCK;
   const methods = useForm();
@@ -55,7 +57,8 @@ export const BatchImportStock = ({
     },
   };
 
-  const handleBeforeOpenFile = () => {
+  const handleBeforeOpenFile = async () => {
+    if (loadProducts && !(await loadProducts())) return false;
     reset();
   };
 
@@ -382,6 +385,7 @@ export const BatchImportStock = ({
         onClose={handleCloseModal}
         onOpen={() => setOpenModal(true)}
         triggerClassName={triggerClassName}
+        disabled={disabled}
         onBeforeOpenFile={handleBeforeOpenFile}
         onFileRead={handleFileRead}
         onFileError={() => toast.error("Error al leer el archivo")}

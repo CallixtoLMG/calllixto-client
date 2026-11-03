@@ -7,7 +7,7 @@ const vm = require("node:vm");
 const root = path.join(__dirname, "..", "..");
 const source = fs.readFileSync(path.join(root, "src", "api", "stock.js"), "utf8");
 
-const helperStart = source.indexOf("export const MAX_STOCK_TRANSACTION_OPERATIONS");
+const helperStart = source.indexOf("export const MAX_STOCK_BATCH_FLOWS");
 const helperEnd = source.indexOf("export function useGetStockFlow");
 const helperSource = source
   .slice(helperStart, helperEnd)
@@ -22,6 +22,7 @@ const context = {
 vm.runInNewContext(
   `${helperSource}
 module.exports = {
+  MAX_STOCK_BATCH_FLOWS,
   MAX_STOCK_TRANSACTION_OPERATIONS,
   buildSupplierStockBatches,
   postSupplierStockBatches,
@@ -30,6 +31,7 @@ module.exports = {
 );
 
 const {
+  MAX_STOCK_BATCH_FLOWS,
   MAX_STOCK_TRANSACTION_OPERATIONS,
   buildSupplierStockBatches,
   postSupplierStockBatches,
@@ -47,52 +49,58 @@ const getOperationCount = (flows) =>
 const flatten = (batches) => batches.flat();
 const getBatchLengths = (batches) => Array.from(batches, (batch) => batch.length);
 
-test("supplier stock batches never exceed the transaction operation budget", () => {
+test("supplier stock batches never exceed either PostgreSQL limit", () => {
+  assert.equal(MAX_STOCK_BATCH_FLOWS, 250);
+  assert.equal(MAX_STOCK_TRANSACTION_OPERATIONS, 500);
+
   const flows = [
-    ...createFlows(120),
-    ...createFlows(90, (index) => `REPEATED-${index % 3}`),
+    ...createFlows(501),
+    ...createFlows(500, (index) => `REPEATED-${index % 3}`),
   ];
 
   const batches = buildSupplierStockBatches(flows);
 
   assert.ok(batches.length > 1);
   batches.forEach((batch) => {
+    assert.ok(batch.length <= MAX_STOCK_BATCH_FLOWS);
     assert.ok(getOperationCount(batch) <= MAX_STOCK_TRANSACTION_OPERATIONS);
   });
 });
 
-test("45 distinct products fit in one supplier stock batch", () => {
-  const batches = buildSupplierStockBatches(createFlows(45));
+for (const [count, expected] of [
+  [249, [249]],
+  [250, [250]],
+  [251, [250, 1]],
+  [500, [250, 250]],
+]) {
+  test(`${count} distinct stock flows are split into ${expected.join(", ")}`, () => {
+    const batches = buildSupplierStockBatches(createFlows(count));
 
-  assert.deepEqual(getBatchLengths(batches), [45]);
-  assert.equal(getOperationCount(batches[0]), 90);
-});
+    assert.deepEqual(getBatchLengths(batches), expected);
+    batches.forEach((batch) => {
+      assert.ok(batch.length <= MAX_STOCK_BATCH_FLOWS);
+      assert.equal(getOperationCount(batch), batch.length * 2);
+      assert.ok(getOperationCount(batch) <= MAX_STOCK_TRANSACTION_OPERATIONS);
+    });
+  });
+
+  test(`${count} flows for one product are split into ${expected.join(", ")}`, () => {
+    const batches = buildSupplierStockBatches(createFlows(count, () => "SAME_PRODUCT"));
+
+    assert.deepEqual(getBatchLengths(batches), expected);
+    batches.forEach((batch) => {
+      assert.ok(batch.length <= MAX_STOCK_BATCH_FLOWS);
+      assert.equal(getOperationCount(batch), batch.length + 1);
+      assert.ok(getOperationCount(batch) <= MAX_STOCK_TRANSACTION_OPERATIONS);
+    });
+  });
+}
 
 test("one supplier stock flow makes one batch with two operations", () => {
   const batches = buildSupplierStockBatches(createFlows(1));
 
   assert.deepEqual(getBatchLengths(batches), [1]);
   assert.equal(getOperationCount(batches[0]), 2);
-});
-
-test("the 46th distinct product moves to the next supplier stock batch", () => {
-  const batches = buildSupplierStockBatches(createFlows(46));
-
-  assert.deepEqual(getBatchLengths(batches), [45, 1]);
-});
-
-test("120 distinct products are split into 45, 45, and 30 flows", () => {
-  const batches = buildSupplierStockBatches(createFlows(120));
-
-  assert.deepEqual(getBatchLengths(batches), [45, 45, 30]);
-});
-
-test("repeated products are counted once per batch while each flow is counted", () => {
-  const batches = buildSupplierStockBatches(createFlows(90, () => "SAME_PRODUCT"));
-
-  assert.deepEqual(getBatchLengths(batches), [89, 1]);
-  assert.equal(getOperationCount(batches[0]), 90);
-  assert.equal(getOperationCount(batches[1]), 2);
 });
 
 test("non-contiguous repeated products still count as one unique product per batch", () => {
@@ -111,7 +119,7 @@ test("non-contiguous repeated products still count as one unique product per bat
 });
 
 test("supplier stock batching preserves every flow in original order", () => {
-  const flows = createFlows(120, (index) => `P${index % 7}`);
+  const flows = createFlows(1001, (index) => `P${index % 7}`);
   const batches = buildSupplierStockBatches(flows);
 
   assert.equal(
@@ -125,6 +133,7 @@ test("supplier stock batch posting is sequential", async () => {
   const calls = [];
   let activeRequests = 0;
   let maxActiveRequests = 0;
+  const flows = createFlows(501);
 
   const post = async (url, body) => {
     activeRequests += 1;
@@ -140,14 +149,19 @@ test("supplier stock batch posting is sequential", async () => {
   const result = await postSupplierStockBatches({
     supplierId: "AA",
     inflow: true,
-    flows: createFlows(46),
+    flows,
     post,
   });
 
   assert.equal(result.statusOk, true);
   assert.equal(maxActiveRequests, 1);
-  assert.deepEqual(calls.map((call) => call.body.flows.length), [45, 1]);
+  assert.equal(result.processed, 1);
+  assert.deepEqual(calls.map((call) => call.body.flows.length), [250, 250, 1]);
+  assert.deepEqual(calls.flatMap((call) => Array.from(call.body.flows)), flows);
+  assert.ok(calls.every((call) => call.body.inflow === true));
+  assert.ok(calls.every((call) => Object.keys(call.body).join(",") === "inflow,flows"));
   assert.deepEqual(calls.map((call) => call.url), [
+    "/stock-flows/AA/add",
     "/stock-flows/AA/add",
     "/stock-flows/AA/add",
   ]);
@@ -169,14 +183,56 @@ test("supplier stock batch posting stops after an intermediate failure", async (
   const result = await postSupplierStockBatches({
     supplierId: "AA",
     inflow: false,
-    flows: createFlows(120),
+    flows: createFlows(501),
     post,
   });
 
   assert.equal(result.statusOk, false);
   assert.equal(result.error.message, "Demasiadas operaciones");
-  assert.deepEqual(calls.map((call) => call.body.flows.length), [45, 45]);
+  assert.deepEqual(calls.map((call) => call.body.flows.length), [250, 250]);
+  assert.ok(calls.every((call) => call.body.inflow === false));
 });
+
+test("supplier stock batch posting stops on the first failed response", async () => {
+  let calls = 0;
+  const failure = { statusOk: false, error: { message: "Stock update failed" } };
+
+  const result = await postSupplierStockBatches({
+    supplierId: "AA",
+    inflow: true,
+    flows: createFlows(501),
+    post: async () => {
+      calls += 1;
+      return { data: failure };
+    },
+  });
+
+  assert.equal(result, failure);
+  assert.equal(calls, 1);
+});
+
+for (const failureAt of [1, 2]) {
+  test(`supplier stock batch posting stops when request ${failureAt} rejects`, async () => {
+    let calls = 0;
+    const error = new Error("Network failure");
+
+    await assert.rejects(
+      postSupplierStockBatches({
+        supplierId: "AA",
+        inflow: true,
+        flows: createFlows(501),
+        post: async () => {
+          calls += 1;
+          if (calls === failureAt) throw error;
+          return { data: { statusOk: true } };
+        },
+      }),
+      (rejection) => rejection === error
+    );
+
+    assert.equal(calls, failureAt);
+  });
+}
 
 test("empty supplier stock batches do not make requests", async () => {
   let calls = 0;

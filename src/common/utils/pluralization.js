@@ -1,3 +1,5 @@
+import { formatInteger } from "./numbers";
+
 export const PLURAL_LABELS = {
   day: {
     singular: "día",
@@ -57,7 +59,7 @@ export const formatCount = (count, keyOrSingular, plural) => {
     ? getPluralLabel(keyOrSingular, count)
     : pluralize(count, keyOrSingular, plural);
 
-  return `${count} ${label}`;
+  return `${formatInteger(count)} ${label}`;
 };
 
 export const formatLastCount = (count, key) => {

@@ -104,3 +104,8 @@ export const calculatePriceFromMargin = (cost, margin) => {
   const price = cost * (1 + margin / 100);
   return parseFloat(price.toFixed(2));
 };
+
+export const getProductAssociation = (hasProducts) => ({
+  canUseProductTools: hasProducts === true,
+  canDeleteEntity: hasProducts === false,
+});

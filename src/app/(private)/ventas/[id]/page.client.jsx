@@ -194,7 +194,7 @@ const BudgetPageClient = ({ budget }) => {
           onClick: () => setIsModalPDFOpen(true),
           text: 'Descargar PDF de la venta',
           showTooltipWhenExpanded: true,
-          iconOnly:true,
+          iconOnly: true,
         },
         !isBudgetDraft(budget.state) &&
         {
@@ -205,7 +205,7 @@ const BudgetPageClient = ({ budget }) => {
           text: 'Copiar link público',
           tooltip: publicLinkTooltip,
           disabled: !canCopyPublicLink,
-          iconOnly:true,
+          iconOnly: true,
         },
         hasValidSendOptions && {
           id: 3,
@@ -220,7 +220,7 @@ const BudgetPageClient = ({ budget }) => {
           color: COLORS.GREEN,
           onClick: () => { push(PAGES.BUDGETS.CLONE(budget.id)) },
           text: 'Clonar venta',
-          iconOnly:true,
+          iconOnly: true,
         },
         budget.state === BUDGET_STATES.CONFIRMED.id && {
           id: 5,
@@ -229,7 +229,7 @@ const BudgetPageClient = ({ budget }) => {
           onClick: () => setIsModalCancelOpen(true),
           text: 'Anular venta',
           basic: true,
-          iconOnly:true,
+          iconOnly: true,
         },
       ].filter(Boolean);
       setActions(actions);
