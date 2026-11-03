@@ -64,7 +64,8 @@ const setup = (t) => {
     calls.push({ url, ...options });
     if (failPage === options.params.pageNumber) throw new Error("Page failed");
     const length = options.params.pageSize === 500 ? (options.params.pageNumber === 3 ? 200 : 500) : 20;
-    return { data: { statusOk: true, [url]: Array.from({ length }, (_, id) => ({ id })), count: "1200", LastEvaluatedKey: {} } };
+    const offset = (options.params.pageNumber - 1) * options.params.pageSize;
+    return { data: { statusOk: true, [url]: Array.from({ length }, (_, id) => ({ id: offset + id })), count: "1200", LastEvaluatedKey: {} } };
   } }) };
   const paged = load("src/api/pagedLists.js", { "./axios": axios });
   const common = Object.fromEntries(["useCreateItem", "useEditItem", "usePatchItem", "useDeleteItem", "usePostUpdateItem"]

@@ -43,13 +43,14 @@ const settled = (observer) => new Promise((resolve, reject) => {
   unsubscribe = observer.subscribe(check);
   check(observer.getCurrentResult());
 });
-const setup = (t) => {
+const setup = (t, respond) => {
   const client = new QueryClient({ defaultOptions: { queries: { gcTime: Infinity, retry: false } } });
   t.after(() => client.clear());
   const calls = [], mutations = [];
   let mutationResult = { statusOk: true };
   const axios = { getInstance: () => ({ get: async (url, options) => {
     calls.push({ url, ...options });
+    if (respond) return { data: respond(options.params) };
     return { data: { statusOk: true, expenses: [{ id: `A${options.params.pageNumber}` }],
       ...(options.params.count && { count: 40 }), LastEvaluatedKey: { id: "compatibility-only" } } };
   } }) };
@@ -78,6 +79,26 @@ const setup = (t) => {
   };
   return { client, calls, mutations, paged, api, payments, state, options, hook,
     failMutation: () => { mutationResult = { statusOk: false }; } };
+};
+
+const renderRoute = (a, list, query = {}) => {
+  let configuration, page;
+  const downloads = [], errors = [];
+  const Route = load("src/app/(private)/gastos/page.jsx", {
+    "@/User": { useUserContext: () => ({ role: "viewer" }) },
+    "@/api/expenses": { ...a.api, usePagedExpenses: () => ({ total: 0, isFetching: false, ...query }) },
+    "@/api/pagedLists": a.paged, "@/common/constants": constants,
+    "@/common/utils": { downloadExcel: (...args) => downloads.push(args) },
+    "@/components/expenses/ExpensesPage": { default: (props) => { page = props; return null; } },
+    "@/components/expenses/expenses.constants": expenseConstants,
+    "@/components/layout": { useBreadcrumContext: () => ({ setLabels() {} }) }, "@/hooks": { useKeyboardShortcuts() {} },
+    "@/hooks/useServerListFilters": { default: (config) => { configuration = config; return list; } },
+    "@/roles": { RULES: { canCreate: {} } }, "next/navigation": { useRouter: () => ({ push() {} }) },
+    "react-hot-toast": { toast: { error: (message) => errors.push(message) } },
+  }).default;
+  renderToStaticMarkup(React.createElement(QueryClientProvider, { client: a.client }, React.createElement(Route)));
+  return { configuration, page, downloads, errors,
+    exportAction: page.sideActions.find((action) => action.id === "download-excel") };
 };
 
 test("Expenses sends numeric pages, reuses count and ignores compatibility cursors", async (t) => {
@@ -154,20 +175,10 @@ test("Expenses table passes the backend page intact and disables categories and 
   assert.ok(table.headers.every((h) => h.sortValue === undefined));
 });
 
-test("Expenses filter apply uses the same boolean-order identity and export stays disabled", async (t) => {
+test("Expenses filter apply uses the same boolean-order identity and disables export while the list is unavailable", async (t) => {
   const a = setup(t);
   const restored = { ...a.state, appliedFilters: { state: "all", categories: "Servicios" } };
-  let configuration, page;
-  const Route = load("src/app/(private)/gastos/page.jsx", {
-    "@/User": { useUserContext: () => ({ role: "viewer" }) }, "@/api/expenses": a.api,
-    "@/api/pagedLists": a.paged, "@/common/constants": constants,
-    "@/components/expenses/ExpensesPage": { default: (props) => { page = props; return null; } },
-    "@/components/expenses/expenses.constants": expenseConstants,
-    "@/components/layout": { useBreadcrumContext: () => ({ setLabels() {} }) }, "@/hooks": { useKeyboardShortcuts() {} },
-    "@/hooks/useServerListFilters": { default: (config) => { configuration = config; return restored; } },
-    "@/roles": { RULES: { canCreate: {} } }, "next/navigation": { useRouter: () => ({ push() {} }) },
-  }).default;
-  renderToStaticMarkup(React.createElement(QueryClientProvider, { client: a.client }, React.createElement(Route)));
+  const { configuration, page } = renderRoute(a, restored);
   const observer = new QueryObserver(a.client, a.options());
   t.after(observer.subscribe(() => {}));
   await settled(observer);
@@ -175,9 +186,61 @@ test("Expenses filter apply uses the same boolean-order identity and export stay
   assert.equal(a.calls.length, 2);
   assert.equal(a.calls[1].params.count, true);
   assert.equal(page.list.appliedCount, 0);
-  const exportAction = page.sideActions.find((action) => action.id === "download-excel");
-  assert.equal(exportAction.disabled, true);
-  assert.equal(exportAction.onClick, undefined);
+  for (const [hydrated, query] of [[false, { total: 34 }], [true, { total: 34, isFetching: true }], [true, { total: null }], [true, { total: 0 }]]) {
+    const { exportAction } = renderRoute(a, { ...restored, hydrated }, query);
+    assert.equal(exportAction.disabled, true);
+    await exportAction.onClick();
+  }
+  assert.equal(a.calls.length, 2);
+});
+
+test("Expenses Excel exports the 34 applied matches out of 50, ignores draft and formats all rows", async (t) => {
+  const dataset = Array.from({ length: 50 }, (_, i) => ({
+    id: `A${String(i + 1).padStart(4, "0")}`,
+    name: i < 34 ? "Internet" : "Telefonía",
+    categories: i === 0 ? undefined : [{ name: "Servicios" }, { name: "Oficina" }],
+    amount: 500 + i,
+    state: "PENDING",
+    comments: `Gasto ${i + 1}`,
+  }));
+  const a = setup(t, ({ id, name, state, pageNumber, pageSize, count, order }) => {
+    const matches = dataset.filter((expense) => expense.id.includes(id) && expense.name === name && expense.state === state);
+    if (!order) matches.reverse();
+    return { statusOk: true, expenses: matches.slice((pageNumber - 1) * pageSize, pageNumber * pageSize),
+      ...(count && { count: matches.length }) };
+  });
+  const appliedFilters = { id: "A", name: "Internet", state: "PENDING", categories: "Ignorada" };
+  const list = { ...a.state, pageNumber: 2, appliedFilters, order: "desc", methods: { getValues: () => ({ name: "Telefonía" }) } };
+  const matches = dataset.slice(0, 34).reverse();
+  const { exportAction, downloads, errors } = renderRoute(a, list, { total: 34, data: { items: matches.slice(20) } });
+  assert.equal(exportAction.disabled, false);
+  await exportAction.onClick();
+  assert.deepEqual(plain(a.calls.map(({ params }) => params)), [1, 2].map((pageNumber) => ({
+    id: "A", name: "Internet", state: "PENDING", sort: "id", order: false, pageNumber, pageSize: 20, count: pageNumber === 1,
+  })));
+  assert.deepEqual(errors, []);
+  assert.deepEqual(plain(downloads), [[[
+    ["ID", "Nombre", "Categorias", "Monto", "Estado", "Comentarios"],
+    ...matches.map(({ id, amount, comments, categories }) => [id, "Internet", categories ? "Servicios, Oficina" : "", amount, "Pendiente", comments]),
+  ], "Lista de Gastos"]]);
+});
+
+test("Expenses Excel writes nothing when a later page fails, is incomplete or repeats an ID", async (t) => {
+  const firstPage = Array.from({ length: 20 }, (_, i) => ({ id: `A${i + 1}` }));
+  for (const [secondPage, message] of [
+    [{ statusOk: false, message: "Falló la página" }, /Falló la página/],
+    [{ statusOk: true, expenses: [] }, /listado completo/],
+    [{ statusOk: true, expenses: [firstPage[0]] }, /registros repetidos/],
+  ]) {
+    const a = setup(t, ({ pageNumber }) => pageNumber === 1
+      ? { statusOk: true, expenses: firstPage, count: 21 } : secondPage);
+    const { exportAction, downloads, errors } = renderRoute(a, a.state, { total: 21 });
+    await exportAction.onClick();
+    assert.deepEqual(a.calls.map(({ params }) => params.pageNumber), [1, 2]);
+    assert.deepEqual(downloads, []);
+    assert.equal(errors.length, 1);
+    assert.match(errors[0], message);
+  }
 });
 
 test("Expense create/edit/cancel skip Dexie and recount active pages only on success", async (t) => {

@@ -18,7 +18,6 @@ const twoDigitIdWithAttempt = (seed: number, attempt: number) => twoDigitId(seed
 const productLocalId = (seed: number) => (seed % 1_679_616).toString(36).padStart(4, "0").toUpperCase();
 
 const exportScenarios: ExportScenario[] = [
-  { name: "customers", path: "/clientes", expectedFileName: /lista de clientes\.xlsx$/i },
   {
     name: "suppliers",
     path: "/proveedores",
@@ -40,14 +39,6 @@ const exportScenarios: ExportScenario[] = [
     prepare: async (page, timestamp) => (await createProductByApi(page, timestamp)).name,
     filter: (page, value) => filterByName(page, value),
   },
-  { name: "expenses", path: "/gastos", expectedFileName: /lista de gastos\.xlsx$/i },
-  {
-    name: "budgets",
-    path: "/ventas",
-    expectedFileName: /lista de ventas\.xlsx$/i,
-    prepare: async (page, timestamp) => (await createBudgetByApi(page, timestamp)).customerName,
-    filter: (page, value) => filterBudgetByCustomer(page, value),
-  },
   {
     name: "cash balances",
     path: "/cajas",
@@ -64,31 +55,13 @@ const openListPage = async (page: Page, path: string) => {
   await expect(getPageActionsRail(page)).toBeAttached({ timeout: 30_000 });
 };
 
-const getVisibleTableRowsCount = async (page: Page) => {
-  const rows = page.getByTestId("table-row");
-  const count = await rows.count();
-  let visibleRows = 0;
-
-  for (let index = 0; index < count; index += 1) {
-    if (await rows.nth(index).isVisible()) {
-      visibleRows += 1;
-    }
-  }
-
-  return visibleRows;
-};
-
 const getExpectedExportRowsCount = async (page: Page) => {
-  const paginationSummary = page.getByText(/\d+\s*-\s*\d+\s*de\s*\d+/).first();
-
-  if (await paginationSummary.isVisible({ timeout: 2_000 })) {
-    const text = (await paginationSummary.textContent()) ?? "";
-    const total = text.match(/de\s*(\d+)/i)?.[1];
-
-    if (total) return Number(total);
-  }
-
-  return getVisibleTableRowsCount(page);
+  const pattern = /^[\d.]+\s*-\s*[\d.]+\s+de\s+([\d.]+)$/i;
+  const summary = page.getByText(pattern);
+  await expect(summary).toBeVisible();
+  const total = (await summary.innerText()).trim().match(pattern)?.[1];
+  expect(total).toBeDefined();
+  return Number(total?.replace(/\./g, ""));
 };
 
 const getPageActionsRail = (page: Page) => page.getByTestId("page-actions-aside");
@@ -96,7 +69,7 @@ const getExcelDownloadAction = (page: Page) =>
   getPageActionsRail(page).getByTestId(/^nav-action-descargar .+ en excel$/);
 const isActionReady = async (action: Locator) => {
   if (await action.count() !== 1) return false;
-  return action.click({ trial: true }).then(() => true).catch(() => false);
+  return action.click({ trial: true, timeout: 1_000 }).then(() => true).catch(() => false);
 };
 const expectActionReady = async (action: Locator) => {
   await expect(action).toBeVisible();
@@ -157,19 +130,6 @@ const postApi = async <TBody extends Record<string, unknown>>(
   expect(body[responseEntity], JSON.stringify(body)).toBeTruthy();
 
   return body;
-};
-
-const createCustomerByApi = async (page: Page, timestamp: number) => {
-  const customer = {
-    name: `E2E Export Customer ${timestamp}`,
-    phoneNumbers: [{ ref: "Casa", areaCode: "385", number: "5555555" }],
-    addresses: [{ ref: "Casa", address: "Calle E2E Export 123" }],
-    emails: [],
-    comments: `Comentario E2E export customer ${timestamp}`,
-  };
-
-  const body = await postApi<{ customer: typeof customer & { id?: string } }>(page, "customers", customer, "customer");
-  return body.customer;
 };
 
 const createSupplierByApi = async (page: Page, timestamp: number, prefix = "E2E Export Supplier") => {
@@ -233,36 +193,6 @@ const createProductByApi = async (page: Page, timestamp: number) => {
   return body.product;
 };
 
-const createBudgetByApi = async (page: Page, timestamp: number) => {
-  const customer = await createCustomerByApi(page, timestamp);
-  const product = await createProductByApi(page, timestamp + 31);
-  const budgetProduct = {
-    id: product.id,
-    name: product.name,
-    price: product.price,
-    quantity: 1,
-    discount: 0,
-    delivered: 0,
-    stockControl: false,
-  };
-  const budget = {
-    customer,
-    products: [budgetProduct],
-    comments: `E2E Export Budget ${timestamp}`,
-    state: "DRAFT",
-    globalDiscount: 0,
-    additionalCharge: 0,
-    expirationOffsetDays: 7,
-    paymentMethods: ["all"],
-    paymentsMade: [],
-    pickUpInStore: false,
-    total: product.price,
-  };
-
-  await postApi(page, "budgets", budget, "budget");
-  return { customerName: customer.name };
-};
-
 const createCashBalanceForExport = async (page: Page, timestamp: number) => {
   const comment = `E2E Export Cash Balance ${timestamp}`;
 
@@ -286,11 +216,6 @@ const filterByName = async (page: Page, value: string) => {
   await page.locator('input[name="name"]').press("Enter");
 };
 
-const filterBudgetByCustomer = async (page: Page, value: string) => {
-  await page.locator('input[name="customer"]').fill(value);
-  await page.locator('input[name="customer"]').press("Enter");
-};
-
 const expectExportableRow = async (page: Page, value: string) => {
   await expect(page.getByTestId("table-row").filter({ hasText: value })).toBeVisible({ timeout: 30_000 });
 };
@@ -299,20 +224,78 @@ const expectExportableRows = async (page: Page) => {
   await expect(page.getByTestId("table-row")).not.toHaveCount(0, { timeout: 30_000 });
 };
 
-const readExcelRowsCount = async (filePath: string) => {
+const readExcelRows = (filePath: string) => {
   const workbook = XLSX.readFile(filePath);
   const [firstSheetName] = workbook.SheetNames;
   const worksheet = workbook.Sheets[firstSheetName];
   const rows = XLSX.utils.sheet_to_json<unknown[]>(worksheet, { header: 1, blankrows: false });
 
-  const nonEmptyRows = rows.filter((row) =>
-    Array.isArray(row) && row.some((cell) => cell !== null && cell !== undefined && String(cell).trim() !== "")
-  );
-
-  return Math.max(nonEmptyRows.length - 1, 0);
+  return rows.slice(1);
 };
 
 test.describe("exports", () => {
+  for (const { entity, path, fileName, matches, batch, order, identity } of [
+    { entity: "customers", path: "/clientes", fileName: /lista de clientes\.xlsx$/i, matches: 520, batch: 500, order: "asc", identity: "name" as const },
+    { entity: "expenses", path: "/gastos", fileName: /lista de gastos\.xlsx$/i, matches: 34, batch: 20, order: "true", identity: "id" as const },
+  ]) {
+    test(`exports all applied ${entity} across pages with a pending draft`, async ({ page }) => {
+      await loginAsE2EUser(page);
+
+      const dataset = Array.from({ length: matches + 16 }, (_, i) => ({
+        id: `A${String(i + 1).padStart(4, "0")}`,
+        name: `${i < matches ? "Aplicado" : "Borrador"} ${i + 1}`,
+        amount: i + 100,
+        state: entity === "customers" ? "ACTIVE" : "PENDING",
+        categories: [],
+      }));
+      const requests: URLSearchParams[] = [];
+      const endpoint = new URL(getE2EAccountApiUrl(entity));
+      await page.route((url) => url.origin === endpoint.origin && url.pathname === endpoint.pathname, async (route) => {
+        const headers = {
+          "access-control-allow-origin": "*",
+          "access-control-allow-headers": "authorization",
+          "access-control-allow-methods": "GET, OPTIONS",
+        };
+        if (route.request().method() === "OPTIONS") return route.fulfill({ status: 204, headers });
+        const params = new URL(route.request().url()).searchParams;
+        requests.push(params);
+        const filtered = dataset.filter(({ name }) => name.includes(params.get("name") ?? ""));
+        const pageSize = Number(params.get("pageSize"));
+        const offset = (Number(params.get("pageNumber")) - 1) * pageSize;
+        await route.fulfill({ headers, json: {
+          statusOk: true,
+          [entity]: filtered.slice(offset, offset + pageSize),
+          ...(params.get("count") === "true" && { count: filtered.length }),
+        } });
+      });
+
+      await openListPage(page, path);
+      await filterByName(page, "Aplicado");
+      await expect(page.getByText(`1 - 20 de ${matches}`, { exact: true })).toBeVisible();
+      await expect(page.getByTestId("table-row")).toHaveCount(20);
+      await revealExcelDownloadAction(page);
+      const exportStart = requests.length;
+      await page.locator('input[name="name"]').fill("Borrador");
+
+      const download = await downloadExcel(page);
+      expect(download.suggestedFilename()).toMatch(fileName);
+      const rows = readExcelRows(await download.path());
+      expect(rows.map(([key]) => key)).toEqual(dataset.slice(0, matches).map((row) => row[identity]));
+      expect(requests.slice(exportStart).map((params) => Object.fromEntries(params))).toEqual([1, 2].map((pageNumber) => ({
+        name: "Aplicado", pageNumber: String(pageNumber), pageSize: String(batch), sort: "id", order, count: String(pageNumber === 1),
+        ...(entity === "customers" && { state: "" }),
+      })));
+    });
+  }
+
+  test("keeps the budgets Excel action disabled", async ({ page }) => {
+    await loginAsE2EUser(page);
+    await openListPage(page, "/ventas");
+    const action = getExcelDownloadAction(page);
+    await expect(action).toBeVisible();
+    await expect(action).toBeDisabled();
+  });
+
   for (const scenario of exportScenarios) {
     test(`exports ${scenario.name} table to Excel`, { tag: scenario.tags }, async ({ page }) => {
       await loginAsE2EUser(page);
@@ -340,7 +323,7 @@ test.describe("exports", () => {
       expect(suggestedFileName).toMatch(scenario.expectedFileName);
       expect(downloadedPath).toBeTruthy();
 
-      const exportedRowsCount = await readExcelRowsCount(downloadedPath as string);
+      const exportedRowsCount = readExcelRows(downloadedPath).length;
 
       expect(exportedRowsCount).toBeGreaterThan(0);
       expect(exportedRowsCount).toBe(expectedRowsCount);
