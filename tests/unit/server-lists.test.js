@@ -51,6 +51,40 @@ const settled = (observer) => new Promise((resolve, reject) => {
   check(observer.getCurrentResult());
 });
 
+test("the Users legacy list sends no attributes and preserves rows through its storage adapter", async () => {
+  const calls = [];
+  const users = [{
+    id: "user-1", username: "test@example.invalid", firstName: "Test", state: "ACTIVE", role: "admin",
+    createdAt: "2026-01-01T00:00:00", updatedAt: "2026-01-02T00:00:00",
+  }];
+  let stored = [];
+  const apiConstants = { ...constants, ENTITIES: { USERS: "users" }, HARD_DELETED: "HARD_DELETED", IN_MS: {} };
+  const axios = { getInstance: () => ({
+    get: async (url, { params }) => {
+      calls.push({ url, params });
+      return { data: { statusOk: true, users } };
+    },
+  }) };
+  const common = load("src/api/common.js", {
+    "@/common/constants": apiConstants, "@/common/utils": {}, "@/common/utils/dates": {}, "./axios": axios,
+    "@/db": {
+      getStorageItem: async () => undefined,
+      clearStorageTable: async () => { stored = []; },
+      bulkPutStorageItems: async ({ values }) => { stored = values; },
+      getAllStorageItems: async () => stored,
+      updateOrCreateStorageItem: async () => {},
+    },
+  });
+  const { useListUsers } = load("src/api/users.js", {
+    "@/common/constants": apiConstants, "@/fetchUrls": { PATHS: { USERS: "users" } },
+    "@/components/users/users.constants": { LIST_USERS_QUERY_KEY: "listUsers", MAIN_KEY: "username" },
+    "@tanstack/react-query": { useQuery: ({ queryFn }) => queryFn() },
+    "./axios": axios, "./common": common,
+  });
+  assert.deepEqual(plain(await useListUsers()), { users });
+  assert.deepEqual(plain(calls), [{ url: "users", params: {} }]);
+});
+
 test("preferences normalize page size and sorting before the query is enabled", async (t) => {
   for (const stored of [undefined, { page: 2, pageSize: 100, sorting: { key: "name", direction: "descending" } }]) {
     const list = createList(t);

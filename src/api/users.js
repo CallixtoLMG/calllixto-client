@@ -1,5 +1,4 @@
 import { ENTITIES, INACTIVE, IN_MS, SET_STATE } from "@/common/constants";
-import { getDefaultListParams } from '@/common/utils';
 import { GET_USER_QUERY_KEY, LIST_ATTRIBUTES, LIST_USERS_QUERY_KEY, MAIN_KEY } from "@/components/users/users.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
@@ -13,7 +12,6 @@ export function useListUsers() {
       entity: ENTITIES.USERS,
       url: PATHS.USERS,
       key: MAIN_KEY,
-      params: getDefaultListParams(LIST_ATTRIBUTES)
     }),
     staleTime: IN_MS.ONE_DAY,
   });
