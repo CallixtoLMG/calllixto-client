@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { loginAsE2EUser } from "./support/auth";
 import { openCashBalanceModal } from "./support/cashBalances";
+import { E2E_ACCOUNTS } from "./support/env";
 
 type SettingItem = {
   name: string;
@@ -126,7 +127,7 @@ const assertPaymentMethodAvailable = async (page: Page, method: string) => {
 
 test.describe("settings", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page);
+    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
   });
 
   test("adds settings for customers, expenses, products, and general", async ({ page }) => {

@@ -1,13 +1,62 @@
-import { Button as CustomButton, Label } from '@/common/components/custom';
-import { POPUP_POSITIONS, CONTENT_SIZES, COLORS, ICONS, SIZES } from "@/common/constants";
-import { formatInteger } from "@/common/utils/numbers";
+import { Button as CustomButton, DropdownItem, Flex, Label } from '@/common/components/custom';
+import ModalAction from '@/common/components/modals/ModalAction';
+import { POPUP_POSITIONS, CONTENT_SIZES, BUTTON_TEXTS, COLORS, ENTITIES, ICONS, PAGES, SIZES } from "@/common/constants";
+import { LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
+import { LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
+import { LIST_CASH_BALANCES_QUERY_KEY } from '@/components/cashBalances/cashBalances.constants';
+import { LIST_CUSTOMERS_QUERY_KEY } from "@/components/customers/customers.constants";
+import { LIST_EXPENSES_QUERY_KEY } from '@/components/expenses/expenses.constants';
+import { LIST_PRODUCTS_QUERY_KEY } from "@/components/products/products.constants";
+import { LIST_SUPPLIERS_QUERY_KEY } from '@/components/suppliers/suppliers.constants';
+import { LIST_USERS_QUERY_KEY } from '@/components/users/users.constants';
+import { useRestoreEntity } from '@/hooks';
+import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { Icon, Popup } from 'semantic-ui-react';
+import { Dropdown, Icon, Popup } from 'semantic-ui-react';
 import { IconedButton } from '../buttons';
-import { DesktopRestoreAction, FiltersActions, FiltersContainer, FiltersSearchActions, HeaderSegment, MainContainer, MobileRestoreAction, NarrowRestoreAction, WideRestoreAction } from './styles';
+import { DesktopRestoreAction, FiltersActions, FiltersContainer, FiltersSearchActions, HeaderSegment, MainContainer, MobileRestoreAction, NarrowRestoreAction, RefetchAction, WideRestoreAction } from './styles';
 
-const Filters = ({ children, onRestoreFilters, appliedCount, hydrated }) => {
+const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, hydrated, showRefetchAction = true }) => {
+  const ENTITY_MAPPING = {
+    [ENTITIES.CUSTOMERS]: { queryKey: LIST_CUSTOMERS_QUERY_KEY, text: PAGES.CUSTOMERS.NAME },
+    [ENTITIES.PRODUCTS]: { queryKey: LIST_PRODUCTS_QUERY_KEY, text: PAGES.PRODUCTS.NAME },
+    [ENTITIES.BUDGETS]: { queryKey: LIST_BUDGETS_QUERY_KEY, text: PAGES.BUDGETS.NAME },
+    [ENTITIES.BRANDS]: { queryKey: LIST_BRANDS_QUERY_KEY, text: PAGES.BRANDS.NAME },
+    [ENTITIES.SUPPLIERS]: { queryKey: LIST_SUPPLIERS_QUERY_KEY, text: PAGES.SUPPLIERS.NAME },
+    [ENTITIES.USERS]: { queryKey: LIST_USERS_QUERY_KEY, text: PAGES.USERS.NAME },
+    [ENTITIES.EXPENSES]: { queryKey: LIST_EXPENSES_QUERY_KEY, text: PAGES.EXPENSES.NAME },
+    [ENTITIES.CASHBALANCES]: { queryKey: LIST_CASH_BALANCES_QUERY_KEY, text: PAGES.CASH_BALANCES.NAME },
+  };
+
   const { formState: { isDirty } } = useFormContext();
+  const [showModal, setShowModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { queryKey, text } = ENTITY_MAPPING[entity] || {};
+
+  const restoreEntity = useRestoreEntity({ entity, key: queryKey });
+
+  const handleHardUpdate = () => {
+    setShowModal(true);
+  };
+
+  const handleConfirmHardUpdate = async () => {
+    setIsLoading(true);
+
+    if (!entity || !queryKey || typeof restoreEntity !== "function") {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      await restoreEntity();
+
+    } catch (error) {
+      console.error("Error en restoreEntity:", error);
+    }
+
+    setIsLoading(false);
+    setShowModal(false);
+  };
 
   return (
     <MainContainer>
@@ -34,7 +83,7 @@ const Filters = ({ children, onRestoreFilters, appliedCount, hydrated }) => {
               position={POPUP_POSITIONS.TOP_CENTER}
               size={SIZES.TINY}
               trigger={
-                <Label $alignSelf="center" width={CONTENT_SIZES.FIT} circular color={COLORS.BLUE}>{formatInteger(appliedCount)}</Label>
+                <Label $alignSelf="center" width={CONTENT_SIZES.FIT} circular color={COLORS.BLUE}>{appliedCount}</Label>
               }
             />
           )}
@@ -66,8 +115,39 @@ const Filters = ({ children, onRestoreFilters, appliedCount, hydrated }) => {
               color={isDirty ? COLORS.BLUE : undefined}
             />
           </FiltersSearchActions>
+          {showRefetchAction && onRefetch &&
+            <RefetchAction>
+              <Dropdown width="130px" pointing as={CustomButton} text={BUTTON_TEXTS.UPDATE} icon={ICONS.REFRESH} floating labeled button className='icon'>
+                <Dropdown.Menu>
+                  <DropdownItem onClick={onRefetch}>
+                    <Icon color={COLORS.BLUE} name={ICONS.BOLT} />Actualización rápida
+                  </DropdownItem>
+                  <DropdownItem onClick={handleHardUpdate}>
+                    <Icon color={COLORS.RED} name={ICONS.CLOUD_DOWNLOAD} />Actualización completa
+                  </DropdownItem>
+                </Dropdown.Menu>
+              </Dropdown>
+            </RefetchAction>
+          }
         </FiltersActions>
       </HeaderSegment>
+      <ModalAction
+        title={`¿Quieres realizar una actualización completa de ${text} ?  `}
+        onConfirm={handleConfirmHardUpdate}
+        confirmButtonText={BUTTON_TEXTS.UPDATE}
+        confirmButtonIcon={ICONS.REFRESH}
+        showModal={showModal}
+        setShowModal={setShowModal}
+        isLoading={isLoading}
+        noConfirmation={true}
+        bodyContent={
+          <>
+            <strong>¡Atención!</strong> Esta acción puede tomar varios minutos en completarse, no se recomienda ejecutarla de manera frecuente!
+            Si no encuentras un elemento en las tablas, podrías probar primero usando opción de <strong>&quot;Actualización ligera&quot;</strong>.
+          </>
+        }
+        warning
+      />
     </MainContainer>
   );
 }

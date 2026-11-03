@@ -1,8 +1,8 @@
 import { expect, type Locator, type Page, type Request } from "@playwright/test";
-import { E2E_ACCOUNT_SLUG, getE2ECredentials } from "./env";
+import { getE2ECredentials } from "./env";
 
 type LoginAsE2EUserOptions = {
-  accountSlug?: RegExp | string;
+  accountName?: RegExp | string;
 };
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -105,5 +105,7 @@ export const loginAsE2EUser = async (page: Page, options: LoginAsE2EUserOptions 
     await closeUpdatesButton.click();
   }
 
-  await selectAccount(page, options.accountSlug ?? E2E_ACCOUNT_SLUG);
+  if (options.accountName) {
+    await selectAccount(page, options.accountName);
+  }
 };

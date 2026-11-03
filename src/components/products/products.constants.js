@@ -5,11 +5,12 @@ import { ALL, BUTTON_TEXTS, COLORS, FIELD_LABELS as COMMON_FIELD_LABELS, CONTENT
 import { BUDGETS_PAGE } from "@/common/constants/routes";
 import { getFormatedPrice } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
-import { formatInteger } from "@/common/utils/numbers";
 import { Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
 import { formatProductId, getBrandId, getProductId, getSupplierId } from "./products.utils";
 
+export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
+export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
 export const GET_PRODUCT_QUERY_KEY = "getProduct";
 export const PRODUCTS_FILTERS_KEY = "productsFilters";
 export const MAIN_KEY = 'id';
@@ -99,7 +100,7 @@ export const PRODUCT_COLUMNS = [
     sortable: true,
     width: 1,
     align: "end",
-    value: (product) => formatInteger(product?.stock || 0),
+    value: (product) => (product?.stock || 0),
     sortValue: (product) => product.stock ?? ""
   },
   {
@@ -188,8 +189,7 @@ export const PRODUCT_STATES = {
 };
 
 export const EMPTY_PRODUCT = { name: '', cost: 0, price: 0, id: '', comments: '', supplierId: '', brandId: '' };
-export const EMPTY_FILTERS = { id: '', name: '', state: '' };
-export const PRODUCT_SORT_FIELDS = { id: 'id', name: 'name' };
+export const EMPTY_FILTERS = { id: '', name: '', state: PRODUCT_STATES.ACTIVE.id };
 
 export const PRODUCT_STATES_OPTIONS = Object.values(PRODUCT_STATES)
   .map(({ id, title, color }) => ({

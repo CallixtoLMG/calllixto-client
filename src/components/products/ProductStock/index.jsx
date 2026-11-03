@@ -6,7 +6,6 @@ import { ModalAction } from "@/common/components/modals";
 import { Filters, Table } from "@/common/components/table";
 import { CONTENT_SIZES, ALL, COLORS, ICONS, IN, OUT, PAGES, RULES as VALIDATE_RULES } from "@/common/constants";
 import { createFilter } from "@/common/utils";
-import { formatInteger } from "@/common/utils/numbers";
 import { useFilters } from "@/hooks";
 import { useState } from "react";
 import { FormProvider } from "react-hook-form";
@@ -169,13 +168,13 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
               iconOnly
             />
             <Message padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
-              <Icon name={ICONS.BOXES} /> Stock: {formatInteger(product?.stock ?? 0)}
+              <Icon name={ICONS.BOXES} /> Stock: {product?.stock ?? 0}
             </Message>
           </Flex>
         </Flex>
         <FormProvider {...filterMethods}>
           <Form onSubmit={onSubmit}>
-            <Filters appliedCount={appliedCount} hydrated={hydrated} onRestoreFilters={onRestoreFilters}>
+            <Filters appliedCount={appliedCount} hydrated={hydrated} entity="STOCK" onRestoreFilters={onRestoreFilters}>
               <DropdownControlled
                 width={CONTENT_SIZES.FIT}
                 name="type"

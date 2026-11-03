@@ -1,15 +1,15 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useDeleteBrand, useEditBrand, useSetBrandState } from "@/api/brands";
+import { useHasProductsByBrandId } from "@/api/products";
 import { FieldsContainer, FormField, Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES, PLACEHOLDERS } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
-import { getProductAssociation } from "@/components/products/products.utils";
 import BrandForm from "@/components/brands/BrandForm";
-import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
@@ -51,10 +51,7 @@ const BrandPageClient = ({ brand }) => {
   const deleteBrand = useDeleteBrand();
   const setBrandState = useSetBrandState();
 
-  const { canDeleteEntity: canDelete } = getProductAssociation(brand?.hasProducts);
-  const deletionTooltip = brand?.hasProducts === true
-    ? "No se puede eliminar esta marca, existen productos asociados."
-    : !canDelete ? "No se pudo verificar si la marca tiene productos asociados." : undefined;
+  const { hasAssociatedProducts, isLoadingProducts } = useHasProductsByBrandId(brand?.id);
   const { handleProtectedAction } = useProtectedAction({ formRef, onBeforeView });
 
   useEffect(() => {
@@ -155,7 +152,6 @@ const BrandPageClient = ({ brand }) => {
       return;
     }
 
-    if (modalAction === DELETE && !canDelete) return;
     setActiveAction(modalAction);
 
     if (modalAction === DELETE) {
@@ -199,22 +195,22 @@ const BrandPageClient = ({ brand }) => {
           icon: ICONS.TRASH,
           color: COLORS.RED,
           text: "Eliminar marca",
-          collapsedTooltip: deletionTooltip,
+          collapsedTooltip: hasAssociatedProducts ? "No se puede eliminar esta marca, existen productos asociados." : undefined,
           basic: true,
-          onClick: canDelete ? handleClick(DELETE) : undefined,
+          onClick: handleClick(DELETE),
           loading: activeAction === DELETE,
-          disabled: !canDelete || !!activeAction,
-          tooltip: deletionTooltip,
+          disabled: hasAssociatedProducts || !!activeAction,
+          tooltip: hasAssociatedProducts ? "No se puede eliminar esta marca, existen productos asociados." : false,
           iconOnly:true
         },
       ] : [];
       setActions(actions);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [role, brand, activeAction, isMutateStatePending, isDeletePending, setActions, canDelete, deletionTooltip]);
+  }, [role, brand, activeAction, isMutateStatePending, isDeletePending, setActions, hasAssociatedProducts]);
 
   return (
-    <>
+    <Loader active={isLoadingProducts}>
       {!isItemInactive(brand?.state) && toggleButton}
       {isItemInactive(brand?.state) && (
         <FieldsContainer>
@@ -262,7 +258,7 @@ const BrandPageClient = ({ brand }) => {
           )
         }
       />
-    </>
+    </Loader>
   );
 };
 

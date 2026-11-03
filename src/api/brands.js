@@ -1,24 +1,19 @@
 import { ENTITIES, INACTIVE, IN_MS, SET_STATE } from "@/common/constants";
-import { GET_BRAND_QUERY_KEY, LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
+import { getDefaultListParams } from '@/common/utils';
+import { GET_BRAND_QUERY_KEY, LIST_ATTRIBUTES, LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
 import { PATHS } from "@/fetchUrls";
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getInstance } from "./axios";
-import { useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from './common';
-import { fetchAllListPages, invalidateServerLists, usePagedList } from './pagedLists';
-
-export const usePagedBrands = (state) => usePagedList({ ...state, entity: ENTITIES.BRANDS, url: PATHS.BRANDS });
-
-export const fetchBrandsForExport = ({ appliedFilters, sort, order }) => fetchAllListPages({
-  entity: ENTITIES.BRANDS, url: PATHS.BRANDS, filters: appliedFilters, sort, order,
-});
+import { listItems, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from './common';
 
 export function useListBrands() {
   const query = useQuery({
     queryKey: [LIST_BRANDS_QUERY_KEY],
-    queryFn: async ({ signal }) => ({ brands: await fetchAllListPages({
-      entity: ENTITIES.BRANDS, url: PATHS.BRANDS, signal,
-    }) }),
-    retry: false,
+    queryFn: () => listItems({
+      entity: ENTITIES.BRANDS,
+      url: PATHS.BRANDS,
+      params: getDefaultListParams(LIST_ATTRIBUTES)
+    }),
     staleTime: IN_MS.ONE_DAY,
   });
 
@@ -48,19 +43,15 @@ export function useGetBrand(id) {
 
 export const useCreateBrand = () => {
   const createItem = useCreateItem();
-  const queryClient = useQueryClient();
 
-  const createBrand = async (brand) => {
-    const data = await createItem({
+  const createBrand = (brand) => {
+    return createItem({
       entity: ENTITIES.BRANDS,
-      skipStorageUpdate: true,
       url: PATHS.BRANDS,
       value: brand,
       responseEntity: ENTITIES.BRAND,
       invalidateQueries: [[LIST_BRANDS_QUERY_KEY]],
     });
-    if (data?.statusOk) await invalidateServerLists(queryClient, ENTITIES.BRANDS);
-    return data;
   };
 
   return createBrand;
@@ -68,18 +59,14 @@ export const useCreateBrand = () => {
 
 export const useDeleteBrand = () => {
   const deleteItem = useDeleteItem();
-  const queryClient = useQueryClient();
 
-  const deleteBrand = async (id) => {
-    const data = await deleteItem({
+  const deleteBrand = (id) => {
+    return deleteItem({
       entity: ENTITIES.BRANDS,
-      skipStorageUpdate: true,
       id,
       url: `${PATHS.BRANDS}/${id}`,
       invalidateQueries: [[LIST_BRANDS_QUERY_KEY]]
     });
-    if (data?.statusOk) await invalidateServerLists(queryClient, ENTITIES.BRANDS);
-    return data;
   };
 
   return deleteBrand;
@@ -87,19 +74,15 @@ export const useDeleteBrand = () => {
 
 export const useEditBrand = () => {
   const editItem = useEditItem();
-  const queryClient = useQueryClient();
 
-  const editBrand = async (brand) => {
-    const data = await editItem({
+  const editBrand = (brand) => {
+    return editItem({
       entity: ENTITIES.BRANDS,
-      skipStorageUpdate: true,
       url: `${PATHS.BRANDS}/${brand.id}`,
       value: brand,
       responseEntity: ENTITIES.BRAND,
       invalidateQueries: [[LIST_BRANDS_QUERY_KEY], [GET_BRAND_QUERY_KEY, brand.id]]
     });
-    if (data?.statusOk) await invalidateServerLists(queryClient, ENTITIES.BRANDS);
-    return data;
   };
 
   return editBrand;
@@ -107,12 +90,10 @@ export const useEditBrand = () => {
 
 export const useSetBrandState = () => {
   const updateItem = usePostUpdateItem();
-  const queryClient = useQueryClient();
 
-  const setBrandState = async ({ id, state, inactiveReason }) => {
-    const data = await updateItem({
+  const setBrandState = ({ id, state, inactiveReason }) => {
+    return updateItem({
       entity: ENTITIES.BRANDS,
-      skipStorageUpdate: true,
       url: `${PATHS.BRANDS}/${id}/${SET_STATE}`,
       value: {
         id,
@@ -124,9 +105,8 @@ export const useSetBrandState = () => {
         [LIST_BRANDS_QUERY_KEY],
         [GET_BRAND_QUERY_KEY, id],
       ],
+      attributes: LIST_ATTRIBUTES,
     });
-    if (data?.statusOk) await invalidateServerLists(queryClient, ENTITIES.BRANDS);
-    return data;
   };
 
   return setBrandState;

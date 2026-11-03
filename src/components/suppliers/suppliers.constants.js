@@ -7,7 +7,7 @@ import { Popup } from "semantic-ui-react";
 export const GET_SUPPLIER_QUERY_KEY = 'getSupplier';
 export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
 export const SUPPLIERS_FILTERS_KEY = 'suppliersFilters';
-export const SUPPLIER_SORT_FIELDS = { id: 'id', name: 'name', state: 'state' };
+export const LIST_ATTRIBUTES = ["id", "name", "addresses", "phoneNumbers", "comments", "state", "inactiveReason"];
 
 export const SUPPLIERS_COLUMNS = [
   {
@@ -17,6 +17,7 @@ export const SUPPLIERS_COLUMNS = [
     sortable: true,
     width: 1,
     value: (supplier) => supplier?.id,
+    sortValue: (supplier) => supplier.id ?? ""
   },
   {
     id: 2,
@@ -32,12 +33,13 @@ export const SUPPLIERS_COLUMNS = [
         </OverflowWrapper>
         {supplier.comments && <CommentTooltip $lowTooltip comment={supplier.comments} />}
       </Flex>,
+    sortValue: (supplier) => supplier.name ?? ""
   },
   {
     id: 3,
     title: FIELD_LABELS.ADDRESS,
     key: "addresses",
-    sortable: false,
+    sortable: true,
     width: 5,
     value: (supplier) => {
       const { primaryAddress, additionalAddresses } = getAddressesForDisplay(supplier.addresses || []);
@@ -50,6 +52,7 @@ export const SUPPLIERS_COLUMNS = [
         </Flex>
       );
     },
+    sortValue: (customer) => customer.addresses?.[0]?.address ?? ""
   },
   {
     id: 4,
@@ -93,7 +96,7 @@ export const EXAMPLE_TEMPLATE_DATA_STOCK = [
 ];
 
 export const EMPTY_SUPPLIER = { id: '', name: '', emails: [], phoneNumbers: [], addresses: [], comments: '' };
-export const EMPTY_FILTERS = { id: '', name: '', state: '' };
+export const EMPTY_FILTERS = { id: '', name: '', state: SUPPLIER_STATES.ACTIVE.id };
 
 export const SUPPLIER_STATES_OPTIONS = Object.values(SUPPLIER_STATES)
   .map(({ id, title, color }) => ({

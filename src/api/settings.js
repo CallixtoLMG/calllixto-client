@@ -3,17 +3,15 @@ import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { GET_SETTING_QUERY_KEY, LIST_SETTINGS_QUERY_KEY } from "../components/settings/settings.constants";
 import { getInstance } from "./axios";
-import { useEditItem } from "./common";
+import { listItems, useEditItem } from "./common";
 
 export function useListSettings() {
   const query = useQuery({
     queryKey: [LIST_SETTINGS_QUERY_KEY],
-    queryFn: async () => {
-      const { data } = await getInstance().get(PATHS.SETTINGS);
-      if (!data?.statusOk || !Array.isArray(data.settings)) throw new Error("No se pudo cargar la configuración.");
-      return { settings: data.settings };
-    },
-    retry: false,
+    queryFn: () => listItems({
+      entity: ENTITIES.SETTINGS,
+      url: PATHS.SETTINGS,
+    }),
     staleTime: IN_MS.ONE_DAY,
   });
 
@@ -48,7 +46,6 @@ export const useEditSetting = () => {
   const editSetting = ({ entity, value }) => {
     return editItem({
       entity: ENTITIES.SETTINGS,
-      skipStorageUpdate: true,
       url: `${PATHS.SETTINGS}/${entity}`,
       value,
       key: "entity",

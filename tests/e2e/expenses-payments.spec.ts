@@ -7,6 +7,7 @@ import {
   isApiResponse,
 } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
+import { E2E_ACCOUNTS } from "./support/env";
 import { waitForEntityDetailUrl, waitForExpenseSettingsReady } from "./support/entities";
 
 type ExpenseFixture = {
@@ -365,7 +366,7 @@ const voidExpenseIfPresent = async (page: Page, expenseUrl: string | null, reaso
 
 test.describe("expense payment", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page);
+    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
   });
 
   test("creates, updates, and deletes an expense payment", async ({ page }) => {

@@ -1,5 +1,5 @@
 import { expect, type Page, type Response } from "@playwright/test";
-import { E2E_ACCOUNT_SLUG, getE2EApiBaseUrl } from "./env";
+import { E2E_ACCOUNTS, getE2EApiBaseUrl } from "./env";
 
 type ApiResponseBody = {
   statusOk?: boolean;
@@ -63,16 +63,17 @@ export const getE2EApiHeaders = async (page: Page) => {
   return { authorization: `Bearer ${token}` };
 };
 
-export const getE2EAccountApiUrl = (path: string) => {
-  const accountBaseUrl = `${getE2EApiBaseUrl().replace(/\/+$/g, "")}/${E2E_ACCOUNT_SLUG}/`;
+export const getE2EAccountApiUrl = (path: string, accountName = E2E_ACCOUNTS.modulesEnabled) => {
+  const accountBaseUrl = `${getE2EApiBaseUrl().replace(/\/+$/g, "")}/${accountName}/`;
   return new URL(path.replace(/^\/+/g, ""), accountBaseUrl).toString();
 };
 
 export const getE2EApiJson = async <TBody extends ApiResponseBody>(
   page: Page,
   path: string,
+  accountName = E2E_ACCOUNTS.modulesEnabled,
 ) => {
-  const response = await page.request.get(getE2EAccountApiUrl(path), {
+  const response = await page.request.get(getE2EAccountApiUrl(path, accountName), {
     headers: await getE2EApiHeaders(page),
   });
 

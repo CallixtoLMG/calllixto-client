@@ -6,11 +6,6 @@ const test = require("node:test");
 const root = path.join(__dirname, "..", "..");
 const read = (...segments) => fs.readFileSync(path.join(root, ...segments), "utf8");
 
-test("Sales date default help describes when Settings supplies the range", () => {
-  const source = read("src", "components", "settings", "settings.constants.js");
-  assert.match(source, /BUDGET_DEFAULT_PAGE_DATE_RANGE: "Define el rango de fechas predeterminado de Ventas\. Se usa cuando no hay un rango guardado válido y al restaurar las fechas\."/);
-});
-
 test("settings budget general exposes and persists publicEnabled checkbox", () => {
   const generalSettings = read("src", "components", "settings", "Entities", "Budgets", "General", "index.jsx");
   const settingsConstants = read("src", "components", "settings", "settings.constants.js");
@@ -27,11 +22,11 @@ test("settings budget general exposes and persists publicEnabled checkbox", () =
   assert.doesNotMatch(settingsConstants, /TODO: incluir publicEnabled/);
 });
 
-test("settings sales date ranges delete icon shows pointer cursor", () => {
-  const salesRanges = read("src", "components", "settings", "Entities", "Budgets", "General", "SalesDateRangesControlled.jsx");
+test("settings budget history date ranges delete icon shows pointer cursor", () => {
+  const historyRanges = read("src", "components", "settings", "Entities", "Budgets", "General", "HistoryDateRangesControlled.jsx");
 
-  assert.match(salesRanges, /<Icon[\s\S]*\$pointer[\s\S]*name=\{ICONS\.TRASH\}[\s\S]*onClick=\{\(\) => remove\(index\)\}/);
-  assert.doesNotMatch(salesRanges, /pointer="true"/);
+  assert.match(historyRanges, /<Icon[\s\S]*\$pointer[\s\S]*name=\{ICONS\.TRASH\}[\s\S]*onClick=\{\(\) => remove\(index\)\}/);
+  assert.doesNotMatch(historyRanges, /pointer="true"/);
 });
 
 test("sidebar actions use specific labels instead of redundant generic tooltips", () => {
@@ -45,10 +40,12 @@ test("sidebar actions use specific labels instead of redundant generic tooltips"
     read("src", "app", "(private)", "cajas", "page.jsx"),
     read("src", "app", "(private)", "usuarios", "page.jsx"),
     read("src", "app", "(private)", "ventas", "[id]", "page.client.jsx"),
+    read("src", "components", "budgets", "BudgetsPage", "index.jsx"),
   ].join("\n");
 
   [
     "Crear venta",
+    "Historial de ventas",
     "Crear cliente",
     "Crear proveedor",
     "Crear producto",
