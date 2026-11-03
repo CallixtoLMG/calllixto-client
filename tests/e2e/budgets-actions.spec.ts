@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page, type Request } from "@playwright/test";
 import { expectSuccessfulApiResponse, getE2EApiJson, isApiResponse } from "./support/api";
 import { confirmOpenCashBalance, openCashBalanceModal } from "./support/cashBalances";
 import { loginAsE2EUser } from "./support/auth";
@@ -428,7 +428,23 @@ const completeBudgetDelivery = async (
   quantity: number,
   timestamp: number,
 ) => {
-  await page.getByTestId("budget-detail-tab-deliveries").click();
+  const productRequests: string[] = [];
+  const trackProductRequest = (request: Request) => {
+    const productPath = new URL(request.url()).pathname.match(/\/products(?:\/[^/]+)?$/)?.[0];
+    if (request.method() === "GET" && productPath) productRequests.push(productPath);
+  };
+  page.on("request", trackProductRequest);
+  try {
+    const [productResponse] = await Promise.all([
+      page.waitForResponse((response) => isApiResponse(response, "GET", `products/${product.fullId}`)),
+      page.getByTestId("budget-detail-tab-deliveries").click(),
+    ]);
+    expect(productResponse.ok()).toBe(true);
+    expect(productRequests).toEqual([`/products/${product.fullId}`]);
+  } finally {
+    page.off("request", trackProductRequest);
+  }
+
   await page.getByTestId("budget-open-delivery-modal-button").click();
   const modal = page.locator(".ui.modal").filter({ hasText: /registrar entrega/i });
   await expect(modal).toBeVisible({ timeout: 30_000 });
@@ -436,6 +452,8 @@ const completeBudgetDelivery = async (
   await page.getByTestId("budget-delivery-note-field").locator("input").fill(`R-${timestamp}`);
   const row = modal.getByRole("row").filter({ hasText: product.name });
   await expect(row).toBeVisible({ timeout: 30_000 });
+  const rowId = await row.getAttribute("data-row-id");
+  expect(rowId).toBeTruthy();
   await row.locator("input").first().fill(String(quantity));
 
   const responsePromise = page.waitForResponse((response) =>
@@ -447,8 +465,15 @@ const completeBudgetDelivery = async (
     page.getByTestId("modal-confirm").click(),
   ]);
 
-  await expectSuccessfulApiResponse(await responsePromise);
+  const response = await responsePromise;
+  expect(response.request().postDataJSON()).toEqual({
+    deliveryNote: `R-${timestamp}`,
+    inflow: false,
+    flows: [{ productId: product.fullId, rowId, quantity, date: expect.any(String) }],
+  });
+  await expectSuccessfulApiResponse(response);
   await expect(modal).not.toBeVisible({ timeout: 30_000 });
+  await expect(page.getByRole("button", { name: "Sin control de stock" })).toHaveCount(0);
 };
 
 const expectSingleMoneyReversal = <T extends MoneyMovement>(

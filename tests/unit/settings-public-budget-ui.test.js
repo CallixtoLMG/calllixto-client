@@ -6,6 +6,11 @@ const test = require("node:test");
 const root = path.join(__dirname, "..", "..");
 const read = (...segments) => fs.readFileSync(path.join(root, ...segments), "utf8");
 
+test("Sales date default help describes when Settings supplies the range", () => {
+  const source = read("src", "components", "settings", "settings.constants.js");
+  assert.match(source, /BUDGET_DEFAULT_PAGE_DATE_RANGE: "Define el rango de fechas predeterminado de Ventas\. Se usa cuando no hay un rango guardado válido y al restaurar las fechas\."/);
+});
+
 test("settings budget general exposes and persists publicEnabled checkbox", () => {
   const generalSettings = read("src", "components", "settings", "Entities", "Budgets", "General", "index.jsx");
   const settingsConstants = read("src", "components", "settings", "settings.constants.js");

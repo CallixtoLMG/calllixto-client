@@ -12,7 +12,7 @@ const root = path.join(__dirname, "../..");
 const Box = ({ children }) => React.createElement("div", null, children);
 const constants = {
   ENTITIES: { PRODUCTS: "products", PRODUCT: "product", SETTINGS: "settings", BRANDS: "brands", SUPPLIERS: "suppliers" },
-  IN_MS: { ONE_DAY: 86400000, ONE_HOUR: 3600000 }, COLORS: {}, ICONS: {}, FIELD_LABELS: {},
+  IN_MS: { ONE_DAY: 86400000, ONE_HOUR: 3600000, ONE_MINUTE: 60000 }, COLORS: {}, ICONS: {}, FIELD_LABELS: {},
   CONTENT_SIZES: {}, BUTTON_TEXTS: {}, DATE_FORMATS: {}, POPUP_POSITIONS: {}, SIZES: {},
   SORTING: { ASC: "ascending", DESC: "descending" }, PAGES: { PRODUCTS: {} }, TOOLTIPS: {},
 };
@@ -152,6 +152,68 @@ test("failed supplier page aborts before tool runs and leaves no partial cache",
   assert.equal(client.getQueryData(catalogs.productCatalogKeys.supplier("VA")), undefined);
   fail(undefined);
   assert.equal((await client.fetchQuery(catalogs.supplierProductsOptions("VA"))).length, 1200);
+});
+
+test("Deliveries uses unique product details for stock control and keeps the original rows", async (t) => {
+  const { api, axios, calls, client, catalogs } = createAdapter(t);
+  axios.getInstance = () => ({ get: async (url) => {
+    calls.push(url);
+    const id = url.split("/").at(-1);
+    if (id === "35") throw new Error("Product request failed");
+    return { data: { product: { id, name: "Nombre actual", stockControl: id === "10" } } };
+  } });
+
+  const products = ["10", "20", "20", "35"].map((id, index) => ({
+    rowId: `row-${index}`, id, name: `Nombre histórico ${index}`, quantity: 2, delivered: 0,
+  }));
+  let options, table, disabledIds;
+  let results = [];
+  const constantsForDeliveries = {
+    DELIVERY: "delivery", ADJUST_DELIVERY: "adjust-delivery",
+    hasInvalidStockQuantities: () => false,
+    getDeliveryStats: (product) => ({ pending: product.quantity, delivered: product.delivered }),
+    buildBudgetDeliveriesColumns: ({ stockControlDisabledProductIds }) => {
+      disabledIds = stockControlDisabledProductIds;
+      return [];
+    },
+  };
+  const styled = () => () => Box;
+  const folder = "src/components/budgets/BudgetDeliveries";
+  const Deliveries = load(`${folder}/index.jsx`, {
+    "@/api/products": api, "@/api/stock": { useConsumeStock: () => () => {} },
+    "@/common/components/buttons": { IconedButton: Box },
+    "@/common/components/custom": { Box, FieldsContainer: Box, Flex: Box, OverflowWrapper: Box },
+    "@/common/components/form": {}, "@/common/components/modals": { ModalAction: () => null },
+    "@/common/components/table": { Table: (props) => { table = props; return null; } },
+    "@/common/constants": constants, "@/common/utils": {},
+    "@tanstack/react-query": { useQueries: (value) => { options = value; return value.combine(results); }, useMutation: () => ({}) },
+    "react-hook-form": { useFormContext: () => ({}), useWatch: () => products },
+    "styled-components": { default: styled }, "../../../common/components/custom": { FlexColumn: Box },
+    "../../products/ProductStock/styles": { Header: Box }, "../budgets.constants": constantsForDeliveries,
+    "../budgets.utils": { isBudgetCancelled: () => false }, "../useBudgetActionButtonMode": { useBudgetActionButtonMode: () => ({}) },
+    "./utils": load(`${folder}/utils.js`, {}),
+  }).default;
+  const render = () => renderToStaticMarkup(React.createElement(Deliveries));
+  render();
+  const queries = options.queries;
+  assert.deepEqual(plain(queries.map(({ queryKey }) => queryKey)), [["getProduct", "10"], ["getProduct", "20"], ["getProduct", "35"]]);
+  assert.ok(queries.every((query) => query.staleTime === 60000 && query.refetchOnMount === true));
+  assert.equal(api.productDetailOptions("35").staleTime, 86400000);
+  client.setQueryData(["getProduct", "35"], { id: "35", stockControl: false }, { updatedAt: Date.now() - 61000 });
+  assert.deepEqual(Array.from(disabledIds), []);
+
+  await Promise.allSettled(queries.map((query) => client.fetchQuery(query)));
+  assert.deepEqual(calls.sort(), ["products/10", "products/20", "products/35"]);
+  assert.equal(client.getQueryData(catalogs.productCatalogKeys.all), undefined);
+  results = queries.map((query) => new QueryObserver(client, query).getCurrentResult());
+  assert.equal(results[2].isError, true);
+  assert.equal(results[2].data.stockControl, false);
+  render();
+  assert.deepEqual(Array.from(disabledIds), ["20"]);
+  assert.equal(table.elements, products);
+  assert.equal(table.mainKey, "rowId");
+  await client.fetchQuery(queries.find(({ queryKey }) => queryKey[1] === "20"));
+  assert.equal(calls.length, 3, "fresh details are reused");
 });
 
 test("products list adapter sends filters, paging and sorting; export uses all applied matches", async (t) => {

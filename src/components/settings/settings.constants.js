@@ -88,7 +88,7 @@ export const SETTINGS_HELP_TEXTS = {
   BUDGET_PUBLIC_ENABLED: "Habilita la posibilidad de compartir un presupuesto mediante enlaces públicos.",
   BUDGET_ON_CREATE: "Permite definir valores predeterminados que se completan al crear una venta.",
   BUDGET_ON_PRINT: "Permite configurar como se muestra e imprime el PDF de una venta.",
-  BUDGET_DEFAULT_PAGE_DATE_RANGE: "Define el rango de fechas que se muestra por defecto al entrar al listado de ventas.",
+  BUDGET_DEFAULT_PAGE_DATE_RANGE: "Define el rango de fechas predeterminado de Ventas. Se usa cuando no hay un rango guardado válido y al restaurar las fechas.",
   BUDGET_SALES_DATE_RANGES: "Permite agregar accesos rápidos de fechas para consultar ventas dentro de un período en el listado de Ventas.",
   BUDGET_DEFAULT_STATE: "Define si las nuevas ventas se crean como confirmadas o pendientes por defecto.",
   BUDGET_DEFAULT_DELIVERY: "Define si las nuevas ventas se preparan para retirar en local o para enviar a domicilio.",

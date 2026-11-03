@@ -1,6 +1,6 @@
 import { DATE_FORMATS, ERROR_MESSAGES } from "@/common/constants";
 import { getDateWithOffset, getEndOfUnit, getStartOfUnit } from "@/common/utils/dates";
-import { formatLastCount } from "@/common/utils/pluralization";
+import { formatCount, formatLastCount } from "@/common/utils/pluralization";
 
 // Keep the working Budgets contract: UTC, second precision, without a suffix.
 export const serializeBudgetDate = (date) => getDateWithOffset({ date, offset: 0, format: DATE_FORMATS.ISO });
@@ -53,3 +53,35 @@ export const buildSalesDateRanges = (ranges = []) => (Array.isArray(ranges) ? ra
       endDate: serializeBudgetDate(date),
     }),
   }));
+
+export const getRestoredSalesPreset = ({ presetRange, startDate, endDate }, presets) => {
+  const preset = presets.find(({ value }) => value === presetRange);
+  if (!preset) return "";
+
+  const current = preset.getRange();
+  // Presets end at selection time. On return, compare the visible local end day without moving the saved timestamp.
+  const sameEndDay = parseBudgetDate(endDate)?.toDateString() === parseBudgetDate(current.endDate)?.toDateString();
+  return startDate === current.startDate && sameEndDay ? preset.value : "";
+};
+
+const calendarDay = (date) => new Date(0).setUTCFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+export const getAppliedSalesRangeLabel = ({ startDate, endDate, presetRange, defaultRangeMonths }, presets) => {
+  const start = parseBudgetDate(startDate);
+  const end = parseBudgetDate(endDate);
+  if (!start || !end || start > end) return "";
+
+  const preset = presets.find(({ value }) => value === presetRange);
+  if (preset) return preset.label;
+
+  const defaultMonths = Number(defaultRangeMonths);
+  if (Number.isInteger(defaultMonths) && defaultMonths > 0) return formatLastCount(defaultMonths, "month");
+
+  const endExclusive = new Date(calendarDay(end) + DAY_MS);
+  const months = (endExclusive.getUTCFullYear() - start.getFullYear()) * 12 + endExclusive.getUTCMonth() - start.getMonth();
+  if (months > 0 && start.getDate() === endExclusive.getUTCDate()) return formatCount(months, "month");
+
+  const days = (endExclusive.getTime() - calendarDay(start)) / DAY_MS;
+  return days % 7 === 0 ? formatCount(days / 7, "week") : formatCount(days, "day");
+};

@@ -28,9 +28,11 @@ const FilterFields = styled.div`
   min-width: 0;
   .field { margin: 0 !important; }
   .react-datepicker-wrapper, .react-datepicker__input-container { width: 100%; }
+  > small { opacity: .75; padding-bottom: 8px; }
   @media (max-width: 767px) {
     width: 100%;
     > .field { width: 100% !important; }
+    > small { flex-basis: 100%; padding-bottom: 0; }
   }
 `;
 
@@ -60,7 +62,7 @@ const ServerBudgetsPage = ({ budgets = [], list, total, isLoading, actions, side
                 </Button>
               )} />
               <FilterFields>
-                <SalesDateFilters presets={datePresets} disabled={!hydrated} />
+                <SalesDateFilters appliedRange={list.appliedFilters} presets={datePresets} disabled={!hydrated} />
               </FilterFields>
             </FiltersContainer>
           </HeaderSegment>

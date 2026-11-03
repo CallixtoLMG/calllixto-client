@@ -24,7 +24,7 @@ export const applyServerListFilters = (state, values, defaultFilters) => ({
   ...state, appliedFilters: normalizeFilters(values, defaultFilters), pageNumber: 1,
 });
 
-const useServerListFilters = ({ key: initialKey, defaultFilters: initialFilters, sortFields: initialSortFields, onApply, ready = true, getDefaultFilters }) => {
+const useServerListFilters = ({ key: initialKey, defaultFilters: initialFilters, sortFields: initialSortFields, onApply, ready = true, getInitialFilters }) => {
   const [configuration] = useState(() => ({
     key: initialKey, defaultFilters: { ...initialFilters }, sortFields: { ...initialSortFields },
   }));
@@ -39,19 +39,19 @@ const useServerListFilters = ({ key: initialKey, defaultFilters: initialFilters,
     if (!ready || state.hydrated) return;
     let stored = {};
     try {
-      stored = JSON.parse(window.localStorage.getItem(key) || "{}") || {};
+      stored = JSON.parse(window.localStorage.getItem(key) || "{}") ?? {};
     } catch {
     }
-    // Dynamic defaults (e.g. a date range resolved from Settings) start a new dataset.
-    const defaults = getDefaultFilters?.();
+    // An explicitly resolved initial range starts the list on page 1 and recounts.
+    const initial = getInitialFilters?.(stored);
     const restored = getServerListState(configuration, {
-      ...stored, ...defaults, ...(defaults && { page: 1 }),
+      ...stored, ...initial, ...(initial && { page: 1 }),
     });
     reset(restored.appliedFilters);
     const initialState = { ...restored, hydrated: true };
-    if (defaults) onApply?.(initialState);
+    if (initial) onApply?.(initialState);
     setState(initialState);
-  }, [configuration, key, reset, ready, state.hydrated, getDefaultFilters, onApply]);
+  }, [configuration, key, reset, ready, state.hydrated, getInitialFilters, onApply]);
 
   const { appliedFilters, pageNumber, pageSize, sort, order, hydrated } = state;
   useEffect(() => {
@@ -103,7 +103,7 @@ const useServerListFilters = ({ key: initialKey, defaultFilters: initialFilters,
     ...state,
     methods,
     onSubmit: handleSubmit(applyFilters),
-    onRestoreFilters: () => applyFilters({ ...defaultFilters, ...getDefaultFilters?.() }),
+    onRestoreFilters: () => applyFilters(defaultFilters),
     applyFilterGroup,
     appliedCount: Object.keys(defaultFilters).filter((field) => appliedFilters[field] !== defaultFilters[field]).length,
     setPageNumber,

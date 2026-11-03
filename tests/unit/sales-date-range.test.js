@@ -4,7 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
 const ts = require("typescript");
-const { chromium } = require("@playwright/test");
+const { chromium, expect } = require("@playwright/test");
 
 const root = path.join(__dirname, "../..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
@@ -26,9 +26,10 @@ const load = (file, dependencies) => {
   return loaded.exports;
 };
 const dates = load("src/common/utils/dates.js", { "@/common/constants": constants });
+const pluralization = load("src/common/utils/pluralization.js", { "./numbers": load("src/common/utils/numbers.js", {}) });
 const range = load("src/components/budgets/salesDateRange.js", {
   "@/common/constants": constants, "@/common/utils/dates": dates,
-  "@/common/utils/pluralization": { formatLastCount: (value, unit) => `${value} ${unit}` },
+  "@/common/utils/pluralization": pluralization,
 });
 
 test("Sales dates keep PR5 UTC format; automatic range captures one instant and manual dates include both day boundaries", () => {
@@ -62,7 +63,18 @@ test("Sales retains existing presets and configured ranges, calculating dates wh
   assert.equal(range.parseBudgetDate(selected.startDate).getDate(), 19);
 });
 
-test("Sales forms synchronize effective Settings once, preserve manual edits on irrelevant refetch and reset each group independently", async (t) => {
+test("Sales describes manual ranges by inclusive calendar days and only uses complete weeks or months", () => {
+  for (const [start, end, expected] of [
+    [[10, 3], [10, 3], "1 día"], [[10, 3], [10, 23], "3 semanas"],
+    [[10, 1], [10, 30], "1 mes"], [[10, 1], [11, 20], "50 días"],
+  ]) {
+    const startDate = range.getManualBudgetDate(new Date(2026, ...start), "startDate");
+    const endDate = range.getManualBudgetDate(new Date(2026, ...end), "endDate");
+    assert.equal(range.getAppliedSalesRangeLabel({ startDate, endDate }, []), expected);
+  }
+});
+
+const openSalesFixture = async (t) => {
   const browser = await chromium.launch({ headless: true });
   t.after(() => browser.close());
   const page = await browser.newPage({ timezoneId: "America/Argentina/Buenos_Aires" });
@@ -77,11 +89,14 @@ test("Sales forms synchronize effective Settings once, preserve manual edits on 
     path.join(path.dirname(require.resolve("react")), "umd/react.development.js"),
     path.join(path.dirname(require.resolve("react-dom")), "umd/react-dom.development.js"),
     path.join(path.dirname(require.resolve("react-hook-form")), "index.umd.js"),
+    require.resolve("styled-components/dist/styled-components.min.js"),
     require.resolve("dayjs/dayjs.min.js"), require.resolve("dayjs/plugin/utc.js"), require.resolve("dayjs/plugin/timezone.js"),
   ]) await page.addScriptTag({ content: fs.readFileSync(file, "utf8") });
   const sources = Object.fromEntries([
     "src/common/utils/dates.js", "src/components/budgets/salesDateRange.js", "src/hooks/useServerListFilters.js",
     "src/api/budgets.js", "src/app/(private)/ventas/page.jsx", "src/components/budgets/SalesDateFilters.jsx",
+    "src/components/budgets/ServerBudgetsPage.jsx", "src/common/components/table/styles.jsx",
+    "src/common/utils/pluralization.js", "src/common/utils/numbers.js",
   ].map((file) => [file, compile(file)]));
   await page.evaluate(({ sources, constants, filters }) => {
     const R = window.React, F = window.ReactHookForm, h = R.createElement;
@@ -89,10 +104,11 @@ test("Sales forms synchronize effective Settings once, preserve manual edits on 
       react: R, "react-hook-form": F,
       "react/jsx-runtime": { jsx: (type, props, key) => h(type, { ...props, key }), jsxs: (type, props, key) => h(type, { ...props, key }), Fragment: R.Fragment },
       dayjs: window.dayjs, "dayjs/plugin/utc": window.dayjs_plugin_utc, "dayjs/plugin/timezone": window.dayjs_plugin_timezone,
-      "@/common/constants": constants, "@/common/utils/pluralization": { formatLastCount: (value, unit) => `${value} ${unit}` },
+      "@/common/constants": constants, "styled-components": window.styled,
       "@/components/budgets/budgets.constants": filters,
+      "./budgets.constants": { ...filters, getBudgetColumns: () => [] },
       "@/fetchUrls": { PATHS: { BUDGETS: "budgets" } }, "@tanstack/react-query": {}, "./axios": {}, "./common": {},
-      "@/components/layout": { useBreadcrumContext: () => ({ setLabels() {} }) },
+      "@/components/layout": { useBreadcrumContext: () => ({ setLabels() {} }), useListPageSideActions() {} },
       "@/hooks": { useKeyboardShortcuts() {} }, "next/navigation": { useRouter: () => ({ push() {} }) },
       "react-hot-toast": { toast: { error() {} } },
     };
@@ -104,6 +120,8 @@ test("Sales forms synchronize effective Settings once, preserve manual edits on 
       });
       return loaded.exports;
     };
+    dependencies["./numbers"] = load("src/common/utils/numbers.js");
+    dependencies["@/common/utils/pluralization"] = load("src/common/utils/pluralization.js");
     dependencies["@/common/utils/dates"] = load("src/common/utils/dates.js");
     dependencies["@/components/budgets/salesDateRange"] = dependencies["./salesDateRange"] = load("src/components/budgets/salesDateRange.js");
     dependencies["@/hooks/useServerListFilters"] = load("src/hooks/useServerListFilters.js");
@@ -113,47 +131,77 @@ test("Sales forms synchronize effective Settings once, preserve manual edits on 
     dependencies["@/api/pagedLists"] = { useRefreshServerList: () => refresh };
     dependencies["./pagedLists"] = { usePagedList: ({ appliedFilters, pageNumber, pageSize, sort, order, hydrated }) => {
       window.request = { appliedFilters, pageNumber, pageSize, sort, order, hydrated };
-      window.renders.push({ months: window.settings?.data?.defaultPageDateRange?.value, ...window.request });
+      window.renders.push(window.request);
       return { total: null };
     } };
     dependencies["@/api/budgets"] = load("src/api/budgets.js");
     window.settings = { data: {}, isSuccess: true, isPlaceholderData: true, isFetching: true };
     dependencies["@/api/settings"] = { useGetSetting: () => window.settings };
+    const Box = R.forwardRef(({ children, className, role, "aria-label": ariaLabel }, ref) => h("div", { className, role, "aria-label": ariaLabel, ref }, children));
     dependencies["@/common/components/custom"] = {
-      FormField: ({ control: Control, label, error, ...props }) => h("label", null, label, h(Control, { ...props, ariaLabel: label }), error && h("span", { role: "alert" }, error.content)),
+      Flex: window.styled.div`display: flex;`,
+      Button: ({ children, ...props }) => h("button", { "aria-label": props["aria-label"], type: props.type, disabled: props.disabled, onClick: props.onClick }, children),
+      Icon: () => "↶",
+      FormField: ({ control: Control, label, error, ...props }) => h("label", { className: "field" }, label, h(Control, { ...props, ariaLabel: label }), error && h("span", { role: "alert" }, error.content)),
     };
     dependencies["@/common/components/form"] = {
       DatePicker: ({ selected, onChange, disabled, ariaLabel }) => h("input", { type: "date", disabled, "aria-label": ariaLabel,
         value: selected ? `${selected.getFullYear()}-${String(selected.getMonth() + 1).padStart(2, "0")}-${String(selected.getDate()).padStart(2, "0")}` : "",
         onChange: (event) => onChange(event.target.value ? new Date(`${event.target.value}T00:00:00`) : null),
       }),
-      DropdownControlled: ({ name, options, afterChange }) => h(F.Controller, { name, render: ({ field }) => h("select", {
-        "aria-label": "Rangos predefinidos", value: field.value || "", onChange: (event) => { field.onChange(event.target.value); afterChange(event.target.value); },
-      }, h("option", { value: "" }, "Seleccione"), ...options.map(({ text, value }) => h("option", { key: value, value }, text))) }),
+      TextControlled: ({ name }) => h(F.Controller, { name, render: ({ field }) => h("input", { ...field, "aria-label": name }) }),
+      DropdownControlled: ({ name, label, options, afterChange }) => h(F.Controller, { name, render: ({ field }) => name !== "presetRange"
+        ? h("input", { ...field, "aria-label": name })
+        : h("label", { className: "field" }, label, h("select", {
+          "aria-label": label, value: field.value || "", onChange: (event) => { field.onChange(event.target.value); afterChange(event.target.value); },
+        }, h("option", { value: "" }, "Seleccione"), ...options.map(({ text, value }) => h("option", { key: value, value }, text)))) }),
     };
     dependencies["@/common/components/form/DatePicker/DatePicker"] = {
       DatePicker: dependencies["@/common/components/form"].DatePicker,
     };
-    const DateFilters = load("src/components/budgets/SalesDateFilters.jsx").default;
-    dependencies["@/components/budgets/ServerBudgetsPage"] = { __esModule: true, default: ({ list, datePresets }) => {
-      window.list = list;
-      return h(F.FormProvider, list.methods, h("form", { onSubmit: list.onSubmit },
-        h(DateFilters, { presets: datePresets, disabled: !list.hydrated }),
-        ...["id", "customer", "createdBy", "state", "paymentStatus"].map((name) => h("input", { key: name, "aria-label": name, ...list.methods.register(name) })),
+    dependencies["semantic-ui-react"] = {
+      Form: "form", Popup: ({ trigger }) => trigger, Pagination: Box, Segment: Box,
+      Table: Object.assign(() => null, { Cell: Box, HeaderCell: Box, Header: Box, Row: Box }),
+    };
+    dependencies["@/common/components/table/styles"] = load("src/common/components/table/styles.jsx");
+    dependencies["@/common/components/table"] = {
+      Table: () => null,
+      Filters: ({ children, onRestoreFilters }) => h("div", null, children,
         h("button", { type: "submit" }, "Buscar"),
-        h("button", { type: "button", onClick: list.onRestoreDates }, "Reset fechas"),
-        h("button", { type: "button", onClick: list.onRestoreFilters }, "Reset filtros")));
+        h("button", { type: "button", onClick: onRestoreFilters }, "Reset filtros")),
+    };
+    dependencies["./SalesDateFilters"] = load("src/components/budgets/SalesDateFilters.jsx");
+    const ServerPage = load("src/components/budgets/ServerBudgetsPage.jsx").default;
+    dependencies["@/components/budgets/ServerBudgetsPage"] = { __esModule: true, default: (props) => {
+      window.list = props.list;
+      return h(ServerPage, props);
     } };
-    localStorage.setItem("budgetsFilters", JSON.stringify({ startDate: "2020-01-01T00:00:00", endDate: "2020-02-01T00:00:00", page: 7, createdBy: "Ana" }));
     const Route = load("src/app/(private)/ventas/page.jsx").default;
     const root = window.ReactDOM.createRoot(document.getElementById("root"));
-    window.renderSales = () => window.ReactDOM.flushSync(() => root.render(h(Route)));
+    let key = 0;
+    window.renderSales = () => window.ReactDOM.flushSync(() => root.render(h(Route, { key })));
+    window.remountSales = () => {
+      key += 1;
+      window.applies = [];
+      window.renders = [];
+      window.renderSales();
+    };
     window.renderSales();
   }, { sources, constants, filters: {
-    SALES_FILTERS: { id: "", customer: "", createdBy: "", state: "", paymentStatus: "", startDate: "", endDate: "" },
+    SALES_FILTERS: { id: "", customer: "", createdBy: "", state: "", paymentStatus: "", startDate: "", endDate: "", presetRange: "", defaultRangeMonths: "" },
     BUDGET_SORT_FIELDS: { id: "id", date: "createdAt" }, BUDGETS_FILTERS_KEY: "budgetsFilters", DEFAULT_DATE_RANGE_VALUE: 3,
-    BUDGET_STATES: { DRAFT: { id: "DRAFT" } },
+    BUDGET_STATES: { DRAFT: { id: "DRAFT" }, CONFIRMED: { id: "CONFIRMED" } },
   } });
+  await page.addStyleTag({ content: ".field { display: flex; flex-direction: column; min-width: 0; } .field > :is(input, select) { box-sizing: border-box; height: 40px; max-width: 100%; }" });
+  return { page, errors };
+};
+
+const datesOf = ({ startDate, endDate }) => ({ startDate, endDate });
+const savedFilters = (page) => page.evaluate(() => JSON.parse(localStorage.getItem("budgetsFilters")));
+const storedDates = async (page) => datesOf(await savedFilters(page));
+
+test("Sales restores the applied range on re-entry and uses the latest account default only on date reset", async (t) => {
+  const { page, errors } = await openSalesFixture(t);
   assert.equal(await page.evaluate(() => window.request.hydrated), false);
   await page.evaluate(() => { window.settings = { data: { defaultPageDateRange: { value: 12 }, historyDateRanges: [{ unit: "week", value: 2 }] }, isSuccess: true, isFetching: true }; window.renderSales(); });
   assert.equal(await page.evaluate(() => window.request.hydrated), false);
@@ -162,19 +210,21 @@ test("Sales forms synchronize effective Settings once, preserve manual edits on 
   const initial = await page.evaluate(() => window.request);
   assert.equal(initial.appliedFilters.startDate, "2025-11-02T15:30:45");
   assert.equal(initial.appliedFilters.endDate, "2026-11-02T15:30:45");
-  assert.equal(initial.appliedFilters.createdBy, "Ana");
   assert.equal(initial.pageNumber, 1);
   assert.equal(await page.evaluate(() => window.applies.length), 1, "initial range must recount even if its query was cached");
-  await page.getByLabel("Desde", { exact: true }).fill("2024-01-02");
-  await page.getByLabel("Hasta", { exact: true }).fill("2024-02-03");
+  assert.deepEqual(await storedDates(page), datesOf(initial.appliedFilters));
+  await page.getByLabel("Desde", { exact: true }).fill("2026-09-02");
+  await page.getByLabel("Hasta", { exact: true }).fill("2026-11-01");
   const commercial = { id: "V42", customer: "Cliente Uno", createdBy: "Vendedor Uno", state: "CONFIRMED", paymentStatus: "PENDING" };
   for (const [name, value] of Object.entries(commercial)) await page.getByLabel(name, { exact: true }).fill(value);
   assert.deepEqual(await page.evaluate(() => window.request), initial, "draft must not change query identity");
+  assert.deepEqual(await storedDates(page), datesOf(initial.appliedFilters));
   await page.getByRole("button", { name: "Buscar" }).click();
   await page.waitForFunction(() => window.applies.length === 2);
   const manual = await page.evaluate(() => window.request);
-  assert.equal(manual.appliedFilters.startDate, "2024-01-02T03:00:00");
-  assert.equal(manual.appliedFilters.endDate, "2024-02-04T02:59:59");
+  assert.equal(manual.appliedFilters.startDate, "2026-09-02T03:00:00");
+  assert.equal(manual.appliedFilters.endDate, "2026-11-02T02:59:59");
+  assert.deepEqual(await storedDates(page), datesOf(manual.appliedFilters));
   assert.equal(manual.appliedFilters.customerName, commercial.customer);
   assert.equal(manual.appliedFilters.paymentStatus, "PENDING");
   await page.evaluate(() => window.list.setPageNumber(2));
@@ -191,43 +241,189 @@ test("Sales forms synchronize effective Settings once, preserve manual edits on 
     await page.getByRole("alert").first().waitFor();
     assert.equal(await page.evaluate(() => window.applies.length), 2);
   }
-  // An irrelevant refetch must preserve both manual draft and applied dates.
+  await page.getByLabel("Rangos predefinidos").selectOption("base_month");
+  assert.deepEqual(await storedDates(page), datesOf(manual.appliedFilters));
+  assert.deepEqual(await page.evaluate(() => window.request.appliedFilters), manual.appliedFilters);
+  await page.getByLabel("Desde", { exact: true }).fill("2023-01-02");
+  await page.evaluate(() => window.remountSales());
+  await page.waitForFunction(() => window.request.hydrated);
+  assert.deepEqual(await page.evaluate(() => window.request.appliedFilters), manual.appliedFilters);
+  assert.equal(await page.getByLabel("Desde", { exact: true }).inputValue(), "2026-09-02");
+  assert.equal(await page.evaluate(() => window.request.sort), "createdAt");
+  assert.deepEqual(await page.evaluate(() => window.applies.map(({ appliedFilters }) => appliedFilters.startDate)), [manual.appliedFilters.startDate]);
+  assert.deepEqual(await storedDates(page), datesOf(manual.appliedFilters));
+
+  await page.clock.setFixedTime(new Date("2026-11-03T16:00:00Z"));
+  await page.getByRole("button", { name: "Restaurar fechas", exact: true }).click();
+  await page.waitForFunction(() => window.applies.length === 2);
+  const restored = { startDate: "2025-11-03T16:00:00", endDate: "2026-11-03T16:00:00" };
+  assert.deepEqual(await storedDates(page), restored);
+  await page.clock.setFixedTime(new Date("2026-11-04T16:00:00Z"));
+  await page.evaluate(() => window.remountSales());
+  await page.waitForFunction(() => window.request.hydrated);
+  assert.deepEqual(datesOf(await page.evaluate(() => window.request.appliedFilters)), restored);
+
+  // Both drafts and applied dates survive a change to the account default and presets.
   await page.getByLabel("Desde", { exact: true }).fill("2023-01-02");
   await page.evaluate(() => { window.settings = { ...window.settings, isFetching: true }; window.renderSales(); });
-  await page.evaluate(() => { window.settings = { ...window.settings, isFetching: false, data: { ...window.settings.data } }; window.renderSales(); });
+  await page.evaluate(() => {
+    window.settings = { ...window.settings, isFetching: false,
+      data: { defaultPageDateRange: { value: 3 }, historyDateRanges: [{ unit: "week", value: 3 }] } };
+    window.renderSales();
+  });
   assert.equal(await page.getByLabel("Desde", { exact: true }).inputValue(), "2023-01-02");
-  assert.equal(await page.evaluate(() => window.applies.length), 2);
-  assert.equal(await page.evaluate(() => window.request.appliedFilters.startDate), manual.appliedFilters.startDate);
-  // A real effective Setting change synchronizes once and never enables the old range.
-  await page.evaluate(() => { window.renders = []; window.settings = { ...window.settings, data: { ...window.settings.data, defaultPageDateRange: { value: 3 } } }; window.renderSales(); });
-  await page.waitForFunction(() => window.applies.length === 3);
-  assert.equal(await page.getByLabel("Desde", { exact: true }).inputValue(), "2026-08-02");
-  assert.equal(await page.evaluate(() => window.request.appliedFilters.startDate), "2026-08-02T15:30:45");
-  assert.equal(await page.evaluate(() => window.renders.some((entry) => entry.months === 3 && entry.hydrated && entry.appliedFilters.startDate !== "2026-08-02T15:30:45")), false);
-  await page.clock.setFixedTime(new Date("2026-11-03T16:00:00Z"));
+  assert.equal(await page.evaluate(() => window.applies.length), 1);
+  assert.deepEqual(datesOf(await page.evaluate(() => window.request.appliedFilters)), restored);
+  assert.deepEqual(await storedDates(page), restored);
+  await expect(page.getByRole("status")).toHaveText("Rango aplicado: Últimos 12 meses");
+
   await page.getByLabel("customer", { exact: true }).fill("Draft conservado");
-  await page.getByRole("button", { name: "Reset fechas", exact: true }).click();
-  await page.waitForFunction(() => window.applies.length === 4);
-  assert.equal(await page.evaluate(() => window.request.appliedFilters.startDate), "2026-08-03T16:00:00");
-  assert.equal(await page.evaluate(() => window.request.appliedFilters.endDate), "2026-11-03T16:00:00");
+  await page.getByRole("button", { name: "Restaurar fechas", exact: true }).click();
+  await page.waitForFunction(() => window.applies.length === 2);
+  const newDefault = { startDate: "2026-08-04T16:00:00", endDate: "2026-11-04T16:00:00" };
+  assert.deepEqual(datesOf(await page.evaluate(() => window.request.appliedFilters)), newDefault);
+  assert.deepEqual(await storedDates(page), newDefault);
+  await expect(page.getByRole("status")).toHaveText("Rango aplicado: Últimos 3 meses");
   assert.equal(await page.evaluate(() => window.request.pageNumber), 1);
   for (const [name, value] of Object.entries(commercial)) assert.equal(await page.getByLabel(name, { exact: true }).inputValue(), name === "customer" ? "Draft conservado" : value);
   assert.equal(await page.evaluate(() => window.request.appliedFilters.customerName), commercial.customer);
   assert.equal(await page.evaluate(() => window.request.appliedFilters.paymentStatus), commercial.paymentStatus);
-  await page.getByLabel("Rangos predefinidos").selectOption("custom_week_2");
-  assert.equal(await page.evaluate(() => window.applies.length), 4);
+  await page.getByLabel("Rangos predefinidos").selectOption("custom_week_3");
+  assert.equal(await page.evaluate(() => window.applies.length), 2);
+  assert.deepEqual(await storedDates(page), newDefault);
   const presetDates = await page.evaluate(() => ({ startDate: window.list.methods.getValues("startDate"), endDate: window.list.methods.getValues("endDate") }));
   await page.getByLabel("customer", { exact: true }).fill("Draft cliente");
   await page.getByRole("button", { name: "Reset filtros", exact: true }).click();
-  await page.waitForFunction(() => window.applies.length === 5);
-  assert.equal(await page.getByLabel("Rangos predefinidos").inputValue(), "custom_week_2");
+  await page.waitForFunction(() => window.applies.length === 3);
+  assert.equal(await page.getByLabel("Rangos predefinidos").inputValue(), "custom_week_3");
   assert.deepEqual(await page.evaluate(() => ({ startDate: window.list.methods.getValues("startDate"), endDate: window.list.methods.getValues("endDate") })), presetDates);
-  assert.equal(await page.evaluate(() => window.request.appliedFilters.startDate), "2026-08-03T16:00:00");
-  for (const name of Object.keys(commercial)) assert.equal(await page.getByLabel(name, { exact: true }).inputValue(), "");
+  assert.deepEqual(datesOf(await page.evaluate(() => window.request.appliedFilters)), newDefault);
+  assert.deepEqual(await storedDates(page), newDefault);
+  assert.deepEqual(await page.evaluate((names) => window.list.methods.getValues(names), Object.keys(commercial)), ["", "", "", "", ""]);
   await page.getByLabel("Hasta", { exact: true }).press("Enter");
-  await page.waitForFunction(() => window.applies.length === 6);
+  await page.waitForFunction(() => window.applies.length === 4);
   assert.deepEqual(await page.evaluate(() => window.request.appliedFilters), presetDates);
-  assert.equal(await page.evaluate(() => window.request.appliedFilters.endDate), "2026-11-03T16:00:00");
+  assert.deepEqual(await storedDates(page), presetDates);
+  assert.equal(presetDates.endDate, "2026-11-04T16:00:00");
+  assert.deepEqual(errors, []);
+});
+
+test("Sales persists applied preset identity without changing the saved dates and labels the applied range", async (t) => {
+  const { page, errors } = await openSalesFixture(t);
+  await page.evaluate(() => {
+    window.settings = { data: { defaultPageDateRange: { value: 12 }, historyDateRanges: [{ unit: "week", value: 2 }] }, isSuccess: true };
+    window.renderSales();
+  });
+  const preset = page.getByLabel("Rangos predefinidos");
+  const status = page.getByRole("status");
+  const start = page.getByLabel("Desde", { exact: true });
+  const end = page.getByLabel("Hasta", { exact: true });
+  const search = page.getByRole("button", { name: "Buscar" });
+  const remount = async () => {
+    await page.evaluate(() => window.remountSales());
+    await page.waitForFunction(() => window.request.hydrated);
+  };
+  const expectLabel = (label) => expect(status).toHaveText(`Rango aplicado: ${label}`);
+  await expectLabel("Últimos 12 meses");
+  assert.equal((await savedFilters(page)).defaultRangeMonths, "12");
+
+  for (const width of [1366, 390]) {
+    await page.setViewportSize({ width, height: 768 });
+    const indicator = await status.boundingBox();
+    const dateInput = await end.boundingBox();
+    assert.ok(indicator.width > 0 && indicator.x >= 0 && indicator.x + indicator.width <= width);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), width);
+    if (width > 767) assert.ok(indicator.x > dateInput.x && indicator.y < dateInput.y + dateInput.height);
+    else assert.ok(indicator.y >= dateInput.y + dateInput.height);
+  }
+
+  await preset.selectOption("base_month");
+  await expectLabel("Últimos 12 meses");
+  assert.equal((await savedFilters(page)).presetRange, "");
+  await search.click();
+  await expectLabel("Este mes");
+  const month = await savedFilters(page);
+  assert.equal(month.presetRange, "base_month");
+  assert.equal(month.defaultRangeMonths, "");
+  await page.clock.setFixedTime(new Date("2026-11-02T16:30:45Z"));
+  await remount();
+  assert.equal(await preset.inputValue(), "base_month");
+  assert.deepEqual(await storedDates(page), datesOf(month));
+
+  await preset.selectOption("base_today");
+  await expectLabel("Este mes");
+  assert.deepEqual(await savedFilters(page), month);
+  await preset.selectOption("base_month");
+  await start.fill("2026-11-02");
+  await expectLabel("Este mes");
+  await search.click();
+  await expectLabel("1 día");
+  assert.equal(await preset.inputValue(), "");
+  assert.equal((await savedFilters(page)).presetRange, "");
+
+  await preset.selectOption("custom_week_2");
+  await end.press("Enter");
+  await expectLabel("Últimas 2 semanas");
+  const custom = await savedFilters(page);
+  assert.equal(custom.presetRange, "custom_week_2");
+  await remount();
+  assert.equal(await preset.inputValue(), "custom_week_2");
+  assert.deepEqual(await storedDates(page), datesOf(custom));
+  await page.evaluate(() => { window.settings.data = { ...window.settings.data, historyDateRanges: [] }; });
+  await remount();
+  assert.equal(await preset.inputValue(), "");
+  await expectLabel("15 días");
+  assert.deepEqual(await storedDates(page), datesOf(custom));
+
+  await preset.selectOption("base_today");
+  await search.click();
+  await expectLabel("Hoy");
+  const today = await savedFilters(page);
+  await page.clock.setFixedTime(new Date("2026-11-03T15:30:45Z"));
+  await remount();
+  await expectLabel("1 día");
+  assert.equal(await preset.inputValue(), "");
+  assert.deepEqual(await storedDates(page), datesOf(today));
+
+  await page.evaluate((legacy) => localStorage.setItem("budgetsFilters", JSON.stringify(legacy)), datesOf(month));
+  await remount();
+  await expectLabel("2 días");
+  assert.equal(await preset.inputValue(), "");
+  assert.deepEqual(await storedDates(page), datesOf(month));
+
+  await page.getByRole("button", { name: "Restaurar fechas", exact: true }).click();
+  await expectLabel("Últimos 12 meses");
+  assert.equal(await preset.inputValue(), "");
+  assert.equal((await savedFilters(page)).defaultRangeMonths, "12");
+  assert.deepEqual(errors, []);
+});
+
+test("Sales replaces malformed, incomplete or invalid saved dates using Settings and the three-month fallback", async (t) => {
+  const { page, errors } = await openSalesFixture(t);
+  const startDate = "2026-09-02T15:30:45";
+  const endDate = "2026-11-02T15:30:45";
+  for (const [storage, setting, expectedStart] of [
+    ["{", 12, "2025-11-02T15:30:45"],
+    ["null", 12, "2025-11-02T15:30:45"],
+    [JSON.stringify({ endDate }), 12, "2025-11-02T15:30:45"],
+    [JSON.stringify({ startDate }), 12, "2025-11-02T15:30:45"],
+    [JSON.stringify({ startDate: "2026-02-30T00:00:00", endDate }), 12, "2025-11-02T15:30:45"],
+    [JSON.stringify({ startDate: endDate, endDate: startDate }), 12, "2025-11-02T15:30:45"],
+    ["{", "inválido", "2026-08-02T15:30:45"],
+  ]) {
+    await page.evaluate(({ storage, setting }) => {
+      localStorage.setItem("budgetsFilters", storage);
+      window.settings = { data: { defaultPageDateRange: { value: setting } }, isSuccess: true, isFetching: false };
+      window.remountSales();
+    }, { storage, setting });
+    await page.waitForFunction(() => window.request.hydrated);
+    const expected = { startDate: expectedStart, endDate };
+    assert.deepEqual(await storedDates(page), expected);
+    const enabledRanges = await page.evaluate(() => window.renders.filter(({ hydrated }) => hydrated).map(({ appliedFilters }) => appliedFilters));
+    assert.ok(enabledRanges.length);
+    assert.ok(enabledRanges.every((applied) => applied.startDate === expected.startDate && applied.endDate === expected.endDate));
+    assert.equal(await page.evaluate(() => window.applies.length), 1);
+  }
   assert.deepEqual(errors, []);
 });
 

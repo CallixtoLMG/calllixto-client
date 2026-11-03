@@ -19,26 +19,18 @@ export const fetchProductsForExport = ({ appliedFilters, sort, order }) => fetch
   entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, filters: appliedFilters, sort, order,
 });
 
-export function useGetProduct(id) {
-  const getProduct = async (id) => {
-    try {
-      const { data } = await getInstance().get(`${PATHS.PRODUCTS}/${id}`);
-      return data?.product ?? null;
-    } catch (error) {
-      throw error;
-    }
-  };
+export const productDetailOptions = (id) => ({
+  queryKey: [GET_PRODUCT_QUERY_KEY, id],
+  queryFn: async () => {
+    const { data } = await getInstance().get(`${PATHS.PRODUCTS}/${id}`);
+    return data?.product ?? null;
+  },
+  retry: false,
+  staleTime: IN_MS.ONE_DAY,
+  enabled: !!id,
+});
 
-  const query = useQuery({
-    queryKey: [GET_PRODUCT_QUERY_KEY, id],
-    queryFn: () => getProduct(id),
-    retry: false,
-    staleTime: IN_MS.ONE_DAY,
-    enabled: !!id,
-  });
-
-  return query;
-};
+export const useGetProduct = (id) => useQuery(productDetailOptions(id));
 
 export const useCreateProduct = () => {
   const queryClient = useQueryClient();

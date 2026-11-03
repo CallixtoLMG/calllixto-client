@@ -5,30 +5,35 @@ import { useGetSetting } from "@/api/settings";
 import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import ServerBudgetsPage from "@/components/budgets/ServerBudgetsPage";
 import { BUDGETS_FILTERS_KEY, BUDGET_SORT_FIELDS, SALES_FILTERS, BUDGET_STATES, DEFAULT_DATE_RANGE_VALUE } from "@/components/budgets/budgets.constants";
-import { BASE_SALES_DATE_RANGES, buildSalesDateRanges, getAutomaticBudgetRange } from "@/components/budgets/salesDateRange";
+import { BASE_SALES_DATE_RANGES, buildSalesDateRanges, getAutomaticBudgetRange, getBudgetDateRangeError, getRestoredSalesPreset } from "@/components/budgets/salesDateRange";
 import { useBreadcrumContext } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks";
 import useServerListFilters from "@/hooks/useServerListFilters";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
 
 const Budgets = () => {
   const settings = useGetSetting(ENTITIES.BUDGET);
-  const hasSettings = settings.isSuccess && !settings.isPlaceholderData;
-  const settingsReady = hasSettings && !settings.isFetching;
-  const configuredMonths = Number(settings.data?.defaultPageDateRange?.value);
-  const rangeValue = hasSettings
-    ? (Number.isInteger(configuredMonths) && configuredMonths > 0 ? configuredMonths : DEFAULT_DATE_RANGE_VALUE) : null;
-  // Only a new effective month value should replace a manual range.
-  const appliedRangeSetting = useRef(null);
-  const getDefaultFilters = useCallback(() => {
-    appliedRangeSetting.current = rangeValue;
-    return getAutomaticBudgetRange(rangeValue);
-  }, [rangeValue]);
+  const settingsReady = settings.isSuccess && !settings.isPlaceholderData && !settings.isFetching;
+  const rangeSetting = settings.data?.defaultPageDateRange?.value;
+  const configuredMonths = typeof rangeSetting === "string" ? Number(rangeSetting) : rangeSetting;
+  const defaultMonths = Number.isInteger(configuredMonths) && configuredMonths > 0 ? configuredMonths : DEFAULT_DATE_RANGE_VALUE;
   const presets = useMemo(() => [
     ...BASE_SALES_DATE_RANGES, ...buildSalesDateRanges(settings.data?.historyDateRanges),
   ], [settings.data?.historyDateRanges]);
+  const getDefaultRange = useCallback(() => ({
+    ...getAutomaticBudgetRange(defaultMonths), presetRange: "", defaultRangeMonths: String(defaultMonths),
+  }), [defaultMonths]);
+  const getInitialFilters = useCallback(({ startDate, endDate, presetRange, defaultRangeMonths }) => {
+    const savedRange = { startDate, endDate };
+    if (getBudgetDateRangeError(savedRange)) return getDefaultRange();
+    return {
+      ...savedRange,
+      presetRange: getRestoredSalesPreset({ ...savedRange, presetRange }, presets),
+      defaultRangeMonths: presetRange ? "" : defaultRangeMonths,
+    };
+  }, [getDefaultRange, presets]);
   const refreshList = useRefreshServerList(ENTITIES.BUDGETS);
   const applyList = useCallback((state) => {
     const request = getBudgetListState(state, { settingsReady });
@@ -36,22 +41,17 @@ const Budgets = () => {
   }, [refreshList, settingsReady]);
   const list = useServerListFilters({
     key: BUDGETS_FILTERS_KEY, defaultFilters: SALES_FILTERS, sortFields: BUDGET_SORT_FIELDS, onApply: applyList,
-    ready: settingsReady, getDefaultFilters,
+    ready: settingsReady, getInitialFilters,
   });
   const { applyFilterGroup } = list;
   const resetDates = useCallback(() => {
     if (!settingsReady || !list.hydrated) return;
-    applyFilterGroup({ ...getDefaultFilters(), presetRange: "" });
-  }, [settingsReady, list.hydrated, applyFilterGroup, getDefaultFilters]);
-  useEffect(() => {
-    if (appliedRangeSetting.current !== rangeValue) resetDates();
-  }, [rangeValue, resetDates]);
+    applyFilterGroup(getDefaultRange());
+  }, [settingsReady, list.hydrated, applyFilterGroup, getDefaultRange]);
   const resetSaleFilters = useCallback(() => applyFilterGroup({
     id: "", customer: "", createdBy: "", state: "", paymentStatus: "",
   }), [applyFilterGroup]);
-  const requestState = getBudgetListState(list, {
-    settingsReady: settingsReady && appliedRangeSetting.current === rangeValue,
-  });
+  const requestState = getBudgetListState(list, { settingsReady });
   const { data, total, isFetching, error } = usePagedBudgets(requestState);
   const { setLabels } = useBreadcrumContext();
   const { push } = useRouter();

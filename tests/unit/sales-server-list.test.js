@@ -204,43 +204,54 @@ test("Sales sort whitelist maps Fecha to createdAt with local boolean order and 
   assert.equal(a.calls.length, 2);
 });
 
-test("Sales waits through placeholder and pending Settings, then requests the configured 12-month range once", async (t) => {
-  const a = setup(t);
-  let settings = { data: {}, isSuccess: true, isPlaceholderData: true, isFetching: true };
-  let captured;
-  const ranges = [];
-  const Route = load("src/app/(private)/ventas/page.jsx", {
-    "@/api/budgets": { ...a.api, usePagedBudgets: (state) => { captured = state; return { total: null }; } },
-    "@/api/pagedLists": a.paged, "@/api/settings": { useGetSetting: () => settings },
-    "@/common/constants": constants,
-    "@/components/budgets/salesDateRange": { ...salesDates, getAutomaticBudgetRange: (months) => { ranges.push(months); return salesDates.getAutomaticBudgetRange(months, new Date("2026-11-02T12:00:00Z")); } },
-    "@/common/utils/pluralization": {}, "@/components/budgets/budgets.constants": budgetConstants,
-    "@/components/budgets/ServerBudgetsPage": { default: () => null },
-    "@/components/layout": { useBreadcrumContext: () => ({ setLabels() {} }) }, "@/hooks": { useKeyboardShortcuts() {} },
-    "@/hooks/useServerListFilters": { default: (config) => ({ ...a.state, hydrated: config.ready,
-      appliedFilters: { ...budgetConstants.SALES_FILTERS, ...(config.ready ? config.getDefaultFilters() : {}) } }) },
-    "next/navigation": { useRouter: () => ({ push() {} }) },
-  }).default;
-  const render = () => renderToStaticMarkup(React.createElement(QueryClientProvider, { client: a.client }, React.createElement(Route)));
-  render();
-  const options = () => a.paged.serverListQueryOptions(a.client, a.api.usePagedBudgets(captured));
-  const observer = new QueryObserver(a.client, options());
-  t.after(observer.subscribe(() => {}));
-  assert.equal(a.calls.length, 0);
-  assert.deepEqual(ranges, [], "placeholder must not construct fallback 3-month range");
-  settings = { data: { defaultPageDateRange: { value: 12 } }, isSuccess: true, isFetching: true };
-  render(); observer.setOptions(options());
-  assert.equal(a.calls.length, 0);
-  settings = { ...settings, isFetching: false };
-  render(); observer.setOptions(options());
-  await settled(observer);
-  assert.equal(a.calls.length, 1);
-  assert.equal(a.calls[0].params.startDate, "2025-11-02T12:00:00");
-  assert.equal(a.calls[0].params.endDate, "2026-11-02T12:00:00");
-  assert.equal(a.calls[0].params.pageNumber, 1);
-  assert.equal(a.calls[0].params.count, true);
-  assert.ok(ranges.every((months) => months === 12));
-});
+for (const stored of [{}, { startDate: "2026-09-02T12:00:00", endDate: "2026-11-02T12:00:00", defaultRangeMonths: "2" }]) {
+  test(`Sales waits for Settings and sends one initial request with ${stored.startDate ? "saved dates" : "the 12-month account default"}`, async (t) => {
+    const a = setup(t);
+    let settings = { data: {}, isSuccess: true, isPlaceholderData: true, isFetching: true };
+    let storageReady = false;
+    let captured;
+    const ranges = [];
+    const Route = load("src/app/(private)/ventas/page.jsx", {
+      "@/api/budgets": { ...a.api, usePagedBudgets: (state) => { captured = state; return { total: null }; } },
+      "@/api/pagedLists": a.paged, "@/api/settings": { useGetSetting: () => settings },
+      "@/common/constants": constants,
+      "@/components/budgets/salesDateRange": { ...salesDates, getAutomaticBudgetRange: (months) => { ranges.push(months); return salesDates.getAutomaticBudgetRange(months, new Date("2026-11-02T12:00:00Z")); } },
+      "@/common/utils/pluralization": {}, "@/components/budgets/budgets.constants": budgetConstants,
+      "@/components/budgets/ServerBudgetsPage": { default: () => null },
+      "@/components/layout": { useBreadcrumContext: () => ({ setLabels() {} }) }, "@/hooks": { useKeyboardShortcuts() {} },
+      "@/hooks/useServerListFilters": { default: (config) => {
+        const hydrated = config.ready && storageReady;
+        return { ...a.state, hydrated,
+          appliedFilters: { ...budgetConstants.SALES_FILTERS, ...(hydrated ? config.getInitialFilters(stored) : {}) } };
+      } },
+      "next/navigation": { useRouter: () => ({ push() {} }) },
+    }).default;
+    const render = () => renderToStaticMarkup(React.createElement(QueryClientProvider, { client: a.client }, React.createElement(Route)));
+    render();
+    const options = () => a.paged.serverListQueryOptions(a.client, a.api.usePagedBudgets(captured));
+    const observer = new QueryObserver(a.client, options());
+    t.after(observer.subscribe(() => {}));
+    assert.equal(a.calls.length, 0);
+    assert.deepEqual(ranges, [], "placeholder must not construct fallback 3-month range");
+    settings = { data: { defaultPageDateRange: { value: 12 } }, isSuccess: true, isFetching: true };
+    render(); observer.setOptions(options());
+    assert.equal(a.calls.length, 0);
+    settings = { ...settings, isFetching: false };
+    render(); observer.setOptions(options());
+    assert.equal(a.calls.length, 0, "Settings alone does not enable the initial query");
+    storageReady = true;
+    render(); observer.setOptions(options());
+    await settled(observer);
+    assert.equal(a.calls.length, 1);
+    assert.equal(a.calls[0].params.startDate, stored.startDate ?? "2025-11-02T12:00:00");
+    assert.equal(a.calls[0].params.endDate, "2026-11-02T12:00:00");
+    assert.equal(a.calls[0].params.pageNumber, 1);
+    assert.equal(a.calls[0].params.count, true);
+    assert.equal(Object.hasOwn(a.calls[0].params, "presetRange"), false);
+    assert.equal(Object.hasOwn(a.calls[0].params, "defaultRangeMonths"), false);
+    assert.deepEqual(ranges, stored.startDate ? [] : [12]);
+  });
+}
 
 test("Saving Settings invalidates the cached singular budget key and re-entry reads current months without F5", async (t) => {
   const a = setup(t);

@@ -12,7 +12,10 @@ import { getBudgetListPopupContent, isBudgetCancelled, isBudgetConfirmed } from 
 
 export const GET_BUDGET_QUERY_KEY = 'getBudget';
 export const BUDGETS_FILTERS_KEY = 'budgetsFilters';
-export const SALES_FILTERS = { id: "", customer: "", createdBy: "", state: "", paymentStatus: "", startDate: "", endDate: "" };
+export const SALES_FILTERS = {
+  id: "", customer: "", createdBy: "", state: "", paymentStatus: "",
+  startDate: "", endDate: "", presetRange: "", defaultRangeMonths: "",
+};
 export const BUDGET_SORT_FIELDS = { id: "id", date: "createdAt" };
 
 export const BUDGET_STATES = {

@@ -3,10 +3,11 @@ import { DropdownControlled } from "@/common/components/form";
 import { DatePicker } from "@/common/components/form/DatePicker/DatePicker";
 import { CONTENT_SIZES, ERROR_MESSAGES } from "@/common/constants";
 import { Controller, useFormContext } from "react-hook-form";
-import { getBudgetDateRangeError, getManualBudgetDate, parseBudgetDate } from "./salesDateRange";
+import { getAppliedSalesRangeLabel, getBudgetDateRangeError, getManualBudgetDate, parseBudgetDate } from "./salesDateRange";
 
-const SalesDateFilters = ({ presets = [], disabled }) => {
+const SalesDateFilters = ({ appliedRange, presets = [], disabled }) => {
   const { control, getValues, setValue } = useFormContext();
+  const appliedLabel = getAppliedSalesRangeLabel(appliedRange, presets);
   return <>
     <DropdownControlled
       name="presetRange" label="Rangos predefinidos" width={CONTENT_SIZES.FIT} disabled={disabled}
@@ -15,6 +16,7 @@ const SalesDateFilters = ({ presets = [], disabled }) => {
         const range = presets.find((preset) => preset.value === value)?.getRange();
         if (!range) return;
         Object.entries(range).forEach(([field, date]) => setValue(field, date, { shouldDirty: true }));
+        setValue("defaultRangeMonths", "");
       }}
     />
     {[["startDate", "Desde"], ["endDate", "Hasta"]].map(([name, label]) => (
@@ -27,11 +29,13 @@ const SalesDateFilters = ({ presets = [], disabled }) => {
             onChange={(date) => {
               onChange(getManualBudgetDate(date, name));
               setValue("presetRange", "");
+              setValue("defaultRangeMonths", "");
             }}
           />
         )}
       />
     ))}
+    {appliedLabel && <small role="status">Rango aplicado: {appliedLabel}</small>}
   </>;
 };
 
