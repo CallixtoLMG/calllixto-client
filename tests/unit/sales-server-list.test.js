@@ -217,7 +217,7 @@ test("Sales waits through placeholder and pending Settings, then requests the co
     "@/components/budgets/ServerBudgetsPage": { default: () => null },
     "@/components/layout": { useBreadcrumContext: () => ({ setLabels() {} }) }, "@/hooks": { useKeyboardShortcuts() {} },
     "@/hooks/useServerListFilters": { default: (config) => ({ ...a.state, hydrated: config.ready,
-      appliedFilters: { ...budgetConstants.SALES_FILTERS, ...(config.ready ? config.getDefaultFilters() : {}) }, refresh() {} }) },
+      appliedFilters: { ...budgetConstants.SALES_FILTERS, ...(config.ready ? config.getDefaultFilters() : {}) } }) },
     "next/navigation": { useRouter: () => ({ push() {} }) },
   }).default;
   const render = () => renderToStaticMarkup(React.createElement(QueryClientProvider, { client: a.client }, React.createElement(Route)));

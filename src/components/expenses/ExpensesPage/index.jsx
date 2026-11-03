@@ -16,7 +16,7 @@ const ExpensesPage = ({ expenses = [], isLoading, list, total, sideActions = [] 
         <Form onSubmit={onSubmit}>
           <Filters
             onRestoreFilters={onRestoreFilters} appliedCount={appliedCount}
-            hydrated={hydrated} showRefetchAction={false}
+            hydrated={hydrated}
           >
             <DropdownControlled
               minWidth="150px" width={CONTENT_SIZES.MIN} name="state" label="Estado"

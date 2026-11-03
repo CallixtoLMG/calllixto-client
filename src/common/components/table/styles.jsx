@@ -384,15 +384,6 @@ const FiltersSearchActions = styled.div`
   }
 `;
 
-const RefetchAction = styled.div`
-  display: contents;
-
-  @media (max-width: ${MOBILE_BREAKPOINT}px) {
-    display: flex;
-    order: 1;
-  }
-`;
-
 const ResponsiveHeaderSegment = styled(HeaderSegment)`
   @media (max-width: ${MOBILE_BREAKPOINT}px) {
     width: 100%;
@@ -401,4 +392,4 @@ const ResponsiveHeaderSegment = styled(HeaderSegment)`
   }
 `;
 
-export { ActionsContainer, BatchGearDesktop, Cell, Container, DesktopRestoreAction, FiltersActions, FiltersContainer, FiltersSearchActions, HeaderCell, ResponsiveHeaderSegment as HeaderSegment, InnerActionsContainer, LinkCell, LinkContent, LinkOverlay, MainContainer, MobileRestoreAction, NarrowRestoreAction, Pagination, PaginationContainer, RefetchAction, Segment, SelectionActionsBar, SelectionActionsCount, Table, TableHeader, TableLoaderArea, TableOuterWrapper, TableRow, TableScrollContainer, WideRestoreAction };
+export { ActionsContainer, BatchGearDesktop, Cell, Container, DesktopRestoreAction, FiltersActions, FiltersContainer, FiltersSearchActions, HeaderCell, ResponsiveHeaderSegment as HeaderSegment, InnerActionsContainer, LinkCell, LinkContent, LinkOverlay, MainContainer, MobileRestoreAction, NarrowRestoreAction, Pagination, PaginationContainer, Segment, SelectionActionsBar, SelectionActionsCount, Table, TableHeader, TableLoaderArea, TableOuterWrapper, TableRow, TableScrollContainer, WideRestoreAction };

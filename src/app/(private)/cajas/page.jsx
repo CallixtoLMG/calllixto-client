@@ -97,7 +97,6 @@ const CashBalances = () => {
   return (
     <>
       <CashBalancesPage
-        onRefetch={refetch}
         isLoading={isLoading || isRefetching}
         cashBalances={isPending ? [] : cashBalances}
         paymentOptions={paymentMethodOptions}

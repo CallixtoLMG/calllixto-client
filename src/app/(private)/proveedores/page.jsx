@@ -29,7 +29,7 @@ const Suppliers = () => {
     setLabels([{ name: PAGES.SUPPLIERS.NAME }]);
   }, [setLabels]);
 
-  const { hydrated, pageNumber, pageSize, setPageNumber, appliedFilters, sort, order, refresh } = list;
+  const { hydrated, pageNumber, pageSize, setPageNumber, appliedFilters, sort, order } = list;
   useEffect(() => {
     if (!hydrated || isFetching || total === null) return;
     const lastPage = Math.max(1, Math.ceil(total / pageSize));
@@ -77,17 +77,13 @@ const Suppliers = () => {
       })
     }
     actions.push({
-      id: "update", icon: ICONS.REFRESH, color: COLORS.BLUE,
-      text: "Actualizar proveedores", onClick: refresh, disabled: !hydrated || isFetching,
-      showTooltipWhenExpanded: true,
-    }, {
       id: "download-excel", icon: ICONS.FILE_EXCEL, color: COLORS.BLUE,
       text: "Descargar proveedores en Excel", onClick: handleDownloadExcel,
       disabled: !hydrated || isFetching || total === null || total === 0 || isExporting,
       loading: isExporting, showTooltipWhenExpanded: true,
     });
     return actions;
-  }, [push, role, refresh, hydrated, isFetching, total, isExporting, handleDownloadExcel]);
+  }, [push, role, hydrated, isFetching, total, isExporting, handleDownloadExcel]);
 
   useKeyboardShortcuts(() => push(PAGES.SUPPLIERS.CREATE), SHORTKEYS.ENTER);
 

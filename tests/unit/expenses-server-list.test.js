@@ -154,7 +154,7 @@ test("Expenses table passes the backend page intact and disables categories and 
   assert.ok(table.headers.every((h) => h.sortValue === undefined));
 });
 
-test("Expenses route refresh uses the same boolean-order identity and export stays disabled", async (t) => {
+test("Expenses filter apply uses the same boolean-order identity and export stays disabled", async (t) => {
   const a = setup(t);
   const restored = { ...a.state, appliedFilters: { state: "all", categories: "Servicios" } };
   let configuration, page;
@@ -164,7 +164,7 @@ test("Expenses route refresh uses the same boolean-order identity and export sta
     "@/components/expenses/ExpensesPage": { default: (props) => { page = props; return null; } },
     "@/components/expenses/expenses.constants": expenseConstants,
     "@/components/layout": { useBreadcrumContext: () => ({ setLabels() {} }) }, "@/hooks": { useKeyboardShortcuts() {} },
-    "@/hooks/useServerListFilters": { default: (config) => { configuration = config; return { ...restored, refresh() {} }; } },
+    "@/hooks/useServerListFilters": { default: (config) => { configuration = config; return restored; } },
     "@/roles": { RULES: { canCreate: {} } }, "next/navigation": { useRouter: () => ({ push() {} }) },
   }).default;
   renderToStaticMarkup(React.createElement(QueryClientProvider, { client: a.client }, React.createElement(Route)));

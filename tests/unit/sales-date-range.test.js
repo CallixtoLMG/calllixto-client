@@ -12,6 +12,7 @@ const compile = (file) => ts.transpileModule(read(file), {
   fileName: file, compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true },
 }).outputText;
 const constants = {
+  CONTENT_SIZES: { FIT: "fit-content" },
   DATE_FORMATS: { ISO: "YYYY-MM-DDTHH:mm:ss" }, ERROR_MESSAGES: { REQUIRED_FIELD_SHORT: "Campo requerido" },
   DEFAULT_PAGE_SIZE: 20, PAGE_SIZE_OPTIONS: [{ value: 20 }], SORTING: { ASC: "ascending", DESC: "descending" },
   ENTITIES: { BUDGET: "budget", BUDGETS: "budgets" }, ALL: "all", COLORS: {}, ICONS: {}, SHORTKEYS: {},

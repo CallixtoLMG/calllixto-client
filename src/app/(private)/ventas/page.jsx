@@ -15,7 +15,6 @@ import { toast } from "react-hot-toast";
 
 const Budgets = () => {
   const settings = useGetSetting(ENTITIES.BUDGET);
-  const { refetch: refetchSettings } = settings;
   const hasSettings = settings.isSuccess && !settings.isPlaceholderData;
   const settingsReady = hasSettings && !settings.isFetching;
   const configuredMonths = Number(settings.data?.defaultPageDateRange?.value);
@@ -77,16 +76,11 @@ const Budgets = () => {
   const sideActions = useMemo(() => [
     { id: 1, icon: ICONS.ADD, color: COLORS.GREEN, href: PAGES.BUDGETS.CREATE, text: "Crear venta" },
     {
-      id: "update", icon: ICONS.REFRESH, color: COLORS.BLUE, text: "Actualizar ventas",
-      onClick: hasSettings ? list.refresh : () => refetchSettings(),
-      disabled: settings.isFetching || isFetching || (hasSettings && !hydrated),
-    },
-    {
       id: "download-excel", icon: ICONS.FILE_EXCEL, color: COLORS.BLUE, text: "Descargar ventas en Excel",
       disabled: true, tooltip: "La exportación completa no está disponible por el momento.",
       showTooltipWhenExpanded: true,
     },
-  ], [hasSettings, list.refresh, refetchSettings, hydrated, settings.isFetching, isFetching]);
+  ], []);
   const actions = useMemo(() => [{
     id: 1, icon: ICONS.COPY, color: COLORS.GREEN,
     onClick: (budget) => push(PAGES.BUDGETS.CLONE(budget.id)), tooltip: "Clonar",
