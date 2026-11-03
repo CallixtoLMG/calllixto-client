@@ -109,5 +109,14 @@ export const fetchAllListPages = async ({ pageSize = 500, ...options }) => {
   if (items.length !== firstPage.total) {
     throw new Error("No se pudo obtener el listado completo para exportar.");
   }
+
+  const ids = new Set();
+  for (const item of items) {
+    const id = item?.id;
+    if (typeof id !== "number" && (typeof id !== "string" || id === "")) continue;
+    const key = String(id);
+    if (ids.has(key)) throw new Error("El listado devolvió registros repetidos.");
+    ids.add(key);
+  }
   return items;
 };

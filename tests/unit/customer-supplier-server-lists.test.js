@@ -54,7 +54,8 @@ for (const config of [
       const { pageNumber, pageSize } = options.params;
       if (failExport && pageNumber === 2) return { data: { statusOk: false, message: "Page failed" } };
       const length = pageSize === 500 ? (pageNumber === 3 ? 200 : 500) : 1;
-      return { data: { statusOk: true, [config.entity]: Array.from({ length }, (_, id) => ({ id })), count: "1200" } };
+      const offset = (pageNumber - 1) * pageSize;
+      return { data: { statusOk: true, [config.entity]: Array.from({ length }, (_, id) => ({ id: offset + id })), count: "1200" } };
     } }) };
     const paged = load("src/api/pagedLists.js", { "./axios": axios });
     const tooltipComponents = { AddressesTooltip: Box, CommentTooltip: Box, PhonesTooltip: Box, TagsTooltip: Box };

@@ -1,10 +1,10 @@
-import { ALL, ENTITIES, IN_MS } from "@/common/constants";
+import { ALL, DEFAULT_PAGE_SIZE, ENTITIES, IN_MS } from "@/common/constants";
 import { CANCEL, PATHS } from "@/fetchUrls";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { GET_EXPENSE_QUERY_KEY } from "../components/expenses/expenses.constants";
 import { getInstance } from "./axios";
 import { useCreateItem, useEditItem } from './common';
-import { invalidateServerLists, usePagedList } from "./pagedLists";
+import { fetchAllListPages, invalidateServerLists, usePagedList } from "./pagedLists";
 
 export const getExpenseListState = (state) => {
   const { id, name, state: expenseState } = state.appliedFilters;
@@ -20,6 +20,13 @@ export const getExpenseListState = (state) => {
 };
 
 export const usePagedExpenses = (state) => usePagedList({ ...state, entity: ENTITIES.EXPENSES, url: PATHS.EXPENSES });
+
+export const fetchExpensesForExport = (state) => {
+  const { appliedFilters, sort, order } = getExpenseListState(state);
+  return fetchAllListPages({
+    entity: ENTITIES.EXPENSES, url: PATHS.EXPENSES, filters: appliedFilters, sort, order, pageSize: DEFAULT_PAGE_SIZE,
+  });
+};
 
 export function useGetExpense(id) {
   const getExpense = async (id) => {

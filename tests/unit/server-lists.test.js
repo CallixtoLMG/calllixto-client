@@ -182,16 +182,21 @@ test("successful Brand mutations refresh the active page and recount; failed mut
 });
 
 test("export returns all applied matches with three numeric pages, without changing the visible page", async (t) => {
-  const list = createList(t, (params) => ({ data: {
-    statusOk: true, count: "1200", brands: Array.from({ length: params.pageNumber === 3 ? 200 : 500 }, (_, id) => ({ id })),
+  const matches = Array.from({ length: 1200 }, (_, id) => ({ id, name: `Applied ${id}` })).reverse();
+  const list = createList(t, ({ pageNumber, pageSize, count }) => ({ data: {
+    statusOk: true, ...(count && { count: "1200" }), brands: matches.slice((pageNumber - 1) * pageSize, pageNumber * pageSize),
   } }));
-  const state = { ...list.initial, pageNumber: 4, appliedFilters: { id: "", name: "Applied", state: "" } };
-  const items = await list.paged.fetchAllListPages({ entity: state.entity, url: state.url, filters: state.appliedFilters, sort: state.sort, order: state.order });
-  assert.equal(items.length, 1200);
+  const { fetchBrandsForExport } = load("src/api/brands.js", {
+    "./pagedLists": list.paged, "./axios": {}, "./common": {}, "@/common/constants": constants,
+    "@/fetchUrls": { PATHS: { BRANDS: "brands" } }, "@/components/brands/brands.constants": {},
+  });
+  const appliedFilters = { id: "", name: "Applied", state: "ACTIVE" };
+  const state = { ...list.initial, pageNumber: 4, appliedFilters, sort: "name", order: "desc", draft: { name: "Ignored" } };
+  assert.deepEqual(plain(await fetchBrandsForExport(state)), matches);
   assert.equal(state.pageNumber, 4);
-  assert.deepEqual(list.calls.map(({ params }) => params.pageNumber), [1, 2, 3]);
-  assert.deepEqual(list.calls.map(({ params }) => params.count), [true, false, false]);
-  assert.ok(list.calls.every(({ params }) => params.name === "Applied" && params.pageSize === 500));
+  assert.deepEqual(plain(list.calls.map(({ params }) => params)), [1, 2, 3].map((pageNumber) => ({
+    ...appliedFilters, pageNumber, pageSize: 500, sort: "name", order: "desc", count: pageNumber === 1,
+  })));
 });
 
 test("export rejects failed or incomplete pages instead of returning a partial collection", async (t) => {
