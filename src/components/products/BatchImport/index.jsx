@@ -1,8 +1,6 @@
 import { CONTENT_SIZES } from "@/common/constants";
 import { Button } from "@/common/components/custom";
 import { ModalBatchImport } from "@/components/products/ModalBatchImport";
-import { useRef, useState } from "react";
-import { toast } from "react-hot-toast";
 import { Icon } from "semantic-ui-react";
 import { BatchImportIcon } from "./styles";
 
@@ -32,24 +30,11 @@ export const BatchImport = ({
   openBeforeRead = false,
   accept = ".xlsx,.xls,.xlsm",
   triggerClassName,
-  disabled = false,
 }) => {
-  const opening = useRef(false);
-  const [isOpening, setIsOpening] = useState(false);
   const handleOpenFile = async () => {
-    if (disabled || opening.current) return;
-    opening.current = true;
-    setIsOpening(true);
-    try {
-      if (await onBeforeOpenFile?.() === false) return;
-      inputRef.current.value = null;
-      inputRef.current.click();
-    } catch (error) {
-      toast.error(error.message || "No se pudieron cargar los datos necesarios.");
-    } finally {
-      opening.current = false;
-      setIsOpening(false);
-    }
+    await onBeforeOpenFile?.();
+    inputRef.current.value = null;
+    inputRef.current.click();
   };
 
   const handleFileUpload = async (e) => {
@@ -100,9 +85,7 @@ export const BatchImport = ({
         width={CONTENT_SIZES.FIT}
         $paddingLeft="0"
         as={triggerClassName ? undefined : BatchImportIcon}
-        onClick={disabled ? undefined : handleOpenFile}
-        disabled={disabled || isOpening}
-        loading={isOpening}
+        onClick={handleOpenFile}
         type="button"
         $iconOnly
       >

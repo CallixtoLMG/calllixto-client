@@ -6,19 +6,21 @@ import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { ModalAction, ModalMultiDelete } from "@/common/components/modals";
 import { Filters, Table } from "@/common/components/table";
-import { CONTENT_SIZES, COLORS, SORTING, FIELD_LABELS, ICONS, PAGES, TOOLTIPS } from "@/common/constants";
+import { CONTENT_SIZES, COLORS, ENTITIES, FIELD_LABELS, ICONS, PAGES, TOOLTIPS } from "@/common/constants";
+import { createFilter } from "@/common/utils";
 import { formatCount, pluralize } from "@/common/utils/pluralization";
 import { OnlyPrint, useListPageSideActions } from "@/components/layout";
+import { useFilters } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { FormProvider } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Form } from "semantic-ui-react";
-import { PRODUCT_SORT_FIELDS, PRODUCT_COLUMNS, PRODUCT_STATES, PRODUCT_STATES_OPTIONS } from "../products.constants";
+import { EMPTY_FILTERS, LIST_PRODUCTS_QUERY_KEY, PRODUCTS_FILTERS_KEY, PRODUCT_COLUMNS, PRODUCT_STATES, PRODUCT_STATES_OPTIONS } from "../products.constants";
 
-const ProductsPage = ({ products = [], isLoading, list, total, sideActions = [] }) => {
+const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel, sideActions = [] }) => {
   const { role } = useUserContext();
   const printRef = useRef();
   const deleteProduct = useDeleteProduct();
@@ -31,9 +33,30 @@ const ProductsPage = ({ products = [], isLoading, list, total, sideActions = [] 
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedProducts, setSelectedProducts] = useState({});
 
-  const { onRestoreFilters, onSubmit, methods, appliedCount, hydrated } = list;
-  useListPageSideActions({ sideActions });
-  useEffect(() => { setSelectedProducts({}); }, [list.appliedFilters]);
+  const {
+    onRestoreFilters,
+    onSubmit,
+    filters,
+    setFilters,
+    methods,
+    appliedCount,
+    hydrated
+  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: PRODUCTS_FILTERS_KEY });
+
+  const onFilter = useMemo(() => createFilter(filters, { id: {}, name: {}, state: { skipAll: true, fullMatch: true } }), [filters]);
+  const tableProducts = useMemo(() => products.map(p => ({ ...p, key: p.id })), [products]);
+  const { useSideActions, handleFilteredElementsChange } = useListPageSideActions({
+    sideActions,
+    onRefetch,
+    onDownloadExcel,
+    entity: ENTITIES.PRODUCTS,
+    queryKey: LIST_PRODUCTS_QUERY_KEY,
+    pageName: PAGES.PRODUCTS.NAME,
+    updateTooltip: "Actualizar productos",
+    downloadTooltip: "Descargar productos en Excel",
+    downloadParentId: 2,
+  });
+  const handleFilteredProductsChange = useCallback(handleFilteredElementsChange, [handleFilteredElementsChange]);
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -218,9 +241,13 @@ const ProductsPage = ({ products = [], isLoading, list, total, sideActions = [] 
         <FormProvider {...methods}>
           <Form onSubmit={onSubmit}>
             <Filters
+              entity={ENTITIES.PRODUCTS}
+              onRefetch={onRefetch}
+              clearSelection={() => setSelectedProducts({})}
               onRestoreFilters={onRestoreFilters}
               appliedCount={appliedCount}
               hydrated={hydrated}
+              showRefetchAction={!useSideActions}
             >
               <DropdownControlled
                 minWidth="150px"
@@ -228,7 +255,11 @@ const ProductsPage = ({ products = [], isLoading, list, total, sideActions = [] 
                 name="state"
                 label={FIELD_LABELS.STATE}
                 options={PRODUCT_STATES_OPTIONS}
-                clearable
+                defaultValue={EMPTY_FILTERS.state}
+                afterChange={() => {
+                  onSubmit();
+                  setSelectedProducts({});
+                }}
               />
               <TextControlled
                 name="id"
@@ -250,7 +281,7 @@ const ProductsPage = ({ products = [], isLoading, list, total, sideActions = [] 
         <Table
           isLoading={isLoading || deleteIsPending || recoverIsPending}
           headers={PRODUCT_COLUMNS}
-          elements={products}
+          elements={tableProducts}
           page={PAGES.PRODUCTS}
           actions={actions}
           selection={selectedProducts}
@@ -258,17 +289,13 @@ const ProductsPage = ({ products = [], isLoading, list, total, sideActions = [] 
           selectionActions={selectionActions}
           clearSelection={() => setSelectedProducts({})}
           selectAllCurrentPageElements={selectAllCurrentPageElements}
-          color={PRODUCT_STATES[list.appliedFilters.state]?.color}
+          onFilter={onFilter}
+          color={PRODUCT_STATES[filters.state]?.color}
           paginate
-          serverPagination={{
-            hydrated, pageNumber: list.pageNumber, pageSize: list.pageSize, total,
-            sorting: {
-              key: Object.keys(PRODUCT_SORT_FIELDS).find((key) => PRODUCT_SORT_FIELDS[key] === list.sort),
-              direction: list.order === "desc" ? SORTING.DESC : SORTING.ASC,
-            },
-            sortFields: PRODUCT_SORT_FIELDS,
-            onPageChange: list.setPageNumber, onPageSizeChange: list.setPageSize, onSortChange: list.setSorting,
-          }}
+          filters={filters}
+          setFilters={setFilters}
+          onDownloadExcel={useSideActions ? undefined : onDownloadExcel}
+          onFilteredElementsChange={useSideActions ? handleFilteredProductsChange : undefined}
         />
         <ModalAction
           showModal={showModal}

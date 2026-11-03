@@ -6,6 +6,7 @@ import {
   isApiResponse,
 } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
+import { E2E_ACCOUNTS } from "./support/env";
 import {
   deleteEntityIfPresent,
   expectEntityDeletedFromActiveList,
@@ -98,7 +99,7 @@ const expectBrandName = async (page: Page, name: string) => {
 
 test.describe("brands", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page);
+    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
   });
 
   test("creates, updates, and deletes a brand", async ({ page }) => {

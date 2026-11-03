@@ -5,17 +5,16 @@ import { FIELD_LABELS, ICONS, SELECT_ALL_OPTION } from "@/common/constants";
 import { getLabelColor } from "@/common/utils";
 import { Label } from "semantic-ui-react";
 
+export const LIST_EXPENSES_QUERY_KEY = 'listExpenses';
 export const GET_EXPENSE_QUERY_KEY = 'getExpense';
 export const EXPENSES_FILTERS_KEY = 'expensesFilters';
 
-export const EXPENSE_SORT_FIELDS = { id: "id" };
+export const LIST_ATTRIBUTES = ["id", "name", "categories", "tags", "amount", "expirationDate", "comments", "state", "total", "paymentsMade", "paidAmount", "pendingAmount"];
 
 export const HEADERS = [
   {
     id: 1,
     title: FIELD_LABELS.ID,
-    key: "id",
-    sortable: true,
     width: 1,
     value: (expense) => (
       <Box width="60px">
@@ -69,22 +68,25 @@ export const HEADERS = [
     id: 5,
     title: "Pagado",
     key: "paidAmount",
-    sortable: false,
+    sortable: true,
     width: 2,
     align: "left",
     value: (expense) => <PriceLabel value={expense.paidAmount ?? 0} />,
+    sortValue: (expense) => expense.paidAmount ?? 0
   },
   {
     id: 6,
     title: "Pendiente",
     key: "pendingAmount",
     width: 2,
-    sortable: false,
+    sortable: true,
     align: "left",
     value: (expense) => {
       const pending = (expense.amount ?? 0) - (expense.paidAmount ?? 0);
       return <PriceLabel value={Math.max(pending, 0)} />;
     },
+    sortValue: (expense) =>
+      (expense.amount ?? 0) - (expense.paidAmount ?? 0)
   }
 ];
 
@@ -113,7 +115,7 @@ export const EXPENSE_STATES = {
 };
 
 export const EMPTY_EXPENSE = { name: '', comments: '', amount: '', expirationDate: '', paymentsMade: [] };
-export const EMPTY_FILTERS = { id: '', name: '', state: '' };
+export const EMPTY_FILTERS = { id: '', name: '', categories: "", state: SELECT_ALL_OPTION.value, categories: SELECT_ALL_OPTION.value };
 
 export const EXPENSES_STATE_OPTIONS = [
   SELECT_ALL_OPTION,

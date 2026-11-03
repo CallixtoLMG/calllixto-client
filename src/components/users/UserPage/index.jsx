@@ -1,15 +1,15 @@
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
-import { CONTENT_SIZES, PAGES } from "@/common/constants";
+import { CONTENT_SIZES, ENTITIES, PAGES } from "@/common/constants";
 import { createFilter } from "@/common/utils";
 import { useListPageSideActions } from "@/components/layout";
 import { useFilters } from "@/hooks";
 import { useCallback, useMemo } from "react";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
-import { EMPTY_FILTERS, USERS_FILTERS_KEY, USER_COLUMNS, USER_STATE_OPTIONS } from "../users.constants";
+import { EMPTY_FILTERS, LIST_USERS_QUERY_KEY, USERS_FILTERS_KEY, USER_COLUMNS, USER_STATE_OPTIONS } from "../users.constants";
 
-const UsersPage = ({ users = [], isLoading, onDownloadExcel, sideActions = [] }) => {
+const UsersPage = ({ users = [], isLoading, onRefetch, onDownloadExcel, sideActions = [] }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -23,7 +23,12 @@ const UsersPage = ({ users = [], isLoading, onDownloadExcel, sideActions = [] })
   const onFilter = useMemo(() => createFilter(filters, { username: {}, firstName: {}, lastName: {}, state: { fullMatch: true } }), [filters]);
   const { useSideActions, handleFilteredElementsChange } = useListPageSideActions({
     sideActions,
+    onRefetch,
     onDownloadExcel,
+    entity: ENTITIES.USERS,
+    queryKey: LIST_USERS_QUERY_KEY,
+    pageName: PAGES.USERS.NAME,
+    updateTooltip: "Actualizar usuarios",
     downloadTooltip: "Descargar usuarios en Excel",
   });
   const handleFilteredUsersChange = useCallback(handleFilteredElementsChange, [handleFilteredElementsChange]);
@@ -33,9 +38,12 @@ const UsersPage = ({ users = [], isLoading, onDownloadExcel, sideActions = [] })
       <FormProvider {...methods}>
         <Form onSubmit={onSubmit}>
           <Filters
+            entity={ENTITIES.USERS}
+            onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
             appliedCount={appliedCount}
             hydrated={hydrated}
+            showRefetchAction={!useSideActions}
           >
             <DropdownControlled
               minWidth="150px"

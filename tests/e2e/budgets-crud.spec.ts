@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page, type Request, type Route } from "@playwright/test";
 import { apiPathEndsWith, expectSuccessfulApiResponse, getApiResponseBody, isApiResponse } from "./support/api";
 import { loginAsE2EUser } from "./support/auth";
+import { E2E_ACCOUNTS } from "./support/env";
 import {
   addAddress,
   addPhone,
@@ -442,7 +443,7 @@ const completeBudgetDeliveries = async (page: Page, timestamp: number) => {
 
 test.describe("budgets", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsE2EUser(page);
+    await loginAsE2EUser(page, { accountName: E2E_ACCOUNTS.modulesEnabled });
   });
 
   test("creates a draft budget, moves it to pending, and confirms it", async ({ page }) => {

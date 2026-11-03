@@ -3,10 +3,10 @@ import { CONTENT_SIZES, FIELD_LABELS } from "@/common/constants";
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/common/utils";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "../../common/components/tooltips";
 
-export const CUSTOMER_CATALOG_QUERY_KEY = 'customerCatalog';
+export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
 export const GET_CUSTOMER_QUERY_KEY = 'getCustomer';
 export const CUSTOMERS_FILTERS_KEY = 'customersFilters';
-export const CUSTOMER_SORT_FIELDS = { id: 'id', name: 'name', state: 'state' };
+export const LIST_ATTRIBUTES = ['id', 'name', 'addresses', 'phoneNumbers', 'comments', "state", "tags"];
 
 export const HEADERS = [
   {
@@ -16,6 +16,7 @@ export const HEADERS = [
     sortable: true,
     width: 1,
     value: (customer) => customer.id,
+    sortValue: (customer) => customer.id ?? ""
   },
   {
     id: 2,
@@ -38,12 +39,13 @@ export const HEADERS = [
         </Flex>
       );
     },
+    sortValue: (customer) => customer.name ?? ""
   },
   {
     id: 3,
     title: FIELD_LABELS.ADDRESS,
     key: "addresses",
-    sortable: false,
+    sortable: true,
     width: 4,
     align: "left",
     value: (customer) => {
@@ -57,6 +59,7 @@ export const HEADERS = [
         </Flex>
       );
     },
+    sortValue: (customer) => customer.addresses?.[0]?.address ?? ""
   },
   {
     id: 4,
@@ -93,7 +96,7 @@ export const CUSTOMER_STATES = {
 };
 
 export const EMPTY_CUSTOMER = { name: '', phoneNumbers: [], addresses: [], emails: [], comments: '' };
-export const EMPTY_FILTERS = { name: '', state: '' };
+export const EMPTY_FILTERS = { name: '', state: CUSTOMER_STATES.ACTIVE.id };
 
 export const CUSTOMER_STATES_OPTIONS = Object.values(CUSTOMER_STATES)
   .map(({ id, title, color }) => ({

@@ -9,7 +9,7 @@ import { useState } from "react";
 import { Controller } from "react-hook-form";
 import { Accordion, Checkbox } from "semantic-ui-react";
 import styled from "styled-components";
-import { SalesDateRangesControlled } from "./SalesDateRangesControlled";
+import { HistoryDateRangesControlled } from "./HistoryDateRangesControlled";
 
 const PublicBudgetCheckbox = styled(Checkbox)`
   &&& label {
@@ -65,7 +65,7 @@ const General = () => {
                     </FlexColumn>
                   )}
                 />
-                <SalesDateRangesControlled />
+                <HistoryDateRangesControlled />
               </FlexColumn>
             </AnimatedInner>
           </AnimatedContent>

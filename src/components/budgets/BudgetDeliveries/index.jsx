@@ -1,13 +1,13 @@
-import { productDetailOptions } from "@/api/products";
+import { useListProducts } from "@/api/products";
 import { useConsumeStock } from "@/api/stock";
 import { IconedButton } from "@/common/components/buttons";
 import { Box, FieldsContainer, Flex, OverflowWrapper } from "@/common/components/custom";
 import { NumberField, TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import { Table } from "@/common/components/table";
-import { CONTENT_SIZES, POPUP_POSITIONS, COLORS, ICONS, IN_MS } from "@/common/constants";
+import { CONTENT_SIZES, POPUP_POSITIONS, COLORS, ICONS } from "@/common/constants";
 import { showWarningToast } from "@/common/utils";
-import { useMutation, useQueries } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import styled from "styled-components";
@@ -56,10 +56,6 @@ const DeliveriesActionsRow = styled(Flex)`
   }
 `;
 
-const getDisabledStockControlIds = (results) => getStockControlDisabledProductIds(
-  results.filter(({ isSuccess, fetchStatus }) => isSuccess && fetchStatus === "idle").map(({ data }) => data)
-);
-
 const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => {
   const consumeStock = useConsumeStock();
 
@@ -70,6 +66,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
   const [deliveryNote, setDeliveryNote] = useState("");
   const [mode, setMode] = useState(null);
   const { isMobile, showText } = useBudgetActionButtonMode();
+  const { data: currentProductsData } = useListProducts();
 
   const watchedProducts = useWatch({ control, name: "products" });
 
@@ -78,16 +75,10 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
     [watchedProducts]
   );
 
-  const productQueries = useMemo(() => {
-    const productIds = new Set(products.map(({ id }) => id).filter(Boolean));
-    return Array.from(productIds, (id) => ({
-      ...productDetailOptions(id),
-      staleTime: IN_MS.ONE_MINUTE,
-      refetchOnMount: true,
-    }));
-  }, [products]);
-  const disabledStockControlIds = useQueries({ queries: productQueries, combine: getDisabledStockControlIds });
-  const stockControlDisabledProductIds = useMemo(() => new Set(disabledStockControlIds), [disabledStockControlIds]);
+  const stockControlDisabledProductIds = useMemo(
+    () => new Set(getStockControlDisabledProductIds(currentProductsData?.products ?? [])),
+    [currentProductsData?.products]
+  );
 
   const operableProducts = useMemo(() => {
     if (!products?.length) return [];

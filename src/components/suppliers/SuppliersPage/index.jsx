@@ -1,30 +1,50 @@
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
-import { CONTENT_SIZES, FIELD_LABELS, PAGES, SORTING } from "@/common/constants";
+import { CONTENT_SIZES, ENTITIES, FIELD_LABELS, PAGES } from "@/common/constants";
+import { createFilter } from "@/common/utils";
 import { useListPageSideActions } from "@/components/layout";
+import { useFilters } from "@/hooks";
+import { useCallback, useMemo } from "react";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
-import { SUPPLIER_SORT_FIELDS, SUPPLIERS_COLUMNS, SUPPLIER_STATES_OPTIONS } from "../suppliers.constants";
+import { EMPTY_FILTERS, LIST_SUPPLIERS_QUERY_KEY, SUPPLIERS_COLUMNS, SUPPLIERS_FILTERS_KEY, SUPPLIER_STATES_OPTIONS } from "../suppliers.constants";
 
-const SuppliersPage = ({ isLoading, suppliers = [], list, total, sideActions = [] }) => {
+const SuppliersPage = ({ isLoading, suppliers = [], onRefetch, onDownloadExcel, sideActions = [] }) => {
   const {
     onRestoreFilters,
     onSubmit,
+    filters,
+    setFilters,
     methods,
     appliedCount,
     hydrated
-  } = list;
+  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: SUPPLIERS_FILTERS_KEY });
 
-  useListPageSideActions({ sideActions });
+  const onFilter = useMemo(() => createFilter(filters, { id: {}, name: {}, state: { fullMatch: true } }), [filters]);
+  const { useSideActions, handleFilteredElementsChange } = useListPageSideActions({
+    sideActions,
+    onRefetch,
+    onDownloadExcel,
+    entity: ENTITIES.SUPPLIERS,
+    queryKey: LIST_SUPPLIERS_QUERY_KEY,
+    pageName: PAGES.SUPPLIERS.NAME,
+    updateTooltip: "Actualizar proveedores",
+    downloadTooltip: "Descargar proveedores en Excel",
+    showUpdateTooltipWhenExpanded: true,
+  });
+  const handleFilteredSuppliersChange = useCallback(handleFilteredElementsChange, [handleFilteredElementsChange]);
 
   return (
     <>
       <FormProvider {...methods}>
         <Form onSubmit={onSubmit}>
           <Filters
+            entity={ENTITIES.SUPPLIERS}
+            onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
             appliedCount={appliedCount}
             hydrated={hydrated}
+            showRefetchAction={!useSideActions}
           >
             <DropdownControlled
               minWidth="150px"
@@ -32,7 +52,8 @@ const SuppliersPage = ({ isLoading, suppliers = [], list, total, sideActions = [
               name="state"
               label={FIELD_LABELS.STATE}
               options={SUPPLIER_STATES_OPTIONS}
-              clearable
+              defaultValue={EMPTY_FILTERS.state}
+              afterChange={onSubmit}
             />
             <TextControlled
               name="id"
@@ -56,21 +77,12 @@ const SuppliersPage = ({ isLoading, suppliers = [], list, total, sideActions = [
         headers={SUPPLIERS_COLUMNS}
         elements={suppliers}
         page={PAGES.SUPPLIERS}
+        onFilter={onFilter}
         paginate
-        serverPagination={{
-          hydrated,
-          pageNumber: list.pageNumber,
-          pageSize: list.pageSize,
-          total,
-          sorting: {
-            key: Object.keys(SUPPLIER_SORT_FIELDS).find((key) => SUPPLIER_SORT_FIELDS[key] === list.sort),
-            direction: list.order === "desc" ? SORTING.DESC : SORTING.ASC,
-          },
-          sortFields: SUPPLIER_SORT_FIELDS,
-          onPageChange: list.setPageNumber,
-          onPageSizeChange: list.setPageSize,
-          onSortChange: list.setSorting,
-        }}
+        filters={filters}
+        setFilters={setFilters}
+        onDownloadExcel={useSideActions ? undefined : onDownloadExcel}
+        onFilteredElementsChange={useSideActions ? handleFilteredSuppliersChange : undefined}
       />
     </>
   );
