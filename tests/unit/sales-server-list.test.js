@@ -14,6 +14,8 @@ const constants = {
   ENTITIES: { BUDGETS: "budgets", CUSTOMERS: "customers" }, ALL: "all",
   IN_MS: {}, CONTENT_SIZES: {}, COLORS: {}, DATE_FORMATS: { ISO: "YYYY-MM-DDTHH:mm:ss" }, ERROR_MESSAGES: { REQUIRED_FIELD_SHORT: "Campo requerido" }, FIELD_LABELS: {}, ICONS: {}, POPUP_POSITIONS: {},
   SELECT_ALL_OPTION: { value: "all" }, SORTING: { ASC: "ascending", DESC: "descending" },
+  toApiSorting: (direction) => direction === "descending" ? "DESC" : "ASC",
+  toUiSorting: (order) => order === "DESC" ? "descending" : "ascending",
   DEFAULT_PAGE_SIZE: 20, PAGE_SIZE_OPTIONS: [{ value: 20 }, { value: 100 }], SHORTKEYS: {},
   PAGES: { BUDGETS: { DRAFT: (id) => `/draft/${id}`, SHOW: (id) => `/budget/${id}` } },
 };
@@ -55,7 +57,7 @@ const settled = (observer) => new Promise((resolve, reject) => {
   unsubscribe = observer.subscribe(check);
   check(observer.getCurrentResult());
 });
-const setup = (t) => {
+const setup = (t, { foreignCustomerId, missingProductsPage } = {}) => {
   const client = new QueryClient({ defaultOptions: { queries: { gcTime: Infinity, retry: false } } });
   t.after(() => client.clear());
   const calls = [];
@@ -65,7 +67,12 @@ const setup = (t) => {
     if (failPage === options.params.pageNumber) throw new Error("Page failed");
     const length = options.params.pageSize === 500 ? (options.params.pageNumber === 3 ? 200 : 500) : 20;
     const offset = (options.params.pageNumber - 1) * options.params.pageSize;
-    return { data: { statusOk: true, [url]: Array.from({ length }, (_, id) => ({ id: offset + id })), count: "1200", LastEvaluatedKey: {} } };
+    const items = Array.from({ length }, (_, id) => ({
+      id: offset + id,
+      ...(options.params.customerId && { customer: { id: foreignCustomerId ?? options.params.customerId } }),
+      ...(options.params.includeProducts && options.params.pageNumber !== missingProductsPage && { products: [] }),
+    }));
+    return { data: { statusOk: true, [url]: items, count: "1200", LastEvaluatedKey: {} } };
   } }) };
   const paged = load("src/api/pagedLists.js", { "./axios": axios });
   const common = Object.fromEntries(["useCreateItem", "useEditItem", "usePatchItem", "useDeleteItem", "usePostUpdateItem"]
@@ -84,7 +91,7 @@ const setup = (t) => {
     "@/fetchUrls": { PATHS: constants.ENTITIES }, "./axios": axios, "./common": common, "./pagedLists": paged,
   });
   const range = { startDate: "2025-11-02T12:00:00", endDate: "2026-11-02T12:00:00" };
-  const state = { appliedFilters: { ...budgetConstants.SALES_FILTERS, ...range }, hydrated: true, pageNumber: 1, pageSize: 20, sort: "id", order: "asc" };
+  const state = { appliedFilters: { ...budgetConstants.SALES_FILTERS, ...range }, hydrated: true, pageNumber: 1, pageSize: 20, sort: "id", order: "ASC" };
   const request = (value = state) => api.getBudgetListState(value, { settingsReady: true });
   const options = (value = state) => paged.serverListQueryOptions(client, api.usePagedBudgets(request(value)));
   const hook = (fn) => {
@@ -101,7 +108,7 @@ test("Sales paging keeps applied range and sends count=false after the first tot
   const observer = new QueryObserver(a.client, a.options());
   t.after(observer.subscribe(() => {}));
   await settled(observer);
-  assert.deepEqual(plain(a.calls[0].params), { ...a.range, pageNumber: 1, pageSize: 20, sort: "id", order: true, count: true });
+  assert.deepEqual(plain(a.calls[0].params), { ...a.range, pageNumber: 1, pageSize: 20, sort: "id", order: "ASC", count: true });
   observer.setOptions(a.options({ ...a.state, pageNumber: 2 }));
   await settled(observer);
   assert.equal(a.calls.length, 2);
@@ -109,6 +116,121 @@ test("Sales paging keeps applied range and sends count=false after the first tot
   assert.equal(a.calls[1].params.count, false);
   assert.equal(a.calls[1].params.startDate, a.range.startDate);
   assert.equal(a.calls[1].params.endDate, a.range.endDate);
+});
+
+test("Customer budgets keep exact route ID, optional dates and a count per scoped dataset", async (t) => {
+  const a = setup(t);
+  const getOptions = (customerId, overrides) => a.paged.serverListQueryOptions(a.client, a.api.usePagedBudgets(
+    a.api.getCustomerBudgetListState({
+      ...a.state,
+      appliedFilters: { ...budgetConstants.SALES_FILTERS, customer: "Nombre anterior", state: "DRAFT" },
+      ...overrides,
+    }, customerId),
+  ));
+  assert.equal(getOptions("").enabled, false);
+  assert.equal(getOptions("A1", { appliedFilters: { startDate: a.range.startDate } }).enabled, false);
+  const observer = new QueryObserver(a.client, getOptions("A1"));
+  t.after(observer.subscribe(() => {}));
+  await settled(observer);
+  assert.deepEqual(plain(a.calls[0].params), {
+    customerId: "A1", state: "DRAFT", pageNumber: 1, pageSize: 20, sort: "id", order: "ASC", count: true,
+  });
+  observer.setOptions(getOptions("A1", { sort: budgetConstants.BUDGET_SORT_FIELDS.total, order: "DESC" }));
+  await settled(observer);
+  observer.setOptions(getOptions("A1", { pageNumber: 2, sort: budgetConstants.BUDGET_SORT_FIELDS.total, order: "DESC" }));
+  await settled(observer);
+  assert.deepEqual(a.calls.slice(1).map(({ params }) => plain(params)), [1, 2].map((pageNumber) => ({
+    customerId: "A1", state: "DRAFT", pageNumber, pageSize: 20, sort: "total", order: "DESC", count: false,
+  })));
+  observer.setOptions(getOptions("A2", { appliedFilters: a.range, sort: "total", order: "DESC" }));
+  await settled(observer);
+  assert.deepEqual(plain(a.calls[3].params), {
+    customerId: "A2", ...a.range, pageNumber: 1, pageSize: 20, sort: "createdAt", order: "DESC", count: true,
+  });
+});
+
+test("Customer budget export uses all applied pages and rejects a result outside the customer scope", async (t) => {
+  const a = setup(t);
+  const request = a.api.getCustomerBudgetListState({
+    ...a.state, pageNumber: 4, sort: budgetConstants.BUDGET_SORT_FIELDS.paidAmount, order: "DESC",
+    appliedFilters: { state: "CONFIRMED", paymentStatus: "PAID" },
+  }, "A1");
+  const budgetsList = await a.api.fetchCustomerBudgetsForExport(request);
+  assert.equal(budgetsList.length, 1200);
+  assert.ok(budgetsList.every((budget) => budget.customer.id === "A1"));
+  assert.deepEqual(a.calls.map(({ params }) => plain(params)), [1, 2, 3].map((pageNumber) => ({
+    customerId: "A1", state: "CONFIRMED", paymentStatus: "PAID",
+    sort: "paidAmount", order: "DESC", pageNumber, pageSize: 500, count: pageNumber === 1, includeProducts: true,
+  })));
+
+  const mixed = setup(t, { foreignCustomerId: "A2" });
+  await assert.rejects(mixed.api.fetchCustomerBudgetsForExport(request), /otro cliente/);
+  await assert.rejects(mixed.api.fetchCustomerBudgetsForExport({ appliedFilters: {} }), /ID del cliente/);
+});
+
+test("Sales export requests snapshots for every filtered page and rejects a missing snapshot", async (t) => {
+  const a = setup(t);
+  const request = a.request({ ...a.state, sort: "createdAt", appliedFilters: {
+    ...a.state.appliedFilters, customer: "Ana", state: "CONFIRMED", createdBy: "Vendedor",
+  } });
+  const budgetsList = await a.api.fetchBudgetsForExport(request);
+  assert.equal(budgetsList.length, 1200);
+  assert.deepEqual(a.calls.map(({ params }) => plain(params)), [1, 2, 3].map((pageNumber) => ({
+    ...a.range, customerName: "Ana", createdBy: "Vendedor", state: "CONFIRMED",
+    sort: "createdAt", order: "ASC", pageNumber, pageSize: 500, count: pageNumber === 1, includeProducts: true,
+  })));
+
+  const missing = setup(t, { missingProductsPage: 2 });
+  await assert.rejects(missing.api.fetchBudgetsForExport(request), /no devolvió los productos/);
+});
+
+test("Budget workbooks keep the historical summary and each snapshot in its own product column", () => {
+  const utils = load("src/common/utils/index.js", {
+    "../constants": constants, "./dates": dates, "./pluralization": {}, "./toasts": {},
+  });
+  const products = load("src/components/products/products.utils.js", {
+    "./products.constants": { PRODUCT_STATES: {} },
+  });
+  const { getBudgetsExcelRows } = load("src/components/budgets/budgets.utils.js", {
+    "@/common/components/custom": {}, "@/common/constants": constants, "@/common/utils": utils,
+    "@/common/utils/dates": { getFormatedDate: () => "02-11-2026 12:00" },
+    "@/components/products/products.utils": products, "../../common/components/form": {},
+    "./budgets.constants": budgetConstants,
+  });
+  const budget = { state: "CONFIRMED", customer: { name: "Ana" }, total: 1450, globalDiscount: 5, additionalCharge: 0, createdBy: "Vendedor" };
+  const regular = { id: "P1", name: "Tornillo histórico", quantity: 2, price: 80, discount: 0 };
+  const fraction = { id: "P2", name: "Cable histórico", quantity: 2, price: 100, discount: 10,
+    fractionConfig: { active: true, value: "3", unit: "m", price: 300 } };
+  const rows = plain(getBudgetsExcelRows([
+    { ...budget, id: "B1", products: [regular] },
+    { ...budget, id: "B2", products: [fraction, regular] },
+    { ...budget, id: "B3", products: [] },
+  ]));
+  assert.deepEqual(rows[0], ["ID", "Estado", "Cliente", "Fecha", "Total", "Descuento", "Cargo adicional", "Vendedor", "Producto 1", "Producto 2"]);
+  assert.deepEqual(rows[1].slice(0, 8), ["B1", "Confirmado", "Ana", "02-11-2026 12:00", 1450, "5 % ", "0 % ", "Vendedor"]);
+  assert.deepEqual(rows[1].slice(8), ["Id: P1, Cantidad: 2, Nombre: Tornillo histórico, Precio: 80, Descuento: % 0, Total: 160;"]);
+  assert.equal(rows[2][8], "Id: P2, Cantidad: 2, Nombre: Cable histórico x 3 m, Precio: 100, Descuento: % 10, Total: 540;");
+  assert.equal(rows[2][9], rows[1][8]);
+  assert.deepEqual(rows[3].slice(8), []);
+});
+
+test("Detail Excel filenames sanitize entity names and fall back to a single ID", () => {
+  const writes = [];
+  const { downloadExcel, getEntityExcelFileName } = load("src/common/utils/index.js", {
+    "../constants": constants, "./dates": dates, "./pluralization": {}, "./toasts": {},
+    xlsx: { utils: { aoa_to_sheet() {}, book_new() {}, book_append_sheet() {} }, writeFile: (_, name) => writes.push(name) },
+  });
+  for (const [entity, name, id, expected] of [
+    ["customer", "  Juan  Pérez /:*?  ", "A1917", "Presupuestos - Juan Pérez - A1917.xlsx"],
+    ["brand", "Samsung", "AA", "Productos - Marca Samsung - AA.xlsx"],
+    ["brand", " - Samsung - - Argentina - ", "AA", "Productos - Marca Samsung - Argentina - AA.xlsx"],
+    ["supplier", "Aceros || Solano", "AB", "Productos - Proveedor Aceros Solano - AB.xlsx"],
+    ["customer", "  <>:?  ", "A1917", "Presupuestos - A1917.xlsx"],
+    ["brand", undefined, "AA", "Productos - Marca AA.xlsx"],
+  ]) {
+    downloadExcel([], getEntityExcelFileName(entity, name, id));
+    assert.equal(writes.at(-1), expected);
+  }
 });
 
 test("Sales draft stays out of requests; Buscar maps all applied filters and recounts, including repeated Search", async (t) => {
@@ -125,21 +247,21 @@ test("Sales draft stays out of requests; Buscar maps all applied filters and rec
   assert.equal(a.calls.length, 2);
   assert.deepEqual(plain(a.calls[1].params), {
     id: "B1", customerName: "Ana", createdBy: "Vendedor Uno", state: "CONFIRMED", paymentStatus: "PAID",
-    ...a.range, pageNumber: 1, pageSize: 20, sort: "id", order: true, count: true,
+    ...a.range, pageNumber: 1, pageSize: 20, sort: "id", order: "ASC", count: true,
   });
   await a.paged.refreshServerList(a.client, "budgets", a.request(next));
-  assert.equal(a.calls.length, 3, "refresh must use the same boolean-order query key");
+  assert.equal(a.calls.length, 3, "refresh must use the same sort query key");
   assert.equal(a.calls[2].params.count, true);
 });
 
 test("Sales payment mapping sends PAID/PENDING only for CONFIRMED", () => {
   for (const paymentStatus of ["PAID", "PENDING"]) {
-    const state = { appliedFilters: { state: "CONFIRMED", paymentStatus }, hydrated: true, order: "desc" };
+    const state = { appliedFilters: { state: "CONFIRMED", paymentStatus }, hydrated: true, order: "DESC" };
     const api = load("src/api/budgets.js", { "@/common/constants": constants, "@/components/budgets/budgets.constants": {},
       "@/fetchUrls": {}, "./axios": {}, "./common": {}, "./pagedLists": {}, "@/components/budgets/salesDateRange": salesDates });
     const range = { settingsReady: true };
     assert.equal(api.getBudgetListState(state, range).appliedFilters.paymentStatus, paymentStatus);
-    assert.equal(api.getBudgetListState(state, range).order, false);
+    assert.equal(api.getBudgetListState(state, range).order, "DESC");
     assert.equal(api.getBudgetListState({ ...state, appliedFilters: { state: "PENDING", paymentStatus } }, range).appliedFilters.paymentStatus, undefined);
   }
 });
@@ -169,7 +291,7 @@ test("Sales never queries an invalid range; applying dates and Reset recount whi
   assert.equal(a.calls.length, 1);
   assert.equal(a.calls[0].params.count, true);
   assert.equal(a.calls[0].params.pageNumber, 1);
-  for (const update of [{ pageNumber: 2 }, { sort: "createdAt", order: "desc", pageNumber: 1 }]) {
+  for (const update of [{ pageNumber: 2 }, { sort: "createdAt", order: "DESC", pageNumber: 1 }]) {
     state = { ...state, ...update };
     observer.setOptions(a.options(state));
     await settled(observer);
@@ -186,22 +308,21 @@ test("Sales never queries an invalid range; applying dates and Reset recount whi
   assert.equal(a.calls.at(-1).params.endDate, a.range.endDate);
 });
 
-test("Sales sort whitelist maps Fecha to createdAt with local boolean order and rejects unsupported stored sorts", async (t) => {
+test("Sales restores supported sort fields with ASC/DESC and rejects an unsupported stored sort", async (t) => {
   const a = setup(t);
   const configuration = { defaultFilters: budgetConstants.SALES_FILTERS, sortFields: budgetConstants.BUDGET_SORT_FIELDS };
-  assert.deepEqual(plain(configuration.sortFields), { id: "id", date: "createdAt" });
-  for (const key of ["customer", "total", "paidAmount", "pendingAmount", "createdBy"]) {
-    assert.equal(filters.getServerListState(configuration, { sorting: { key } }).sort, "id");
+  const expectedFields = { id: "id", customer: "customerName", date: "createdAt", total: "total", paidAmount: "paidAmount", createdBy: "createdBy" };
+  assert.deepEqual(plain(configuration.sortFields), expectedFields);
+  assert.equal(filters.getServerListState(configuration, { sorting: { key: "pendingAmount" } }).sort, "id");
+  for (const [key, sort] of Object.entries(expectedFields)) {
+    for (const [direction, order] of [["ascending", "ASC"], ["descending", "DESC"]]) {
+      const state = filters.getServerListState(configuration, { sorting: { key, direction } });
+      await a.client.fetchQuery(a.options({ ...state, appliedFilters: { ...state.appliedFilters, ...a.range }, hydrated: true }));
+      const { sort: requestedSort, order: requestedOrder, startDate, endDate } = a.calls.at(-1).params;
+      assert.deepEqual({ sort: requestedSort, order: requestedOrder, startDate, endDate }, { sort, order, ...a.range });
+    }
   }
-  for (const [direction, order] of [["ascending", true], ["descending", false]]) {
-    const state = filters.getServerListState(configuration, { sorting: { key: "date", direction } });
-    await a.client.fetchQuery(a.options({ ...state, appliedFilters: { ...state.appliedFilters, ...a.range }, hydrated: true }));
-    assert.equal(a.calls.at(-1).params.sort, "createdAt");
-    assert.equal(a.calls.at(-1).params.order, order);
-    assert.equal(a.calls.at(-1).params.startDate, a.range.startDate);
-    assert.equal(a.calls.at(-1).params.endDate, a.range.endDate);
-  }
-  assert.equal(a.calls.length, 2);
+  assert.equal(a.calls.length, 12);
 });
 
 test("Sales waits through placeholder and pending Settings, then requests the configured 12-month range once", async (t) => {
@@ -213,6 +334,9 @@ test("Sales waits through placeholder and pending Settings, then requests the co
     "@/api/budgets": { ...a.api, usePagedBudgets: (state) => { captured = state; return { total: null }; } },
     "@/api/pagedLists": a.paged, "@/api/settings": { useGetSetting: () => settings },
     "@/common/constants": constants,
+    "@/common/utils": {}, "@/components/budgets/budgets.utils": {},
+    "@/common/utils/dates": dates,
+    "@/hooks/useListExcelExport": { default: () => ({}) },
     "@/components/budgets/salesDateRange": { ...salesDates, getAutomaticBudgetRange: (months) => { ranges.push(months); return salesDates.getAutomaticBudgetRange(months, new Date("2026-11-02T12:00:00Z")); } },
     "@/common/utils/pluralization": {}, "@/components/budgets/budgets.constants": budgetConstants,
     "@/components/budgets/ServerBudgetsPage": { default: () => null },
@@ -279,7 +403,7 @@ test("Saving Settings invalidates the cached singular budget key and re-entry re
   assert.equal(calls, 2, "save must invalidate the one-hour cached budget query");
 });
 
-test("Sales table bypasses local filtering/export and exposes only ID and Fecha sorts", (t) => {
+test("Sales table bypasses local filtering/export and leaves Pendiente unsortable", (t) => {
   const a = setup(t);
   let table, form;
   const controls = [];
@@ -295,12 +419,13 @@ test("Sales table bypasses local filtering/export and exposes only ID and Fecha 
   }).default;
   const rows = [{ id: "B1", state: "HARD_DELETED" }];
   const submit = () => {};
-  renderToStaticMarkup(React.createElement(Page, { budgets: rows, list: {
-    ...a.state, appliedFilters: { state: "CONFIRMED" }, methods: {}, onSubmit: submit,
+  renderToStaticMarkup(React.createElement(Page, { budgetsList: rows, list: {
+    ...a.state, sort: "customerName", order: "DESC", appliedFilters: { state: "CONFIRMED" }, methods: {}, onSubmit: submit,
   } }));
   assert.equal(table.elements, rows, "do not remove rows from a backend page");
-  assert.deepEqual(Array.from(table.headers.filter((header) => header.sortable), (header) => header.key), ["id", "date"]);
-  for (const key of ["customer", "total", "paidAmount", "pendingAmount", "createdBy"]) assert.equal(table.headers.find((h) => h.key === key).sortable, false);
+  assert.deepEqual(Array.from(table.headers.filter((header) => header.sortable), (header) => header.key), ["id", "customer", "date", "total", "paidAmount", "createdBy"]);
+  assert.equal(table.headers.find((header) => header.key === "pendingAmount").sortable, false);
+  assert.deepEqual(plain(table.serverPagination.sorting), { key: "customer", direction: "descending" });
   assert.equal(table.onFilter, undefined);
   assert.equal(table.onDownloadExcel, undefined);
   assert.equal(form.onSubmit, submit);

@@ -23,7 +23,7 @@ const Users = () => {
     refetch();
   }, [setLabels, refetch]);
 
-  const users = useMemo(() => data?.users, [data]);
+  const usersList = useMemo(() => data?.users, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
   const handleDownloadExcel = useCallback((elements) => {
@@ -68,7 +68,7 @@ const Users = () => {
   return (
     <UsersPage
       isLoading={loading}
-      users={loading ? [] : users}
+      usersList={loading ? [] : usersList}
       role={role}
       onDownloadExcel={handleDownloadExcel}
       sideActions={sideActions}

@@ -528,6 +528,15 @@ export const SORTING = {
   DESC: 'descending'
 };
 
+export const API_SORTING = {
+  ASC: 'ASC',
+  DESC: 'DESC'
+};
+
+export const toApiSorting = (direction) => direction === SORTING.DESC ? API_SORTING.DESC : API_SORTING.ASC;
+
+export const toUiSorting = (order) => order === API_SORTING.DESC ? SORTING.DESC : SORTING.ASC;
+
 export const ENTITY_VIEW = {
   LIST: 'LIST',
   CREATE: 'CREATE',

@@ -24,6 +24,21 @@ export const getFormatedMargin = (price, cost) => {
   return `% ${roundedMargin}`;
 };
 
+export const getProductsExcelRows = (productsList) => [
+  ["Id", "Nombre", "Marca", "Proveedor", "Costo", "Precio", "Margen", "Estado", "Comentarios"],
+  ...productsList.map((product) => [
+    product.id,
+    product.name,
+    product.brandName,
+    product.supplierName,
+    product.cost,
+    product.price,
+    getFormatedMargin(product.price, product.cost),
+    PRODUCT_STATES[product.state]?.singularTitle || product.state,
+    product.comments,
+  ]),
+];
+
 export const getMargin = (price, cost) => {
   const safePrice = Number(price) || 0;
   const safeCost = Number(cost) || 0;

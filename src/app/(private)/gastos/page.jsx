@@ -78,7 +78,7 @@ const Expenses = () => {
   useKeyboardShortcuts(() => push(PAGES.EXPENSES.CREATE), SHORTKEYS.ENTER);
 
   return <ExpensesPage
-    isLoading={!hydrated || isFetching} expenses={data?.items ?? []}
+    isLoading={!hydrated || isFetching} expensesList={data?.items ?? []}
     list={{ ...list, appliedCount: Object.keys(requestState.appliedFilters).length }} total={total} sideActions={sideActions}
   />;
 };

@@ -25,7 +25,7 @@ const CashBalances = () => {
     refetch();
   }, [setLabels, refetch]);
 
-  const cashBalances = useMemo(() => data?.cashBalances, [data]);
+  const cashBalancesList = useMemo(() => data?.cashBalances, [data]);
   const { mutate, isPending } = useMutation({
     mutationFn: createCashBalance,
     onSuccess: async (response) => {
@@ -98,7 +98,7 @@ const CashBalances = () => {
     <>
       <CashBalancesPage
         isLoading={isLoading || isRefetching}
-        cashBalances={isPending ? [] : cashBalances}
+        cashBalancesList={isPending ? [] : cashBalancesList}
         paymentOptions={paymentMethodOptions}
         onDownloadExcel={handleDownloadExcel}
         sideActions={sideActions}

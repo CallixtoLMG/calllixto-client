@@ -1,14 +1,13 @@
 import { ALL, ENTITIES, IN_MS } from "@/common/constants";
-import { GET_BUDGET_QUERY_KEY } from "@/components/budgets/budgets.constants";
+import { BUDGET_SORT_FIELDS, GET_BUDGET_QUERY_KEY } from "@/components/budgets/budgets.constants";
 import { getBudgetDateRangeError } from "@/components/budgets/salesDateRange";
 import { CANCEL, CONFIRM, PATHS, URL } from "@/fetchUrls";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getInstance } from './axios';
-import { invalidateServerLists, usePagedList } from "./pagedLists";
 import { useCreateItem, useEditItem, usePatchItem } from "./common";
+import { fetchAllListPages, invalidateServerLists, usePagedList } from "./pagedLists";
 
-export const getBudgetListState = (state, { settingsReady }) => {
-  const applied = state.appliedFilters;
+const getAppliedBudgetFilters = (applied) => {
   const filters = {
     id: applied.id,
     customerName: applied.customer,
@@ -16,19 +15,61 @@ export const getBudgetListState = (state, { settingsReady }) => {
     state: applied.state,
     paymentStatus: applied.state === "CONFIRMED" ? applied.paymentStatus : "",
   };
+  return Object.fromEntries(Object.entries(filters).filter(([, value]) => value && value !== ALL));
+};
+
+export const getBudgetListState = (state, { settingsReady }) => {
+  const applied = state.appliedFilters;
   return {
     ...state,
     appliedFilters: {
-      ...Object.fromEntries(Object.entries(filters).filter(([, value]) => value && value !== ALL)),
+      ...getAppliedBudgetFilters(applied),
       startDate: applied.startDate,
       endDate: applied.endDate,
     },
-    order: state.order === "asc",
     hydrated: state.hydrated && settingsReady && !getBudgetDateRangeError(applied),
   };
 };
 
+export const getCustomerBudgetListState = (state, customerId) => {
+  const { id, createdBy, state: budgetState, paymentStatus, startDate, endDate } = state.appliedFilters;
+  const hasDateFilter = Boolean(startDate || endDate);
+  return {
+    ...state,
+    appliedFilters: {
+      ...getAppliedBudgetFilters({ id, createdBy, state: budgetState, paymentStatus }),
+      customerId,
+      ...(hasDateFilter && { startDate, endDate }),
+    },
+    // The API only applies a date range when sorting by createdAt.
+    sort: hasDateFilter ? BUDGET_SORT_FIELDS.date : state.sort,
+    hydrated: state.hydrated && !!customerId && (!hasDateFilter || !getBudgetDateRangeError({ startDate, endDate })),
+  };
+};
+
 export const usePagedBudgets = (state) => usePagedList({ ...state, entity: ENTITIES.BUDGETS, url: PATHS.BUDGETS });
+
+export const fetchBudgetsForExport = async ({ appliedFilters, sort, order }) => {
+  const budgetsList = await fetchAllListPages({
+    entity: ENTITIES.BUDGETS, url: PATHS.BUDGETS,
+    filters: { ...appliedFilters, includeProducts: true }, sort, order,
+  });
+  if (budgetsList.some((budget) => !Array.isArray(budget.products))) {
+    throw new Error("El servidor no devolvió los productos de todos los presupuestos.");
+  }
+  return budgetsList;
+};
+
+export const fetchCustomerBudgetsForExport = async (state) => {
+  const { customerId } = state.appliedFilters;
+  if (!customerId) throw new Error("Falta el ID del cliente.");
+
+  const budgetsList = await fetchBudgetsForExport(state);
+  if (budgetsList.some((budget) => budget.customer?.id !== customerId)) {
+    throw new Error("El listado devolvió presupuestos de otro cliente.");
+  }
+  return budgetsList;
+};
 
 export function useGetBudget(id) {
   const getBudget = async (id) => {

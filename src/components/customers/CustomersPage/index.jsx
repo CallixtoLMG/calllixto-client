@@ -1,12 +1,12 @@
 import { DropdownControlled, TextControlled } from '@/common/components/form';
 import { Filters, Table } from '@/common/components/table';
-import { CONTENT_SIZES, FIELD_LABELS, PAGES, SORTING } from "@/common/constants";
+import { CONTENT_SIZES, FIELD_LABELS, PAGES, toUiSorting } from "@/common/constants";
 import { useListPageSideActions } from "@/components/layout";
 import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
 import { CUSTOMER_SORT_FIELDS, CUSTOMER_STATES_OPTIONS, HEADERS } from "../customers.constants";
 
-const CustomersPage = ({ customers = [], isLoading, list, total, sideActions = [] }) => {
+const CustomersPage = ({ customersList = [], isLoading, list, total, sideActions = [] }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -48,7 +48,7 @@ const CustomersPage = ({ customers = [], isLoading, list, total, sideActions = [
         isLoading={isLoading}
         headers={HEADERS}
         page={PAGES.CUSTOMERS}
-        elements={customers}
+        elements={customersList}
         paginate
         serverPagination={{
           hydrated,
@@ -57,7 +57,7 @@ const CustomersPage = ({ customers = [], isLoading, list, total, sideActions = [
           total,
           sorting: {
             key: Object.keys(CUSTOMER_SORT_FIELDS).find((key) => CUSTOMER_SORT_FIELDS[key] === list.sort),
-            direction: list.order === "desc" ? SORTING.DESC : SORTING.ASC,
+            direction: toUiSorting(list.order),
           },
           sortFields: CUSTOMER_SORT_FIELDS,
           onPageChange: list.setPageNumber,

@@ -1,10 +1,37 @@
 import { Flex } from "@/common/components/custom";
 import { COLORS, DATE_FORMATS } from "@/common/constants";
-import { getFormatedPercentage } from "@/common/utils";
+import { getFormatedPercentage, handleUndefined } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import { getPrice, getTotal } from "@/components/products/products.utils";
 import { PriceLabel } from "../../common/components/form";
 import { BUDGET_STATES } from "./budgets.constants";
+
+export const getBudgetsExcelRows = (budgetsList) => {
+  const maxProducts = budgetsList.reduce((max, budget) => Math.max(max, budget.products.length), 1);
+  const productHeaders = Array.from({ length: maxProducts }, (_, index) => `Producto ${index + 1}`);
+  const headers = ["ID", "Estado", "Cliente", "Fecha", "Total", "Descuento", "Cargo adicional", "Vendedor", ...productHeaders];
+  const rows = budgetsList.map((budget) => {
+    const productCells = budget.products.map((product) => {
+      const { fractionConfig } = product;
+      const name = handleUndefined(product.name);
+      const productName = fractionConfig?.active ? `${name} x ${fractionConfig.value} ${fractionConfig.unit}` : name;
+      return `Id: ${handleUndefined(product.id)}, Cantidad: ${handleUndefined(product.quantity)}, Nombre: ${productName}, Precio: ${product.price ?? 0}, Descuento: % ${product.discount ?? 0}, Total: ${getTotal(product)};`;
+    });
+
+    return [
+      handleUndefined(budget.id),
+      handleUndefined(BUDGET_STATES[budget.state]?.singularTitle ?? budget.state),
+      handleUndefined(budget.customer?.name),
+      handleUndefined(getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)),
+      handleUndefined(budget.total),
+      getFormatedPercentage(budget.globalDiscount),
+      getFormatedPercentage(budget.additionalCharge),
+      handleUndefined(budget.createdBy),
+      ...productCells,
+    ];
+  });
+  return [headers, ...rows];
+};
 
 export const getBudgetListPopupContent = (budget) => {
   if (isBudgetConfirmed(budget?.state)) {

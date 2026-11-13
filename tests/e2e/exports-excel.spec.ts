@@ -235,8 +235,8 @@ const readExcelRows = (filePath: string) => {
 
 test.describe("exports", () => {
   for (const { entity, path, fileName, matches, batch, order, identity } of [
-    { entity: "customers", path: "/clientes", fileName: /lista de clientes\.xlsx$/i, matches: 520, batch: 500, order: "asc", identity: "name" as const },
-    { entity: "expenses", path: "/gastos", fileName: /lista de gastos\.xlsx$/i, matches: 34, batch: 20, order: "true", identity: "id" as const },
+    { entity: "customers", path: "/clientes", fileName: /lista de clientes\.xlsx$/i, matches: 520, batch: 500, order: "ASC", identity: "name" as const },
+    { entity: "expenses", path: "/gastos", fileName: /lista de gastos\.xlsx$/i, matches: 34, batch: 20, order: "ASC", identity: "id" as const },
   ]) {
     test(`exports all applied ${entity} across pages with a pending draft`, async ({ page }) => {
       await loginAsE2EUser(page);

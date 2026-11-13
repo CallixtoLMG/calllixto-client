@@ -14,6 +14,7 @@ const constants = {
   ENTITIES: { CUSTOMERS: "customers", SUPPLIERS: "suppliers" }, IN_MS: { ONE_HOUR: 3600000 },
   SORTING: { ASC: "ascending", DESC: "descending" }, CONTENT_SIZES: {}, FIELD_LABELS: {},
   PAGES: { CUSTOMERS: {}, SUPPLIERS: {} },
+  toUiSorting: (order) => order === "DESC" ? "descending" : "ascending",
 };
 const load = (file, dependencies) => {
   const source = fs.readFileSync(path.join(root, file), "utf8");
@@ -73,7 +74,7 @@ for (const config of [
       [`@/components/${config.entity}/${config.entity}.constants`]: entityConstants,
       "./axios": axios, "./common": common, "./pagedLists": { ...paged, usePagedList: (options) => options },
     });
-    const state = { appliedFilters: config.filters, pageNumber: 1, pageSize: 20, sort: "id", order: "asc", hydrated: true };
+    const state = { appliedFilters: config.filters, pageNumber: 1, pageSize: 20, sort: "id", order: "ASC", hydrated: true };
     const options = (value) => paged.serverListQueryOptions(client, api[`usePaged${collection}`](value));
     t.after(() => client.clear());
     return { client, calls, entityConstants, api, state, options, failExport: () => { failExport = true; }, failMutation: () => { mutationResult = { statusOk: false }; } };
@@ -87,7 +88,7 @@ for (const config of [
     assert.equal(adapter.calls.length, 1);
     assert.equal(adapter.calls[0].url, config.entity);
     assert.deepEqual(JSON.parse(JSON.stringify(adapter.calls[0].params)), {
-      ...config.filters, pageNumber: 1, pageSize: 20, sort: "id", order: "asc", count: true,
+      ...config.filters, pageNumber: 1, pageSize: 20, sort: "id", order: "ASC", count: true,
     });
     observer.setOptions(adapter.options({ ...adapter.state, pageNumber: 2 }));
     await settled(observer);
@@ -96,11 +97,11 @@ for (const config of [
     assert.equal(adapter.calls[1].params.name, config.filters.name);
     assert.equal(adapter.calls[1].params.count, false);
     const sortFields = adapter.entityConstants[config.sortKey];
-    observer.setOptions(adapter.options({ ...adapter.state, sort: sortFields.name, order: "desc" }));
+    observer.setOptions(adapter.options({ ...adapter.state, sort: sortFields.name, order: "DESC" }));
     await settled(observer);
     assert.equal(adapter.calls.length, 3);
     assert.equal(adapter.calls[2].params.sort, "name");
-    assert.equal(adapter.calls[2].params.order, "desc");
+    assert.equal(adapter.calls[2].params.order, "DESC");
     assert.equal(adapter.calls[2].params.pageNumber, 1);
     assert.equal(adapter.calls[2].params.count, false);
     let mutate;

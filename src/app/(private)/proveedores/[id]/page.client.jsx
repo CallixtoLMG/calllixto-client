@@ -3,18 +3,19 @@ import { useUserContext } from "@/User";
 import { useDeleteBySupplierId } from "@/api/products";
 import { supplierProductsOptions } from "@/api/productCatalogs";
 import { useDeleteSupplier, useEditSupplier, useSetSupplierState } from "@/api/suppliers";
-import { FieldsContainer, FormField, Message, MessageHeader, } from "@/common/components/custom";
+import { FieldsContainer, Flex, FormField, Message, MessageHeader, } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, PLACEHOLDERS, POPUP_POSITIONS } from "@/common/constants";
+import { ACTIVE, COLORS, ENTITIES, ICONS, INACTIVE, PAGES, PLACEHOLDERS, POPUP_POSITIONS } from "@/common/constants";
 import { downloadExcel, isItemInactive } from "@/common/utils";
 import { formatInteger } from "@/common/utils/numbers";
 import { OnlyPrint, useBreadcrumContext, useNavActionsContext, } from "@/components/layout";
 import { BatchImportStock } from "@/components/products/BatchImportStock";
-import { DISCOUNT_STOCK, PRODUCT_STATES, UPLOAD_STOCK } from "@/components/products/products.constants";
-import { getFormatedMargin, getProductAssociation } from "@/components/products/products.utils";
+import RelatedProducts from "@/components/products/RelatedProducts";
+import { DISCOUNT_STOCK, UPLOAD_STOCK } from "@/components/products/products.constants";
+import { getProductAssociation } from "@/components/products/products.utils";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { EXAMPLE_TEMPLATE_DATA_STOCK } from "@/components/suppliers/suppliers.constants";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges } from "@/hooks";
@@ -24,8 +25,10 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
+import { Tab } from "semantic-ui-react";
 
-const SupplierPageClient = ({ supplier }) => {
+const SupplierPageClient = ({ supplier, supplierId }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
   const { role } = useUserContext();
   const { push, refresh } = useRouter();
   const queryClient = useQueryClient();
@@ -253,44 +256,11 @@ const SupplierPageClient = ({ supplier }) => {
     confirmationAction === "deleteBatch";
 
   useEffect(() => {
+    if (activeIndex !== 0) return;
+
     const handleBarCodePrint = async () => {
       const items = await loadProducts("print");
       if (items) setPrintPending(true);
-    };
-
-    const handleDownloadExcel = async () => {
-      const items = await loadProducts("excel");
-      if (!items) return;
-      const headers = [
-        'Id',
-        'Nombre',
-        'Marca',
-        'Proveedor',
-        'Costo',
-        'Precio',
-        'Margen',
-        'Estado',
-        'Comentarios',
-      ];
-
-      const mappedProducts = items.map((product) => {
-        const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
-        return [
-          product.id,
-          product.name,
-          product.brandName,
-          product.supplierName,
-          product.cost,
-          product.price,
-          getFormatedMargin(product.price, product.cost),
-          productState,
-          product.comments,
-        ];
-      });
-      downloadExcel(
-        [headers, ...mappedProducts],
-        `Lista de productos de ${supplier.name}`,
-      );
     };
 
     let actions = [];
@@ -343,16 +313,6 @@ const SupplierPageClient = ({ supplier }) => {
         disabled: busy,
 
         items: [
-          {
-            id: "download-products",
-            icon: ICONS.DOWNLOAD,
-            color: COLORS.BLUE,
-            text: "Descargar productos del proveedor",
-            disabled: productToolsDisabled,
-            tooltip: stockExcelTooltip,
-            loading: activeAction === "excel",
-            onClick: productToolsDisabled ? undefined : handleDownloadExcel,
-          },
           {
             id: "upload-stock",
             disabled: productToolsDisabled,
@@ -431,31 +391,56 @@ const SupplierPageClient = ({ supplier }) => {
 
     setActions(actions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [role, supplier, products, hasAssociatedProducts, activeAction, isEditPending, loadProducts, canDeleteEntity, printPending, deletionTooltip]);
+  }, [activeIndex, role, supplier, products, hasAssociatedProducts, activeAction, isEditPending, loadProducts, canDeleteEntity, printPending, deletionTooltip]);
+
+  const details = (
+    <Tab.Pane>
+      <Flex $flexDirection="column" $rowGap="15px">
+        {!isItemInactive(supplier?.state) && toggleButton}
+        {isItemInactive(supplier?.state) && (
+          <FieldsContainer>
+            <FormField flex="1">
+              <Message negative>
+                <MessageHeader>Motivo de inactivación</MessageHeader>
+                <p>{supplier.inactiveReason}</p>
+              </Message>
+            </FormField>
+            <FormField flex="1" />
+            <FormField flex="1" />
+          </FieldsContainer>
+        )}
+        <SupplierForm
+          ref={formRef}
+          supplier={supplier}
+          onSubmit={mutateEdit}
+          isLoading={isEditPending}
+          isUpdating={isUpdating && !isItemInactive(supplier?.state)}
+          view
+          isDeletePending={isDeletePending}
+        />
+      </Flex>
+    </Tab.Pane>
+  );
+  const panes = [
+    { menuItem: "Proveedor", render: () => details },
+    {
+      menuItem: "Productos",
+      render: () => (
+        <Tab.Pane>
+          <RelatedProducts key={supplierId} entity={ENTITIES.SUPPLIER} id={supplierId} name={supplier.name} />
+        </Tab.Pane>
+      ),
+    },
+  ];
 
   return (
     <>
-      {!isItemInactive(supplier?.state) && toggleButton}
-      {isItemInactive(supplier?.state) && (
-        <FieldsContainer>
-          <FormField flex="1">
-            <Message negative>
-              <MessageHeader>Motivo de inactivación</MessageHeader>
-              <p>{supplier.inactiveReason}</p>
-            </Message>
-          </FormField>
-          <FormField flex="1" />
-          <FormField flex="1" />
-        </FieldsContainer>
-      )}
-      <SupplierForm
-        ref={formRef}
-        supplier={supplier}
-        onSubmit={mutateEdit}
-        isLoading={isEditPending}
-        isUpdating={isUpdating && !isItemInactive(supplier?.state)}
-        view
-        isDeletePending={isDeletePending}
+      <Tab
+        panes={panes}
+        activeIndex={activeIndex}
+        onTabChange={(_, { activeIndex: nextIndex }) => {
+          if (nextIndex !== activeIndex) handleProtectedAction(() => setActiveIndex(nextIndex));
+        }}
       />
       {!isUpdating && (
         <OnlyPrint>

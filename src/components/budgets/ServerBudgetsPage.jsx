@@ -2,11 +2,11 @@ import { Button, Icon } from "@/common/components/custom";
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
 import { FiltersContainer, HeaderSegment } from "@/common/components/table/styles";
-import { CONTENT_SIZES, ICONS, PAGES, SORTING } from "@/common/constants";
+import { CONTENT_SIZES, ICONS, PAGES, toUiSorting } from "@/common/constants";
 import { useListPageSideActions } from "@/components/layout";
 import { useEffect, useMemo } from "react";
 import { FormProvider, useWatch } from "react-hook-form";
-import { Form, Popup } from "semantic-ui-react";
+import { Form, Message, Popup } from "semantic-ui-react";
 import styled from "styled-components";
 import SalesDateFilters from "./SalesDateFilters";
 import { BUDGET_SORT_FIELDS, BUDGET_STATES, BUDGET_STATES_OPTIONS, PAYMENT_STATES_OPTIONS, getBudgetColumns } from "./budgets.constants";
@@ -18,6 +18,11 @@ const SalesFiltersForm = styled(Form)`
   flex-direction: column;
   gap: 10px;
   .react-datepicker-popper { z-index: 31; }
+`;
+
+const BudgetsTableLayer = styled.div`
+  .ui.table { isolation: isolate; }
+  .ui.loader { z-index: 1; }
 `;
 
 const FilterFields = styled.div`
@@ -34,7 +39,10 @@ const FilterFields = styled.div`
   }
 `;
 
-const ServerBudgetsPage = ({ budgets = [], list, total, isLoading, actions, sideActions, datePresets }) => {
+const ServerBudgetsPage = ({
+  budgetsList = [], list, total, isLoading, actions, sideActions, datePresets, customerScoped, error,
+  sortFields = BUDGET_SORT_FIELDS,
+}) => {
   const { methods, onSubmit, onRestoreDates, onRestoreFilters, hydrated, appliedCount } = list;
   const draftState = useWatch({ control: methods.control, name: "state" });
   const { setValue } = methods;
@@ -42,8 +50,8 @@ const ServerBudgetsPage = ({ budgets = [], list, total, isLoading, actions, side
     if (draftState !== BUDGET_STATES.CONFIRMED.id) setValue("paymentStatus", "");
   }, [draftState, setValue]);
   const headers = useMemo(() => getBudgetColumns(list.appliedFilters.state).map((header) => ({
-    ...header, sortable: Object.hasOwn(BUDGET_SORT_FIELDS, header.key),
-  })), [list.appliedFilters.state]);
+    ...header, sortable: Object.hasOwn(sortFields, header.key),
+  })), [list.appliedFilters.state, sortFields]);
   useListPageSideActions({ sideActions });
 
   return (
@@ -60,7 +68,7 @@ const ServerBudgetsPage = ({ budgets = [], list, total, isLoading, actions, side
                 </Button>
               )} />
               <FilterFields>
-                <SalesDateFilters presets={datePresets} disabled={!hydrated} />
+                <SalesDateFilters presets={datePresets} disabled={!hydrated} optional={customerScoped} />
               </FilterFields>
             </FiltersContainer>
           </HeaderSegment>
@@ -71,7 +79,9 @@ const ServerBudgetsPage = ({ budgets = [], list, total, isLoading, actions, side
                 width={CONTENT_SIZES.MIN} minWidth="150px" clearable
               />
               <TextControlled name="id" label="Id" placeholder="MI525" width="8vw" minWidth="100px" />
-              <TextControlled name="customer" label="Cliente" placeholder="Martín Bueno" width="13vw" minWidth="120px" />
+              {!customerScoped && (
+                <TextControlled name="customer" label="Cliente" placeholder="Martín Bueno" width="13vw" minWidth="120px" />
+              )}
               <TextControlled name="createdBy" label="Vendedor" placeholder="Nombre completo" width="13vw" minWidth="125px" />
               {draftState === BUDGET_STATES.CONFIRMED.id && (
                 <DropdownControlled
@@ -83,19 +93,25 @@ const ServerBudgetsPage = ({ budgets = [], list, total, isLoading, actions, side
           </Filters>
         </SalesFiltersForm>
       </FormProvider>
-      <Table
-        elements={budgets} headers={headers} page={PAGES.BUDGETS} actions={actions}
-        isLoading={isLoading} paginate color={BUDGET_STATES[list.appliedFilters.state]?.color} $ribbonOverflow
-        serverPagination={{
-          hydrated, total, pageNumber: list.pageNumber, pageSize: list.pageSize,
-          sorting: {
-            key: Object.keys(BUDGET_SORT_FIELDS).find((key) => BUDGET_SORT_FIELDS[key] === list.sort),
-            direction: list.order === "desc" ? SORTING.DESC : SORTING.ASC,
-          },
-          sortFields: BUDGET_SORT_FIELDS,
-          onPageChange: list.setPageNumber, onPageSizeChange: list.setPageSize, onSortChange: list.setSorting,
-        }}
-      />
+      {error ? (
+        <Message negative role="alert" header="No se pudieron cargar los presupuestos." content={error.message} />
+      ) : (
+        <BudgetsTableLayer>
+          <Table
+            elements={budgetsList} headers={headers} page={PAGES.BUDGETS} actions={actions}
+            isLoading={isLoading} paginate color={BUDGET_STATES[list.appliedFilters.state]?.color} $ribbonOverflow
+            serverPagination={{
+              hydrated, total, pageNumber: list.pageNumber, pageSize: list.pageSize,
+              sorting: {
+                key: Object.keys(sortFields).find((key) => sortFields[key] === list.sort),
+                direction: toUiSorting(list.order),
+              },
+              sortFields,
+              onPageChange: list.setPageNumber, onPageSizeChange: list.setPageSize, onSortChange: list.setSorting,
+            }}
+          />
+        </BudgetsTableLayer>
+      )}
     </>
   );
 };

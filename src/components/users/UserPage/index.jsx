@@ -9,7 +9,7 @@ import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
 import { EMPTY_FILTERS, USERS_FILTERS_KEY, USER_COLUMNS, USER_STATE_OPTIONS } from "../users.constants";
 
-const UsersPage = ({ users = [], isLoading, onDownloadExcel, sideActions = [] }) => {
+const UsersPage = ({ usersList = [], isLoading, onDownloadExcel, sideActions = [] }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -73,7 +73,7 @@ const UsersPage = ({ users = [], isLoading, onDownloadExcel, sideActions = [] })
       <Table
         isLoading={isLoading}
         headers={USER_COLUMNS}
-        elements={users}
+        elements={usersList}
         page={PAGES.USERS}
         onFilter={onFilter}
         paginate

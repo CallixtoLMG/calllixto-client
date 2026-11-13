@@ -1,23 +1,26 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useDeleteBrand, useEditBrand, useSetBrandState } from "@/api/brands";
-import { FieldsContainer, FormField, Message, MessageHeader } from "@/common/components/custom";
+import { FieldsContainer, Flex, FormField, Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES, PLACEHOLDERS } from "@/common/constants";
+import { ACTIVE, COLORS, DELETE, ENTITIES, ICONS, INACTIVE, PAGES, PLACEHOLDERS } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
-import { getProductAssociation } from "@/components/products/products.utils";
 import BrandForm from "@/components/brands/BrandForm";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import RelatedProducts from "@/components/products/RelatedProducts";
+import { getProductAssociation } from "@/components/products/products.utils";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
+import { Tab } from "semantic-ui-react";
 
 const BrandPageClient = ({ brand }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
   const { role } = useUserContext();
   const { push, refresh } = useRouter();
   const { setLabels } = useBreadcrumContext();
@@ -177,6 +180,8 @@ const BrandPageClient = ({ brand }) => {
   const requiresConfirmation = modalAction === DELETE;
 
   useEffect(() => {
+    if (activeIndex !== 0) return;
+
     if (brand) {
       const handleClick = (action) => () => handleProtectedAction(() => {
         setModalAction(action);
@@ -211,31 +216,56 @@ const BrandPageClient = ({ brand }) => {
       setActions(actions);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [role, brand, activeAction, isMutateStatePending, isDeletePending, setActions, canDelete, deletionTooltip]);
+  }, [activeIndex, role, brand, activeAction, isMutateStatePending, isDeletePending, setActions, canDelete, deletionTooltip]);
+
+  const details = (
+    <Tab.Pane>
+      <Flex $flexDirection="column" $rowGap="15px">
+        {!isItemInactive(brand?.state) && toggleButton}
+        {isItemInactive(brand?.state) && (
+          <FieldsContainer>
+            <FormField flex="1">
+              <Message negative>
+                <MessageHeader>Motivo de inactivación</MessageHeader>
+                <p>{brand.inactiveReason}</p>
+              </Message>
+            </FormField>
+            <FormField flex="1" />
+            <FormField flex="1" />
+          </FieldsContainer>
+        )}
+        <BrandForm
+          ref={formRef}
+          brand={brand}
+          onSubmit={mutateEdit}
+          isLoading={isEditPending}
+          isUpdating={isUpdating && !isItemInactive(brand?.state)}
+          view
+          isDeletePending={isDeletePending}
+        />
+      </Flex>
+    </Tab.Pane>
+  );
+  const panes = [
+    { menuItem: "Marca", render: () => details },
+    {
+      menuItem: "Productos",
+      render: () => (
+        <Tab.Pane>
+          <RelatedProducts key={brand.id} entity={ENTITIES.BRAND} id={brand.id} name={brand.name} />
+        </Tab.Pane>
+      ),
+    },
+  ];
 
   return (
     <>
-      {!isItemInactive(brand?.state) && toggleButton}
-      {isItemInactive(brand?.state) && (
-        <FieldsContainer>
-          <FormField flex="1">
-            <Message negative>
-              <MessageHeader>Motivo de inactivación</MessageHeader>
-              <p>{brand.inactiveReason}</p>
-            </Message>
-          </FormField>
-          <FormField flex="1" />
-          <FormField flex="1" />
-        </FieldsContainer>
-      )}
-      <BrandForm
-        ref={formRef}
-        brand={brand}
-        onSubmit={mutateEdit}
-        isLoading={isEditPending}
-        isUpdating={isUpdating && !isItemInactive(brand?.state)}
-        view
-        isDeletePending={isDeletePending}
+      <Tab
+        panes={panes}
+        activeIndex={activeIndex}
+        onTabChange={(_, { activeIndex: nextIndex }) => {
+          if (nextIndex !== activeIndex) handleProtectedAction(() => setActiveIndex(nextIndex));
+        }}
       />
       <UnsavedChangesModal
         open={showUnsavedModal}

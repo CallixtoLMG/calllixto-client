@@ -13,7 +13,14 @@ import { getBudgetListPopupContent, isBudgetCancelled, isBudgetConfirmed } from 
 export const GET_BUDGET_QUERY_KEY = 'getBudget';
 export const BUDGETS_FILTERS_KEY = 'budgetsFilters';
 export const SALES_FILTERS = { id: "", customer: "", createdBy: "", state: "", paymentStatus: "", startDate: "", endDate: "" };
-export const BUDGET_SORT_FIELDS = { id: "id", date: "createdAt" };
+export const BUDGET_SORT_FIELDS = {
+  id: "id",
+  customer: "customerName",
+  date: "createdAt",
+  total: "total",
+  paidAmount: "paidAmount",
+  createdBy: "createdBy",
+};
 
 export const BUDGET_STATES = {
   CONFIRMED: {

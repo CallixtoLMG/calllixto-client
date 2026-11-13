@@ -11,7 +11,7 @@ const { QueryClient, QueryClientProvider, QueryObserver } = require("@tanstack/r
 const root = path.join(__dirname, "..", "..");
 const constants = {
   DEFAULT_PAGE_SIZE: 20, PAGE_SIZE_OPTIONS: [10, 20, 50, 100].map((value) => ({ key: value, value, text: String(value) })),
-  SORTING: { ASC: "ascending", DESC: "descending" }, ENTITIES: { BRANDS: "brands" },
+  ENTITIES: { BRANDS: "brands" },
   SHORTKEYS: {}, ICONS: {}, COLORS: {}, CONTENT_SIZES: {}, SIZES: {}, POPUP_POSITIONS: {},
 };
 const configuration = { defaultFilters: { id: "", name: "", state: "" }, sortFields: { id: "id", name: "name", state: "state" } };
@@ -28,6 +28,17 @@ const load = (file, dependencies = {}) => {
   }, { filename: file });
   return loaded.exports;
 };
+const { SORTING, API_SORTING, toApiSorting, toUiSorting } = load("src/common/constants/index.js", {
+  "@/common/utils": { isNewFeature: () => false },
+  "@/roles": {},
+  "../components/custom": { Accent: "span" },
+  "../components/modals/ModalShortcuts/styles": { StyledListHeader: "div", StyledModalContent: "div" },
+  "./entities": { ENTITIES: constants.ENTITIES },
+  "./routes": {},
+  "./texts": { ERROR_MESSAGES: {} },
+  "./dates": {}, "./maintenance": {}, "./semantic": {}, "./session": {}, "./time": {},
+});
+Object.assign(constants, { SORTING, toApiSorting, toUiSorting });
 const filters = load("src/hooks/useServerListFilters.js", { "@/common/constants": constants });
 const createList = (t, respond = () => ({ data: { statusOk: true, brands: [], count: "1200" } })) => {
   const client = new QueryClient({ defaultOptions: { queries: { gcTime: Infinity, retry: false } } });
@@ -51,6 +62,21 @@ const settled = (observer) => new Promise((resolve, reject) => {
   check(observer.getCurrentResult());
 });
 
+test("server list sorting converts both directions and keeps the ascending fallbacks", () => {
+  assert.deepEqual(plain(SORTING), { ASC: "ascending", DESC: "descending" });
+  assert.deepEqual(plain(API_SORTING), { ASC: "ASC", DESC: "DESC" });
+  assert.equal(toApiSorting("ascending"), "ASC");
+  assert.equal(toApiSorting("descending"), "DESC");
+  assert.equal(toUiSorting("ASC"), "ascending");
+  assert.equal(toUiSorting("DESC"), "descending");
+  for (const value of [undefined, null, "", "desc", "DESC", true]) {
+    assert.equal(toApiSorting(value), "ASC");
+  }
+  for (const value of [undefined, null, "", "desc", "descending", true]) {
+    assert.equal(toUiSorting(value), "ascending");
+  }
+});
+
 test("preferences normalize page size and sorting before the query is enabled", async (t) => {
   for (const stored of [undefined, { page: 2, pageSize: 100, sorting: { key: "name", direction: "descending" } }]) {
     const list = createList(t);
@@ -65,12 +91,14 @@ test("preferences normalize page size and sorting before the query is enabled", 
     assert.equal(list.calls[0].params.pageSize, stored ? 100 : 20);
     assert.equal(list.calls[0].params.pageNumber, stored ? 2 : 1);
     assert.equal(list.calls[0].params.sort, stored ? "name" : "id");
-    assert.equal(list.calls[0].params.order, stored ? "desc" : "asc");
+    assert.equal(list.calls[0].params.order, stored ? "DESC" : "ASC");
   }
   const invalid = filters.getServerListState(configuration, { page: -2, pageSize: 999, sorting: { key: "toString" } });
   assert.equal(invalid.pageNumber, 1);
   assert.equal(invalid.pageSize, 20);
   assert.equal(invalid.sort, "id");
+  assert.equal(invalid.order, "ASC");
+  assert.equal(filters.getServerListState(configuration, { sorting: { key: "name", direction: "DESC" } }).order, "ASC");
 });
 
 test("draft stays outside requests; applying, repeating Search, paging, sorting and reset keep request semantics", async (t) => {
@@ -112,11 +140,12 @@ test("draft stays outside requests; applying, repeating Search, paging, sorting 
   assert.equal(list.calls.length, 5);
   assert.equal(list.calls[4].params.pageNumber, 1);
   assert.equal(list.calls[4].params.count, true);
-  state = { ...state, pageNumber: 1, pageSize: 50, sort: configuration.sortFields.name, order: "desc" };
+  state = { ...state, pageNumber: 1, pageSize: 50, sort: configuration.sortFields.name, order: "DESC" };
   observer.setOptions(list.options(state));
   await settled(observer);
   assert.equal(list.calls.length, 6);
   assert.equal(list.calls[5].params.sort, "name");
+  assert.equal(list.calls[5].params.order, "DESC");
   assert.equal(list.calls[5].params.pageSize, 50);
   assert.equal(list.calls[5].params.name, "Applied");
   assert.equal(list.calls[5].params.count, false);
@@ -191,11 +220,11 @@ test("export returns all applied matches with three numeric pages, without chang
     "@/fetchUrls": { PATHS: { BRANDS: "brands" } }, "@/components/brands/brands.constants": {},
   });
   const appliedFilters = { id: "", name: "Applied", state: "ACTIVE" };
-  const state = { ...list.initial, pageNumber: 4, appliedFilters, sort: "name", order: "desc", draft: { name: "Ignored" } };
+  const state = { ...list.initial, pageNumber: 4, appliedFilters, sort: "name", order: "DESC", draft: { name: "Ignored" } };
   assert.deepEqual(plain(await fetchBrandsForExport(state)), matches);
   assert.equal(state.pageNumber, 4);
   assert.deepEqual(plain(list.calls.map(({ params }) => params)), [1, 2, 3].map((pageNumber) => ({
-    ...appliedFilters, pageNumber, pageSize: 500, sort: "name", order: "desc", count: pageNumber === 1,
+    ...appliedFilters, pageNumber, pageSize: 500, sort: "name", order: "DESC", count: pageNumber === 1,
   })));
 });
 

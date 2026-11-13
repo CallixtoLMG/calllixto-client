@@ -14,7 +14,7 @@ import {
   getCashBalanceColumns
 } from "../cashBalances.constants";
 
-const CashBalancesPage = ({ cashBalances = [], isLoading, paymentOptions, onDownloadExcel, sideActions = [] }) => {
+const CashBalancesPage = ({ cashBalancesList = [], isLoading, paymentOptions, onDownloadExcel, sideActions = [] }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -26,11 +26,11 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, paymentOptions, onDown
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: CASH_BALANCES_FILTERS_KEY });
 
   const normalizedCashBalances = useMemo(() => {
-    return cashBalances.map(cashBalance => ({
+    return cashBalancesList.map(cashBalance => ({
       ...cashBalance,
       paymentMethodsText: cashBalance.paymentMethods?.join(", ") ?? ""
     }));
-  }, [cashBalances]);
+  }, [cashBalancesList]);
 
   const onFilter = useMemo(() => createFilter(filters, { id: {}, paymentMethods: { isArray: true, skipAll: true }, state: { fullMatch: true } }), [filters]);
   const { useSideActions, handleFilteredElementsChange } = useListPageSideActions({

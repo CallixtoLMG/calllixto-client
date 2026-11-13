@@ -14,6 +14,8 @@ const constants = {
   ALL: "all", ENTITIES: { EXPENSES: "expenses", EXPENSE: "expense", PAYMENTS: "payments", BUDGET: "budget" },
   IN_MS: {}, CONTENT_SIZES: {}, FIELD_LABELS: {}, ICONS: {}, COLORS: {}, SHORTKEYS: {},
   SELECT_ALL_OPTION: { value: "all" }, SORTING: { ASC: "ascending", DESC: "descending" },
+  toApiSorting: (direction) => direction === "descending" ? "DESC" : "ASC",
+  toUiSorting: (order) => order === "DESC" ? "descending" : "ascending",
   DEFAULT_PAGE_SIZE: 20, PAGE_SIZE_OPTIONS: [{ value: 20 }, { value: 100 }], PAGES: { EXPENSES: {} },
 };
 const plain = (value) => JSON.parse(JSON.stringify(value));
@@ -69,7 +71,7 @@ const setup = (t, respond) => {
     "@/common/constants": constants, "@/components/payments/payments.constants": { GET_PAYMENT_QUERY_KEY: "getPayments" },
     "@/fetchUrls": { PATHS: constants.ENTITIES }, "./axios": axios, "./common": common, "./pagedLists": paged,
   });
-  const state = { appliedFilters: { ...expenseConstants.EMPTY_FILTERS }, pageNumber: 1, pageSize: 20, sort: "id", order: "asc", hydrated: true };
+  const state = { appliedFilters: { ...expenseConstants.EMPTY_FILTERS }, pageNumber: 1, pageSize: 20, sort: "id", order: "ASC", hydrated: true };
   const options = (value = state) => paged.serverListQueryOptions(client, api.usePagedExpenses(api.getExpenseListState(value)));
   const hook = (fn) => {
     let result;
@@ -107,10 +109,10 @@ test("Expenses sends numeric pages, reuses count and ignores compatibility curso
   t.after(observer.subscribe(() => {}));
   await settled(observer);
   assert.equal(a.calls[0].url, "expenses");
-  assert.deepEqual(plain(a.calls[0].params), { pageNumber: 1, pageSize: 20, sort: "id", order: true, count: true });
+  assert.deepEqual(plain(a.calls[0].params), { pageNumber: 1, pageSize: 20, sort: "id", order: "ASC", count: true });
   observer.setOptions(a.options({ ...a.state, pageNumber: 2 }));
   await settled(observer);
-  assert.deepEqual(plain(a.calls[1].params), { pageNumber: 2, pageSize: 20, sort: "id", order: true, count: false });
+  assert.deepEqual(plain(a.calls[1].params), { pageNumber: 2, pageSize: 20, sort: "id", order: "ASC", count: false });
   assert.equal(a.calls.length, 2);
 });
 
@@ -124,7 +126,7 @@ test("Expenses applies only confirmed filters on Buscar, omits categories and To
   const applied = filters.applyServerListFilters({ ...a.state, pageNumber: 2 }, draft, expenseConstants.EMPTY_FILTERS);
   observer.setOptions(a.options(applied));
   await settled(observer);
-  assert.deepEqual(plain(a.calls[1].params), { id: "A1", name: "Internet", state: "PENDING", pageNumber: 1, pageSize: 20, sort: "id", order: true, count: true });
+  assert.deepEqual(plain(a.calls[1].params), { id: "A1", name: "Internet", state: "PENDING", pageNumber: 1, pageSize: 20, sort: "id", order: "ASC", count: true });
   assert.equal(a.api.getExpenseListState({ ...a.state, appliedFilters: draft }).appliedFilters.categories, undefined);
   assert.deepEqual(plain(a.api.getExpenseListState({ ...a.state, appliedFilters: { name: "all", state: "all" } }).appliedFilters), { name: "all" });
   const reset = filters.applyServerListFilters(applied, expenseConstants.EMPTY_FILTERS, expenseConstants.EMPTY_FILTERS);
@@ -143,7 +145,7 @@ test("Expenses whitelist contains only ID and adapts ASC/DESC locally", async (t
   for (const key of ["name", "amount", "categories", "paidAmount", "pendingAmount"]) {
     assert.equal(filters.getServerListState(configuration, { sorting: { key } }).sort, "id");
   }
-  for (const [order, expected] of [["asc", true], ["desc", false]]) {
+  for (const [order, expected] of [["ASC", "ASC"], ["DESC", "DESC"]]) {
     await a.client.fetchQuery(a.options({ ...a.state, order }));
     assert.equal(a.calls.at(-1).params.order, expected);
     assert.equal(a.calls.at(-1).params.sort, "id");
@@ -164,7 +166,7 @@ test("Expenses table passes the backend page intact and disables categories and 
   }).default;
   const rows = [{ id: "A1", state: "HARD_DELETED", categories: [] }];
   const submit = () => {};
-  renderToStaticMarkup(React.createElement(Page, { expenses: rows, list: { ...a.state, methods: {}, onSubmit: submit } }));
+  renderToStaticMarkup(React.createElement(Page, { expensesList: rows, list: { ...a.state, methods: {}, onSubmit: submit } }));
   assert.equal(table.elements, rows);
   for (const prop of ["onFilter", "onDownloadExcel", "onFilteredElementsChange", "filters", "setFilters"]) assert.equal(table[prop], undefined);
   assert.equal(form.onSubmit, submit);
@@ -175,7 +177,7 @@ test("Expenses table passes the backend page intact and disables categories and 
   assert.ok(table.headers.every((h) => h.sortValue === undefined));
 });
 
-test("Expenses filter apply uses the same boolean-order identity and disables export while the list is unavailable", async (t) => {
+test("Expenses filter apply uses the same sort identity and disables export while the list is unavailable", async (t) => {
   const a = setup(t);
   const restored = { ...a.state, appliedFilters: { state: "all", categories: "Servicios" } };
   const { configuration, page } = renderRoute(a, restored);
@@ -205,18 +207,18 @@ test("Expenses Excel exports the 34 applied matches out of 50, ignores draft and
   }));
   const a = setup(t, ({ id, name, state, pageNumber, pageSize, count, order }) => {
     const matches = dataset.filter((expense) => expense.id.includes(id) && expense.name === name && expense.state === state);
-    if (!order) matches.reverse();
+    if (order === "DESC") matches.reverse();
     return { statusOk: true, expenses: matches.slice((pageNumber - 1) * pageSize, pageNumber * pageSize),
       ...(count && { count: matches.length }) };
   });
   const appliedFilters = { id: "A", name: "Internet", state: "PENDING", categories: "Ignorada" };
-  const list = { ...a.state, pageNumber: 2, appliedFilters, order: "desc", methods: { getValues: () => ({ name: "Telefonía" }) } };
+  const list = { ...a.state, pageNumber: 2, appliedFilters, order: "DESC", methods: { getValues: () => ({ name: "Telefonía" }) } };
   const matches = dataset.slice(0, 34).reverse();
   const { exportAction, downloads, errors } = renderRoute(a, list, { total: 34, data: { items: matches.slice(20) } });
   assert.equal(exportAction.disabled, false);
   await exportAction.onClick();
   assert.deepEqual(plain(a.calls.map(({ params }) => params)), [1, 2].map((pageNumber) => ({
-    id: "A", name: "Internet", state: "PENDING", sort: "id", order: false, pageNumber, pageSize: 20, count: pageNumber === 1,
+    id: "A", name: "Internet", state: "PENDING", sort: "id", order: "DESC", pageNumber, pageSize: 20, count: pageNumber === 1,
   })));
   assert.deepEqual(errors, []);
   assert.deepEqual(plain(downloads), [[[

@@ -9,7 +9,7 @@ const Customer = async ({ params }) => {
     responseEntity: ENTITIES.CUSTOMER,
   });
 
-  return <CustomerPageClient customer={customer} />;
+  return <CustomerPageClient customer={customer} customerId={params.id} />;
 };
 
 export default Customer;

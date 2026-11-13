@@ -1,6 +1,6 @@
 "use client";
 
-import { DEFAULT_PAGE_SIZE, PAGE_SIZE_OPTIONS, SORTING } from "@/common/constants";
+import { DEFAULT_PAGE_SIZE, PAGE_SIZE_OPTIONS, toApiSorting, toUiSorting } from "@/common/constants";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -16,7 +16,7 @@ export const getServerListState = ({ defaultFilters, sortFields }, stored = {}) 
     pageNumber: Number.isSafeInteger(pageNumber) && pageNumber > 0 ? pageNumber : 1,
     pageSize: PAGE_SIZE_OPTIONS.some(({ value }) => value === pageSize) ? pageSize : DEFAULT_PAGE_SIZE,
     sort: Object.hasOwn(sortFields, stored.sorting?.key) ? sortFields[stored.sorting.key] : sortFields.id,
-    order: stored.sorting?.direction === SORTING.DESC ? "desc" : "asc",
+    order: toApiSorting(stored.sorting?.direction),
   };
 };
 
@@ -60,7 +60,7 @@ const useServerListFilters = ({ key: initialKey, defaultFilters: initialFilters,
     try {
       window.localStorage.setItem(key, JSON.stringify({
         ...appliedFilters, page: pageNumber, pageSize,
-        sorting: { key: sortKey, direction: order === "desc" ? SORTING.DESC : SORTING.ASC },
+        sorting: { key: sortKey, direction: toUiSorting(order) },
       }));
     } catch {
     }
@@ -96,7 +96,7 @@ const useServerListFilters = ({ key: initialKey, defaultFilters: initialFilters,
   }, []);
   const setSorting = useCallback((column, direction) => {
     if (!Object.hasOwn(sortFields, column)) return;
-    setState((current) => ({ ...current, sort: sortFields[column], order: direction === SORTING.DESC ? "desc" : "asc", pageNumber: 1 }));
+    setState((current) => ({ ...current, sort: sortFields[column], order: toApiSorting(direction), pageNumber: 1 }));
   }, [sortFields]);
 
   return {

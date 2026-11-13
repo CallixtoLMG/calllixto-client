@@ -60,14 +60,18 @@ test("sidebar shows full labels and disabled reasons with real desktop and mobil
       disabled("supplier", "Eliminar proveedor", "No se puede eliminar este proveedor, existen productos asociados."),
       disabled("brand", "Eliminar marca", "No se puede eliminar esta marca, existen productos asociados."),
     ];
-    const Fixture = ({ expanded, mobile }) => {
+    const Fixture = ({ expanded, mobile, loading }) => {
       const { setActions } = useNavActionsContext();
-      React.useEffect(() => setActions(actions), [setActions]);
-      return h("div", { style: { width: expanded ? (mobile ? 308 : 208) : 36, margin: "48px 12px 0 auto" } },
+      React.useEffect(() => setActions([...actions, {
+        id: "download-excel", icon: "file excel", text: "Descargar Excel", loading, disabled: loading,
+      }]), [setActions, loading]);
+      return h("div", { "data-layout": expanded ? (mobile ? "mobile" : "expanded") : "collapsed",
+        style: { width: expanded ? (mobile ? 308 : 208) : 36, margin: "48px 12px 0 auto" } },
         h(NavActions, { variant: expanded ? "sidebar-expanded" : "sidebar-collapsed", disableActionTooltips: mobile }));
     };
     const root = window.ReactDOM.createRoot(document.querySelector("#root"));
-    window.renderRail = (expanded, mobile = false) => root.render(h(NavActionsProvider, null, h(Fixture, { expanded, mobile })));
+    window.renderRail = (expanded, mobile = false, loading = false) =>
+      root.render(h(NavActionsProvider, null, h(Fixture, { expanded, mobile, loading })));
     window.renderRail(true);
   }, {
     rail: compile("src/components/layout/NavActions.jsx"),
@@ -105,6 +109,28 @@ test("sidebar shows full labels and disabled reasons with real desktop and mobil
   assert.equal(await button("Eliminar proveedor").isDisabled(), true);
   assert.equal(await page.evaluate(() => window.disabledClicks), 0);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 390);
+  await page.mouse.click(5, 5);
+  const excel = button("Descargar Excel");
+  for (const [width, expanded, mobile] of [[1366, false, false], [390, true, true]]) {
+    await page.setViewportSize({ width, height: 844 });
+    const render = (loading) => page.evaluate(({ expanded, mobile, loading }) =>
+      window.renderRail(expanded, mobile, loading), { expanded, mobile, loading });
+    await render(false);
+    await page.locator(`[data-layout="${mobile ? "mobile" : "collapsed"}"]`).waitFor();
+    const icon = excel.locator(".file.excel.icon");
+    await icon.waitFor({ state: "visible" });
+    const bounds = await excel.boundingBox();
+    await render(true);
+    await excel.and(page.locator(".loading")).waitFor();
+    assert.equal(await icon.count(), 0);
+    assert.equal(await excel.isDisabled(), true);
+    assert.equal(await excel.evaluate((button) => getComputedStyle(button, "::after").animationName), "button-spin");
+    if (expanded) assert.equal(await excel.getByText("Descargar Excel").isVisible(), false);
+    assert.deepEqual(await excel.boundingBox(), bounds);
+    await render(false);
+    await icon.waitFor({ state: "visible" });
+    assert.equal(await excel.isEnabled(), true);
+  }
 });
 
 test("list rails omit manual refresh and keep the product Excel update", () => {

@@ -1,11 +1,12 @@
 "use client";
 import { useDeleteCustomer, useEditCustomer, useSetCustomerState } from "@/api/customers";
-import { FieldsContainer, FormField, Message, MessageHeader } from "@/common/components/custom";
+import { FieldsContainer, Flex, FormField, Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES, PLACEHOLDERS, POPUP_POSITIONS } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
+import CustomerBudgets from "@/components/customers/CustomerBudgets";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges } from "@/hooks";
@@ -13,8 +14,10 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
+import { Tab } from "semantic-ui-react";
 
-const CustomerPageClient = ({ customer }) => {
+const CustomerPageClient = ({ customer, customerId }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
   const { push, refresh } = useRouter();
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
@@ -166,6 +169,8 @@ const CustomerPageClient = ({ customer }) => {
   const requiresConfirmation = modalAction === DELETE;
 
   useEffect(() => {
+    if (activeIndex !== 0) return;
+
     const handleClick = (action) => () => handleProtectedAction(() => {
       setModalAction(action);
       setIsModalOpen(true);
@@ -203,31 +208,56 @@ const CustomerPageClient = ({ customer }) => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [customer, activeAction, isMutateStatePending, isDeletePending, isEditPending, setActions]);
+  }, [activeIndex, customer, activeAction, isMutateStatePending, isDeletePending, isEditPending, setActions]);
+
+  const details = (
+    <Tab.Pane>
+      <Flex $flexDirection="column" $rowGap="15px">
+        {!isItemInactive(customer?.state) && toggleButton}
+        {isItemInactive(customer?.state) && (
+          <FieldsContainer>
+            <FormField flex="1">
+              <Message negative>
+                <MessageHeader>Motivo de inactivación</MessageHeader>
+                <p>{customer.inactiveReason}</p>
+              </Message>
+            </FormField>
+            <FormField flex="1" />
+            <FormField flex="1" />
+          </FieldsContainer>
+        )}
+        <CustomerForm
+          ref={formRef}
+          customer={customer}
+          onSubmit={mutateEdit}
+          isLoading={isEditPending}
+          isUpdating={isUpdating && !isItemInactive(customer?.state)}
+          view
+          isDeletePending={isDeletePending}
+        />
+      </Flex>
+    </Tab.Pane>
+  );
+  const panes = [
+    { menuItem: "Cliente", render: () => details },
+    {
+      menuItem: "Presupuestos",
+      render: () => (
+        <Tab.Pane>
+          <CustomerBudgets key={customerId} customerId={customerId} customerName={customer?.name} />
+        </Tab.Pane>
+      ),
+    },
+  ];
 
   return (
     <>
-      {!isItemInactive(customer?.state) && toggleButton}
-      {isItemInactive(customer?.state) && (
-        <FieldsContainer>
-          <FormField flex="1">
-            <Message negative>
-              <MessageHeader>Motivo de inactivación</MessageHeader>
-              <p>{customer.inactiveReason}</p>
-            </Message>
-          </FormField>
-          <FormField flex="1" />
-          <FormField flex="1" />
-        </FieldsContainer>
-      )}
-      <CustomerForm
-        ref={formRef}
-        customer={customer}
-        onSubmit={mutateEdit}
-        isLoading={isEditPending}
-        isUpdating={isUpdating && !isItemInactive(customer?.state)}
-        view
-        isDeletePending={isDeletePending}
+      <Tab
+        panes={panes}
+        activeIndex={activeIndex}
+        onTabChange={(_, { activeIndex: nextIndex }) => {
+          if (nextIndex !== activeIndex) handleProtectedAction(() => setActiveIndex(nextIndex));
+        }}
       />
       <UnsavedChangesModal
         open={showUnsavedModal}
