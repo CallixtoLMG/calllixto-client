@@ -12,6 +12,9 @@ import useServerListFilters from "@/hooks/useServerListFilters";
 import { useCallback, useEffect, useMemo } from "react";
 
 const DEFAULT_FILTERS = { id: "", createdBy: "", state: "", paymentStatus: "", startDate: "", endDate: "" };
+const CUSTOMER_BUDGET_SORT_FIELDS = Object.fromEntries(
+  Object.entries(BUDGET_SORT_FIELDS).filter(([column]) => column !== "customer"),
+);
 const DATE_SORT_FIELDS = { date: BUDGET_SORT_FIELDS.date };
 
 const CustomerBudgets = ({ customerId, customerName }) => {
@@ -23,7 +26,7 @@ const CustomerBudgets = ({ customerId, customerName }) => {
   const list = useServerListFilters({
     key: `customerBudgetsFilters:${customerId}`,
     defaultFilters: DEFAULT_FILTERS,
-    sortFields: BUDGET_SORT_FIELDS,
+    sortFields: CUSTOMER_BUDGET_SORT_FIELDS,
     onApply: applyList,
   });
   const { appliedFilters, sort, order, hydrated, pageNumber, pageSize, setPageNumber, applyFilterGroup } = list;
@@ -84,7 +87,7 @@ const CustomerBudgets = ({ customerId, customerName }) => {
         error={error}
         sideActions={sideActions}
         datePresets={BASE_SALES_DATE_RANGES}
-        sortFields={request.appliedFilters.startDate ? DATE_SORT_FIELDS : BUDGET_SORT_FIELDS}
+        sortFields={request.appliedFilters.startDate ? DATE_SORT_FIELDS : CUSTOMER_BUDGET_SORT_FIELDS}
       />
     </Flex>
   );

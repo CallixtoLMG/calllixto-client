@@ -403,7 +403,7 @@ test("Saving Settings invalidates the cached singular budget key and re-entry re
   assert.equal(calls, 2, "save must invalidate the one-hour cached budget query");
 });
 
-test("Sales table bypasses local filtering/export and leaves Pendiente unsortable", (t) => {
+test("Sales and Customer budgets expose their own sort fields and keep remote rows intact", (t) => {
   const a = setup(t);
   let table, form;
   const controls = [];
@@ -430,6 +430,35 @@ test("Sales table bypasses local filtering/export and leaves Pendiente unsortabl
   assert.equal(table.onDownloadExcel, undefined);
   assert.equal(form.onSubmit, submit);
   assert.ok(controls.every((control) => control.afterChange === undefined));
+
+  let request;
+  const CustomerBudgets = load("src/components/customers/CustomerBudgets.jsx", {
+    "@/api/budgets": {
+      ...a.api,
+      usePagedBudgets: (state) => { request = state; return { total: 40 }; },
+    },
+    "@/api/pagedLists": { useRefreshServerList: () => () => {} },
+    "@/common/components/custom": { Flex: Box },
+    "@/common/constants": constants, "@/common/utils": {},
+    "@/components/budgets/budgets.constants": budgetConstants,
+    "@/components/budgets/budgets.utils": {},
+    "@/components/budgets/salesDateRange": salesDates,
+    "@/components/budgets/ServerBudgetsPage": { default: Page },
+    "@/hooks/useListExcelExport": { default: () => ({}) },
+    "@/hooks/useServerListFilters": { default: (config) => ({
+      ...filters.getServerListState(config, {
+        state: "CONFIRMED", page: 2, sorting: { key: "customer", direction: "descending" },
+      }),
+      methods: {}, hydrated: true,
+    }) },
+  }).default;
+  renderToStaticMarkup(React.createElement(CustomerBudgets, { customerId: "A1" }));
+  assert.deepEqual(plain(request.appliedFilters), { customerId: "A1", state: "CONFIRMED" });
+  assert.equal(request.sort, "id");
+  assert.equal(request.pageNumber, 2);
+  assert.deepEqual(plain(table.serverPagination.sorting), { key: "id", direction: "descending" });
+  assert.equal(table.headers.find((header) => header.key === "customer").sortable, false);
+  assert.deepEqual(Array.from(table.headers.filter((header) => header.sortable), (header) => header.key), ["id", "date", "total", "paidAmount", "createdBy"]);
 });
 
 test("Customer catalog loads exactly 3 numeric pages for 1200 items, ignoring compatibility cursors", async (t) => {
