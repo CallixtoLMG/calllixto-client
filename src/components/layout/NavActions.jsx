@@ -105,6 +105,7 @@ const SidebarActionText = styled.span`
   text-overflow: ${({ $wrapLabel }) => ($wrapLabel ? "clip" : "ellipsis")};
   white-space: ${({ $wrapLabel }) => ($wrapLabel ? "normal" : "nowrap")};
   color: #263238;
+  visibility: ${({ $loading }) => $loading ? "hidden" : undefined};
   padding: 0 9px;
 
   ${({ $wrapLabel }) => $wrapLabel && `
@@ -434,11 +435,13 @@ const SidebarActionWithTooltip = ({
     >
       {action.icon && (
         <SidebarActionIconSlot $child={child} $isOpen={isSidebarOpen} $sidebarColor={sidebarColor}>
-          <Icon name={action.icon} />
+          {!action.loading && <Icon name={action.icon} />}
         </SidebarActionIconSlot>
       )}
-      {isSidebarOpen && label && <SidebarActionText ref={labelRef} $wrapLabel={wrapLabel}>{label}</SidebarActionText>}
-      {isSidebarOpen && hasItems && (
+      {isSidebarOpen && label && (
+        <SidebarActionText ref={labelRef} $wrapLabel={wrapLabel} $loading={action.loading}>{label}</SidebarActionText>
+      )}
+      {isSidebarOpen && hasItems && !action.loading && (
         <SidebarChevron
           $sidebarColor={sidebarColor}
           name={isGroupOpen ? ICONS.CARET_UP : ICONS.CARET_DOWN}

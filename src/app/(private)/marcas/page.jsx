@@ -91,7 +91,7 @@ const Brands = () => {
   return (
     <BrandsPage
       isLoading={!hydrated || isFetching}
-      brands={data?.items ?? []}
+      brandsList={data?.items ?? []}
       list={list}
       total={total}
       sideActions={sideActions}

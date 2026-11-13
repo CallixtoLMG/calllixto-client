@@ -9,8 +9,8 @@ import { downloadExcel } from "@/common/utils";
 import { useBreadcrumContext } from "@/components/layout";
 import { BatchImportProducts } from "@/components/products/BatchImportProducts";
 import ProductsPage from "@/components/products/ProductsPage";
-import { EMPTY_FILTERS, EXAMPLE_TEMPLATE_DATA, PRODUCTS_FILTERS_KEY, PRODUCT_SORT_FIELDS, PRODUCT_STATES } from "@/components/products/products.constants";
-import { getFormatedMargin } from "@/components/products/products.utils";
+import { EMPTY_FILTERS, EXAMPLE_TEMPLATE_DATA, PRODUCTS_FILTERS_KEY, PRODUCT_SORT_FIELDS } from "@/components/products/products.constants";
+import { getProductsExcelRows } from "@/components/products/products.utils";
 import { useKeyboardShortcuts } from "@/hooks";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
@@ -42,24 +42,8 @@ const Products = () => {
     if (isExporting) return;
     setIsExporting(true);
     try {
-      const elements = await fetchProductsForExport({ appliedFilters, sort, order });
-      if (!elements.length) return;
-      const headers = ['Id', 'Nombre', 'Marca', 'Proveedor', 'Costo', 'Precio', 'Margen', 'Estado', 'Comentarios'];
-      const mappedPRoducts = elements.map(product => {
-        const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
-        return [
-          product.id,
-          product.name,
-          product.brandName,
-          product.supplierName,
-          product.cost,
-          product.price,
-          getFormatedMargin(product.price, product.cost),
-          productState,
-          product.comments
-        ];
-      });
-      downloadExcel([headers, ...mappedPRoducts], "Lista de Productos");
+      const productsList = await fetchProductsForExport({ appliedFilters, sort, order });
+      if (productsList.length) downloadExcel(getProductsExcelRows(productsList), "Lista de Productos");
     } catch (error) {
       toast.error(error.message || "No se pudieron exportar los productos.");
     } finally {
@@ -138,7 +122,7 @@ const Products = () => {
     <>
       <ProductsPage
         isLoading={!hydrated || isFetching}
-        products={data?.items ?? []}
+        productsList={data?.items ?? []}
         list={list}
         total={total}
         sideActions={sideActions}

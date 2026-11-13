@@ -11,10 +11,14 @@ const { QueryClient, QueryClientProvider, QueryObserver } = require("@tanstack/r
 const root = path.join(__dirname, "../..");
 const Box = ({ children }) => React.createElement("div", null, children);
 const constants = {
-  ENTITIES: { PRODUCTS: "products", PRODUCT: "product", SETTINGS: "settings", BRANDS: "brands", SUPPLIERS: "suppliers" },
+  ENTITIES: {
+    PRODUCTS: "products", PRODUCT: "product", SETTINGS: "settings",
+    BRANDS: "brands", BRAND: "brand", SUPPLIERS: "suppliers", SUPPLIER: "supplier",
+  },
   IN_MS: { ONE_DAY: 86400000, ONE_HOUR: 3600000 }, COLORS: {}, ICONS: {}, FIELD_LABELS: {},
   CONTENT_SIZES: {}, BUTTON_TEXTS: {}, DATE_FORMATS: {}, POPUP_POSITIONS: {}, SIZES: {},
   SORTING: { ASC: "ascending", DESC: "descending" }, PAGES: { PRODUCTS: {} }, TOOLTIPS: {},
+  toUiSorting: (order) => order === "DESC" ? "descending" : "ascending",
 };
 const load = (file, dependencies) => {
   const { outputText } = ts.transpileModule(fs.readFileSync(path.join(root, file), "utf8"), {
@@ -155,18 +159,21 @@ test("failed supplier page aborts before tool runs and leaves no partial cache",
 });
 
 test("products list adapter sends filters, paging and sorting; export uses all applied matches", async (t) => {
-  const { client, calls, paged, api } = createAdapter(t);
-  const state = { appliedFilters: { id: "VA", name: "Papel", state: "ACTIVE" },
-    pageNumber: 1, pageSize: 20, sort: "name", order: "desc", hydrated: true };
-  await client.fetchQuery(paged.serverListQueryOptions(client, api.usePagedProducts(state)));
-  await client.fetchQuery(paged.serverListQueryOptions(client, api.usePagedProducts({ ...state, pageNumber: 2 })));
-  assert.deepEqual(plain(calls[0].params), { ...state.appliedFilters, pageNumber: 1, pageSize: 20, sort: "name", order: "desc", count: true });
-  assert.equal(calls[1].params.count, false);
-  assert.equal(calls[1].params.pageNumber, 2);
-  assert.equal((await api.fetchProductsForExport({ ...state, draft: { name: "Ignored" } })).length, 1200);
-  assert.ok(calls.every(({ params }) => params.name === "Papel" && params.id === "VA" && params.state === "ACTIVE"));
-  assert.deepEqual(calls.slice(2).map(({ params }) => params.pageNumber), [1, 2, 3]);
-  assert.deepEqual(plain(productConstants.PRODUCT_SORT_FIELDS), { id: "id", name: "name" });
+  assert.deepEqual(plain(productConstants.PRODUCT_SORT_FIELDS), { id: "id", name: "name", stock: "stock", price: "price" });
+  for (const [scope, sort, order] of [[{ supplierId: "VA" }, "stock", "DESC"], [{ brandId: "AS" }, "price", "ASC"]]) {
+    const { client, calls, paged, api } = createAdapter(t);
+    const appliedFilters = { ...scope, id: "VA", name: "Papel", state: "ACTIVE" };
+    const state = { appliedFilters, pageNumber: 1, pageSize: 20, sort: productConstants.PRODUCT_SORT_FIELDS[sort], order, hydrated: true };
+    await client.fetchQuery(paged.serverListQueryOptions(client, api.usePagedProducts(state)));
+    await client.fetchQuery(paged.serverListQueryOptions(client, api.usePagedProducts({ ...state, pageNumber: 2 })));
+    assert.deepEqual(calls.map(({ params }) => plain(params)), [1, 2].map((pageNumber) => ({
+      ...appliedFilters, pageNumber, pageSize: 20, sort, order, count: pageNumber === 1,
+    })));
+    assert.equal((await api.fetchProductsForExport({ ...state, draft: { name: "Ignored" } })).length, 1200);
+    assert.deepEqual(calls.slice(2).map(({ params }) => plain(params)), [1, 2, 3].map((pageNumber) => ({
+      ...appliedFilters, pageNumber, pageSize: 500, sort, order, count: pageNumber === 1,
+    })));
+  }
 });
 
 test("CRUD and supplier deletion invalidate the affected supplier, catalog and visible list", async (t) => {
@@ -270,7 +277,7 @@ test("ProductsPage binds a remote page and keeps draft controls passive", (t) =>
   }).default;
   const products = [{ id: "VABB001" }];
   const submit = () => {};
-  const element = React.createElement(Page, { products, total: 1200, list: {
+  const element = React.createElement(Page, { productsList: products, total: 1200, list: {
     appliedFilters: {}, methods: {}, onSubmit: submit, hydrated: false, pageNumber: 2, pageSize: 100,
   } });
   renderToStaticMarkup(React.createElement(QueryClientProvider, { client: a.client }, element));
@@ -278,8 +285,7 @@ test("ProductsPage binds a remote page and keeps draft controls passive", (t) =>
   assert.equal(table.onFilter, undefined);
   assert.equal(table.serverPagination.pageNumber, 2);
   assert.equal(table.serverPagination.pageSize, 100);
-  assert.equal(table.serverPagination.sortFields.stock, undefined);
-  assert.equal(table.serverPagination.sortFields.price, undefined);
+  assert.equal(table.serverPagination.sortFields, productConstants.PRODUCT_SORT_FIELDS);
   assert.equal(form.onSubmit, submit);
   assert.equal(dropdown.afterChange, undefined);
   assert.equal(dropdown.clearable, true);
@@ -322,8 +328,8 @@ test("Brand/Supplier initial render never starts a product catalog for associati
     "@/api/brands": { useDeleteBrand: mutation, useEditBrand: mutation, useSetBrandState: mutation },
     "@/api/suppliers": { useDeleteSupplier: mutation, useEditSupplier: mutation, useSetSupplierState: mutation },
     "@/common/constants": { ...constants, PLACEHOLDERS: {}, PAGES: { BRANDS: {}, SUPPLIERS: {} } },
-    "@/common/components/custom": { FieldsContainer: Box, FormField: Box, Message: Box, MessageHeader: Box },
-    "@/common/components/form": { TextField: Box }, "@/common/components/modals": { ModalAction: () => null },
+    "@/common/components/custom": { FieldsContainer: Box, Flex: Box, FormField: Box, Message: Box, MessageHeader: Box },
+    "@/common/components/buttons": { IconedButton: Box }, "@/common/components/form": { TextField: Box }, "@/common/components/modals": { ModalAction: () => null },
     "@/common/components/modals/ModalAction": { default: () => null },
     "@/common/components/modals/ModalUnsavedChanges": { default: () => null },
     "@/common/components/custom/PrintBarCodes": { default: React.forwardRef(function RefStub() { return null; }) },
@@ -334,6 +340,7 @@ test("Brand/Supplier initial render never starts a product catalog for associati
     "@/components/products/products.constants": productConstants, "@/components/products/products.utils": productUtils,
     "@/components/products/BatchImportStock": { BatchImportStock: Box },
     "@/components/brands/BrandForm": { default: React.forwardRef(function RefStub() { return null; }) },
+    "@/components/products/RelatedProducts": { default: () => assert.fail("Product tab mounted before selection") },
     "@/components/suppliers/SupplierForm": { default: React.forwardRef(function RefStub() { return null; }) },
     "@/components/suppliers/suppliers.constants": {},
     "@/hooks": { useAllowUpdate: () => ({}), useProtectedAction: () => ({}), useUnsavedChanges: () => ({}) },
@@ -349,4 +356,54 @@ test("Brand/Supplier initial render never starts a product catalog for associati
   }
   assert.equal(a.calls.length, 0);
   assert.equal(a.client.getQueryCache().getAll().length, 0);
+});
+
+test("Supplier products reject a page or export containing another supplier's products", async () => {
+  const own = { id: "VAAS001", supplierId: "VA" };
+  const foreign = { id: "BRAS001", supplierId: "BR" };
+  let pageItems = [own, foreign];
+  let exportItems = [own, foreign];
+  let request, table, action, exportFile;
+  let downloads = 0;
+  const RelatedProducts = load("src/components/products/RelatedProducts.jsx", {
+    "@/api/products": {
+      usePagedProducts: (state) => { request = state; return { data: { items: pageItems }, total: pageItems.length }; },
+      fetchProductsForExport: async () => exportItems,
+    },
+    "@/common/components/table": { Table: (props) => { table = props; return null; } },
+    "@/common/constants": constants,
+    "@/common/utils": { downloadExcel: () => { downloads++; }, getEntityExcelFileName: () => "file" },
+    "@/components/layout": { useListPageSideActions: ({ sideActions }) => { [action] = sideActions; } },
+    "@/components/products/products.constants": productConstants,
+    "@/components/products/products.utils": productUtils,
+    "@/hooks/useListExcelExport": { default: (options) => { exportFile = options.exportFile; return { isExporting: false }; } },
+    "@/hooks/useServerListFilters": { default: ({ sortFields }) => {
+      assert.equal(sortFields, productConstants.PRODUCT_SORT_FIELDS);
+      return { hydrated: true, pageNumber: 1, pageSize: 20, sort: sortFields.price, order: "DESC", appliedFilters: {} };
+    } },
+    "semantic-ui-react": { Message: ({ content }) => React.createElement("div", null, content) },
+  }).default;
+  const render = () => renderToStaticMarkup(React.createElement(RelatedProducts, { entity: "supplier", id: "VA", name: "Proveedor" }));
+  assert.match(render(), /productos de otro proveedor/);
+  assert.deepEqual(plain(request.appliedFilters), { supplierId: "VA" });
+  assert.equal(table, undefined);
+  assert.equal(action.disabled, true);
+  await assert.rejects(exportFile(request), /productos de otro proveedor/);
+  assert.equal(downloads, 0);
+
+  pageItems = [own];
+  exportItems = [own];
+  render();
+  assert.equal(table.elements, pageItems);
+  assert.equal(table.serverPagination.sortFields, productConstants.PRODUCT_SORT_FIELDS);
+  assert.deepEqual(plain(table.serverPagination.sorting), { key: "price", direction: "descending" });
+  assert.equal(action.disabled, false);
+  await exportFile(request);
+  assert.equal(downloads, 1);
+
+  pageItems = [];
+  render();
+  assert.equal(table.elements, pageItems);
+  assert.equal(action.disabled, true);
+  assert.equal(action.tooltip, "No hay productos para descargar.");
 });

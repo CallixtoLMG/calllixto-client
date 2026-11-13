@@ -1,13 +1,17 @@
 "use client";
-import { getBudgetListState, usePagedBudgets } from "@/api/budgets";
+import { fetchBudgetsForExport, getBudgetListState, usePagedBudgets } from "@/api/budgets";
 import { useRefreshServerList } from "@/api/pagedLists";
 import { useGetSetting } from "@/api/settings";
 import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { downloadExcel } from "@/common/utils";
+import { getFormatedDate } from "@/common/utils/dates";
 import ServerBudgetsPage from "@/components/budgets/ServerBudgetsPage";
 import { BUDGETS_FILTERS_KEY, BUDGET_SORT_FIELDS, SALES_FILTERS, BUDGET_STATES, DEFAULT_DATE_RANGE_VALUE } from "@/components/budgets/budgets.constants";
-import { BASE_SALES_DATE_RANGES, buildSalesDateRanges, getAutomaticBudgetRange } from "@/components/budgets/salesDateRange";
+import { getBudgetsExcelRows } from "@/components/budgets/budgets.utils";
+import { BASE_SALES_DATE_RANGES, buildSalesDateRanges, getAutomaticBudgetRange, parseBudgetDate } from "@/components/budgets/salesDateRange";
 import { useBreadcrumContext } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks";
+import useListExcelExport from "@/hooks/useListExcelExport";
 import useServerListFilters from "@/hooks/useServerListFilters";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef } from "react";
@@ -49,13 +53,34 @@ const Budgets = () => {
   const resetSaleFilters = useCallback(() => applyFilterGroup({
     id: "", customer: "", createdBy: "", state: "", paymentStatus: "",
   }), [applyFilterGroup]);
-  const requestState = getBudgetListState(list, {
-    settingsReady: settingsReady && appliedRangeSetting.current === rangeValue,
-  });
+  const { appliedFilters, sort, order, hydrated, pageNumber, pageSize, setPageNumber } = list;
+  const ready = settingsReady && appliedRangeSetting.current === rangeValue;
+  const requestState = useMemo(() => getBudgetListState({
+    appliedFilters, sort, order, hydrated, pageNumber, pageSize,
+  }, { settingsReady: ready }), [appliedFilters, sort, order, hydrated, pageNumber, pageSize, ready]);
   const { data, total, isFetching, error } = usePagedBudgets(requestState);
+  const { isExporting, startExport } = useListExcelExport({
+    entity: ENTITIES.BUDGETS,
+    errorMessage: "No se pudieron exportar los presupuestos.",
+    exportFile: async (state) => {
+      const matches = await fetchBudgetsForExport(state);
+      if (!matches.length) return;
+      const startDate = parseBudgetDate(state.appliedFilters.startDate);
+      const endDate = parseBudgetDate(state.appliedFilters.endDate);
+      const fileName = startDate && endDate
+        ? `Ventas - ${getFormatedDate(startDate)} al ${getFormatedDate(endDate)}`
+        : "Lista de ventas";
+      downloadExcel(getBudgetsExcelRows(matches), fileName);
+    },
+  });
+  // The backend applies the date range only when sorted by createdAt.
+  const requiresDateSort = Boolean(requestState.appliedFilters.startDate) && requestState.sort !== BUDGET_SORT_FIELDS.date;
+  const exportDisabled = !requestState.hydrated || isFetching || !!error || !(total > 0) || isExporting || requiresDateSort;
+  const exportTooltip = error ? "No se pudieron cargar los presupuestos."
+    : total === 0 ? "No hay presupuestos para descargar."
+    : requiresDateSort ? "Ordená por Fecha para exportar el rango aplicado." : undefined;
   const { setLabels } = useBreadcrumContext();
   const { push } = useRouter();
-  const { hydrated, pageNumber, pageSize, setPageNumber } = list;
 
   useEffect(() => {
     if (!requestState.hydrated || isFetching || total === null) return;
@@ -69,7 +94,7 @@ const Budgets = () => {
     setLabels([{ name: PAGES.BUDGETS.NAME }]);
   }, [setLabels]);
 
-  const budgets = useMemo(() => (data?.items ?? []).map((budget) => ({
+  const budgetsList = useMemo(() => (data?.items ?? []).map((budget) => ({
     ...budget,
     href: budget.state === BUDGET_STATES.DRAFT.id ? PAGES.BUDGETS.DRAFT(budget.id) : PAGES.BUDGETS.SHOW(budget.id),
   })), [data]);
@@ -77,10 +102,11 @@ const Budgets = () => {
     { id: 1, icon: ICONS.ADD, color: COLORS.GREEN, href: PAGES.BUDGETS.CREATE, text: "Crear venta" },
     {
       id: "download-excel", icon: ICONS.FILE_EXCEL, color: COLORS.BLUE, text: "Descargar ventas en Excel",
-      disabled: true, tooltip: "La exportación completa no está disponible por el momento.",
+      disabled: exportDisabled, loading: isExporting, tooltip: exportTooltip,
+      onClick: () => startExport(requestState),
       showTooltipWhenExpanded: true,
     },
-  ], []);
+  ], [exportDisabled, isExporting, exportTooltip, startExport, requestState]);
   const actions = useMemo(() => [{
     id: 1, icon: ICONS.COPY, color: COLORS.GREEN,
     onClick: (budget) => push(PAGES.BUDGETS.CLONE(budget.id)), tooltip: "Clonar",
@@ -88,7 +114,7 @@ const Budgets = () => {
   useKeyboardShortcuts(() => push(PAGES.BUDGETS.CREATE), SHORTKEYS.ENTER);
 
   return <ServerBudgetsPage
-    budgets={budgets} list={{ ...list, hydrated: requestState.hydrated,
+    budgetsList={budgetsList} list={{ ...list, hydrated: requestState.hydrated,
       onRestoreDates: resetDates, onRestoreFilters: resetSaleFilters,
       appliedCount: Object.keys(requestState.appliedFilters).filter((key) => !["startDate", "endDate"].includes(key)).length }} total={total}
     isLoading={!hydrated || settings.isFetching || isFetching} sideActions={sideActions} actions={actions}

@@ -189,7 +189,7 @@ export const PRODUCT_STATES = {
 
 export const EMPTY_PRODUCT = { name: '', cost: 0, price: 0, id: '', comments: '', supplierId: '', brandId: '' };
 export const EMPTY_FILTERS = { id: '', name: '', state: '' };
-export const PRODUCT_SORT_FIELDS = { id: 'id', name: 'name' };
+export const PRODUCT_SORT_FIELDS = { id: 'id', name: 'name', stock: 'stock', price: 'price' };
 
 export const PRODUCT_STATES_OPTIONS = Object.values(PRODUCT_STATES)
   .map(({ id, title, color }) => ({

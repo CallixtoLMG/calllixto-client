@@ -1,12 +1,12 @@
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
-import { CONTENT_SIZES, FIELD_LABELS, PAGES, SORTING } from "@/common/constants";
+import { CONTENT_SIZES, FIELD_LABELS, PAGES, toUiSorting } from "@/common/constants";
 import { useListPageSideActions } from "@/components/layout";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
 import { SUPPLIER_SORT_FIELDS, SUPPLIERS_COLUMNS, SUPPLIER_STATES_OPTIONS } from "../suppliers.constants";
 
-const SuppliersPage = ({ isLoading, suppliers = [], list, total, sideActions = [] }) => {
+const SuppliersPage = ({ isLoading, suppliersList = [], list, total, sideActions = [] }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -54,7 +54,7 @@ const SuppliersPage = ({ isLoading, suppliers = [], list, total, sideActions = [
       <Table
         isLoading={isLoading}
         headers={SUPPLIERS_COLUMNS}
-        elements={suppliers}
+        elements={suppliersList}
         page={PAGES.SUPPLIERS}
         paginate
         serverPagination={{
@@ -64,7 +64,7 @@ const SuppliersPage = ({ isLoading, suppliers = [], list, total, sideActions = [
           total,
           sorting: {
             key: Object.keys(SUPPLIER_SORT_FIELDS).find((key) => SUPPLIER_SORT_FIELDS[key] === list.sort),
-            direction: list.order === "desc" ? SORTING.DESC : SORTING.ASC,
+            direction: toUiSorting(list.order),
           },
           sortFields: SUPPLIER_SORT_FIELDS,
           onPageChange: list.setPageNumber,

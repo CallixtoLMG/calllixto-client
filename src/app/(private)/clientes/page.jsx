@@ -82,7 +82,7 @@ const Customers = () => {
   return (
     <CustomersPage
       isLoading={!hydrated || isFetching}
-      customers={data?.items ?? []}
+      customersList={data?.items ?? []}
       list={list}
       total={total}
       sideActions={sideActions}

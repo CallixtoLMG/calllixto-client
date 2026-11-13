@@ -1,6 +1,6 @@
 import { Box, FlexColumn } from "@/common/components/custom";
 import { GroupedButtonsControlled, NumberControlled, SearchControlled } from "@/common/components/form";
-import { CONTENT_SIZES, COLORS, ICONS } from "@/common/constants";
+import { COLORS, CONTENT_SIZES, ICONS } from "@/common/constants";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordionTitle";
 import SettingsFieldLabel from "@/components/settings/Common/SettingsFieldLabel";
@@ -13,7 +13,17 @@ import { Accordion } from "semantic-ui-react";
 const OnCreate = ({ customerOptions, isLoading }) => {
 
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
-  const toggleAccordion = () => setIsAccordionOpen(!isAccordionOpen);
+  const [isAccordionExpanded, setIsAccordionExpanded] = useState(false);
+  const toggleAccordion = () => {
+    setIsAccordionExpanded(false);
+    setIsAccordionOpen((open) => !open);
+  };
+  // Visible overflow gives the grid row a minimum height during opening.
+  const handleAccordionTransitionEnd = ({ target, currentTarget, propertyName }) => {
+    if (isAccordionOpen && target === currentTarget && propertyName === "grid-template-rows") {
+      setIsAccordionExpanded(true);
+    }
+  };
   const { watch } = useFormContext();
   const [defaultsCreate, defaultsCreateCustomer] = watch(['defaultsCreate', "defaultsCreate.customer"]);
 
@@ -28,16 +38,15 @@ const OnCreate = ({ customerOptions, isLoading }) => {
           Al crear una venta
         </SettingsAccordionTitle>
         <Accordion.Content active>
-          <AnimatedContent $active={isAccordionOpen}>
-            <AnimatedInner>
+          <AnimatedContent $active={isAccordionOpen} onTransitionEnd={handleAccordionTransitionEnd}>
+            <AnimatedInner $active={isAccordionExpanded}>
               <FlexColumn $rowGap="15px">
                 <GroupedButtonsControlled
-                   label="Estado por defecto"
-                  // label={
-                  //   <SettingsFieldLabel helpText={SETTINGS_HELP_TEXTS.BUDGET_DEFAULT_STATE}>
-                  //     Estado por defecto
-                  //   </SettingsFieldLabel>
-                  // }
+                  label={
+                    <SettingsFieldLabel helpText={SETTINGS_HELP_TEXTS.BUDGET_DEFAULT_STATE}>
+                      Estado por defecto
+                    </SettingsFieldLabel>
+                  }
                   name="defaultsCreate.state"
                   width={CONTENT_SIZES.FIT}
                   color={defaultsCreate?.state === BUDGET_STATES.CONFIRMED.id ? COLORS.GREEN : COLORS.ORANGE}

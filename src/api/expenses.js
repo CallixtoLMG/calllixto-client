@@ -15,7 +15,6 @@ export const getExpenseListState = (state) => {
       ...(name && { name }),
       ...(expenseState && expenseState !== ALL && { state: expenseState }),
     },
-    order: state.order === "asc",
   };
 };
 

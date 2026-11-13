@@ -13,7 +13,7 @@ const compile = (file) => ts.transpileModule(read(file), {
 }).outputText;
 const constants = {
   CONTENT_SIZES: { FIT: "fit-content" },
-  DATE_FORMATS: { ISO: "YYYY-MM-DDTHH:mm:ss" }, ERROR_MESSAGES: { REQUIRED_FIELD_SHORT: "Campo requerido" },
+  DATE_FORMATS: { ISO: "YYYY-MM-DDTHH:mm:ss", ONLY_DATE: "DD-MM-YYYY" }, ERROR_MESSAGES: { REQUIRED_FIELD_SHORT: "Campo requerido" },
   DEFAULT_PAGE_SIZE: 20, PAGE_SIZE_OPTIONS: [{ value: 20 }], SORTING: { ASC: "ascending", DESC: "descending" },
   ENTITIES: { BUDGET: "budget", BUDGETS: "budgets" }, ALL: "all", COLORS: {}, ICONS: {}, SHORTKEYS: {},
   PAGES: { BUDGETS: { NAME: "Ventas" } },
@@ -90,12 +90,22 @@ test("Sales forms synchronize effective Settings once, preserve manual edits on 
       "react/jsx-runtime": { jsx: (type, props, key) => h(type, { ...props, key }), jsxs: (type, props, key) => h(type, { ...props, key }), Fragment: R.Fragment },
       dayjs: window.dayjs, "dayjs/plugin/utc": window.dayjs_plugin_utc, "dayjs/plugin/timezone": window.dayjs_plugin_timezone,
       "@/common/constants": constants, "@/common/utils/pluralization": { formatLastCount: (value, unit) => `${value} ${unit}` },
+      "@/common/utils": { downloadExcel: (rows, fileName) => window.downloads.push({ rows, fileName }) },
+      "@/components/budgets/budgets.utils": {
+        getBudgetsExcelRows: (matches) => [["ID", "Producto 1"], ...matches.map(({ id, products }) => [id, products[0].name])],
+      },
+      "@/hooks/useListExcelExport": { __esModule: true, default: ({ exportFile }) => {
+        window.exportFile = exportFile;
+        return { startExport: exportFile };
+      } },
       "@/components/budgets/budgets.constants": filters,
       "@/fetchUrls": { PATHS: { BUDGETS: "budgets" } }, "@tanstack/react-query": {}, "./axios": {}, "./common": {},
       "@/components/layout": { useBreadcrumContext: () => ({ setLabels() {} }) },
       "@/hooks": { useKeyboardShortcuts() {} }, "next/navigation": { useRouter: () => ({ push() {} }) },
       "react-hot-toast": { toast: { error() {} } },
     };
+    constants.toApiSorting = (direction) => direction === "descending" ? "DESC" : "ASC";
+    constants.toUiSorting = (order) => order === "DESC" ? "descending" : "ascending";
     const load = (file) => {
       const loaded = { exports: {} };
       new Function("module", "exports", "require", sources[file])(loaded, loaded.exports, (name) => {
@@ -109,13 +119,21 @@ test("Sales forms synchronize effective Settings once, preserve manual edits on 
     dependencies["@/hooks/useServerListFilters"] = load("src/hooks/useServerListFilters.js");
     window.applies = [];
     window.renders = [];
+    window.exportRequests = [];
+    window.downloads = [];
     const refresh = (state) => window.applies.push(state);
     dependencies["@/api/pagedLists"] = { useRefreshServerList: () => refresh };
-    dependencies["./pagedLists"] = { usePagedList: ({ appliedFilters, pageNumber, pageSize, sort, order, hydrated }) => {
-      window.request = { appliedFilters, pageNumber, pageSize, sort, order, hydrated };
-      window.renders.push({ months: window.settings?.data?.defaultPageDateRange?.value, ...window.request });
-      return { total: null };
-    } };
+    dependencies["./pagedLists"] = {
+      usePagedList: ({ appliedFilters, pageNumber, pageSize, sort, order, hydrated }) => {
+        window.request = { appliedFilters, pageNumber, pageSize, sort, order, hydrated };
+        window.renders.push({ months: window.settings?.data?.defaultPageDateRange?.value, ...window.request });
+        return { total: 40 };
+      },
+      fetchAllListPages: async (options) => {
+        window.exportRequests.push(options);
+        return [{ id: "V42", products: [{ name: "Snapshot histórico" }] }];
+      },
+    };
     dependencies["@/api/budgets"] = load("src/api/budgets.js");
     window.settings = { data: {}, isSuccess: true, isPlaceholderData: true, isFetching: true };
     dependencies["@/api/settings"] = { useGetSetting: () => window.settings };
@@ -135,14 +153,16 @@ test("Sales forms synchronize effective Settings once, preserve manual edits on 
       DatePicker: dependencies["@/common/components/form"].DatePicker,
     };
     const DateFilters = load("src/components/budgets/SalesDateFilters.jsx").default;
-    dependencies["@/components/budgets/ServerBudgetsPage"] = { __esModule: true, default: ({ list, datePresets }) => {
+    dependencies["@/components/budgets/ServerBudgetsPage"] = { __esModule: true, default: ({ list, datePresets, sideActions }) => {
       window.list = list;
+      const excel = sideActions.find(({ id }) => id === "download-excel");
       return h(F.FormProvider, list.methods, h("form", { onSubmit: list.onSubmit },
         h(DateFilters, { presets: datePresets, disabled: !list.hydrated }),
         ...["id", "customer", "createdBy", "state", "paymentStatus"].map((name) => h("input", { key: name, "aria-label": name, ...list.methods.register(name) })),
         h("button", { type: "submit" }, "Buscar"),
         h("button", { type: "button", onClick: list.onRestoreDates }, "Reset fechas"),
-        h("button", { type: "button", onClick: list.onRestoreFilters }, "Reset filtros")));
+        h("button", { type: "button", onClick: list.onRestoreFilters }, "Reset filtros"),
+        h("button", { type: "button", disabled: excel.disabled, onClick: excel.onClick }, excel.text)));
     } };
     localStorage.setItem("budgetsFilters", JSON.stringify({ startDate: "2020-01-01T00:00:00", endDate: "2020-02-01T00:00:00", page: 7, createdBy: "Ana" }));
     const Route = load("src/app/(private)/ventas/page.jsx").default;
@@ -154,6 +174,19 @@ test("Sales forms synchronize effective Settings once, preserve manual edits on 
     BUDGET_SORT_FIELDS: { id: "id", date: "createdAt" }, BUDGETS_FILTERS_KEY: "budgetsFilters", DEFAULT_DATE_RANGE_VALUE: 3,
     BUDGET_STATES: { DRAFT: { id: "DRAFT" } },
   } });
+  const assertExport = async (fileName) => {
+    const before = await page.evaluate(() => ({
+      request: window.request, exports: window.exportRequests.length, downloads: window.downloads.length,
+    }));
+    await page.getByRole("button", { name: "Descargar ventas en Excel" }).click();
+    await page.waitForFunction((count) => window.downloads.length === count + 1, before.downloads);
+    const exported = await page.evaluate(() => ({ requests: window.exportRequests, file: window.downloads.at(-1) }));
+    assert.deepEqual(exported.requests.slice(before.exports), [{
+      entity: "budgets", url: "budgets", filters: { ...before.request.appliedFilters, includeProducts: true },
+      sort: before.request.sort, order: before.request.order,
+    }]);
+    assert.deepEqual(exported.file, { fileName, rows: [["ID", "Producto 1"], ["V42", "Snapshot histórico"]] });
+  };
   assert.equal(await page.evaluate(() => window.request.hydrated), false);
   await page.evaluate(() => { window.settings = { data: { defaultPageDateRange: { value: 12 }, historyDateRanges: [{ unit: "week", value: 2 }] }, isSuccess: true, isFetching: true }; window.renderSales(); });
   assert.equal(await page.evaluate(() => window.request.hydrated), false);
@@ -181,6 +214,10 @@ test("Sales forms synchronize effective Settings once, preserve manual edits on 
   await page.waitForFunction(() => window.request.pageNumber === 2);
   await page.evaluate(() => window.list.setSorting("date", "descending"));
   await page.waitForFunction(() => window.request.sort === "createdAt");
+  assert.equal(await page.evaluate(() => window.request.order), "DESC");
+  assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem("budgetsFilters")).sorting), {
+    key: "date", direction: "descending",
+  });
   assert.deepEqual(await page.evaluate(() => window.request.appliedFilters), manual.appliedFilters);
   assert.equal(await page.evaluate(() => window.request.pageNumber), 1);
   for (const [label, value] of [["Desde", ""], ["Hasta", ""], ["Desde", "2025-01-01"]]) {
@@ -198,6 +235,7 @@ test("Sales forms synchronize effective Settings once, preserve manual edits on 
   assert.equal(await page.getByLabel("Desde", { exact: true }).inputValue(), "2023-01-02");
   assert.equal(await page.evaluate(() => window.applies.length), 2);
   assert.equal(await page.evaluate(() => window.request.appliedFilters.startDate), manual.appliedFilters.startDate);
+  await assertExport("Ventas - 02-01-2024 al 03-02-2024");
   // A real effective Setting change synchronizes once and never enables the old range.
   await page.evaluate(() => { window.renders = []; window.settings = { ...window.settings, data: { ...window.settings.data, defaultPageDateRange: { value: 3 } } }; window.renderSales(); });
   await page.waitForFunction(() => window.applies.length === 3);
@@ -228,6 +266,14 @@ test("Sales forms synchronize effective Settings once, preserve manual edits on 
   await page.waitForFunction(() => window.applies.length === 6);
   assert.deepEqual(await page.evaluate(() => window.request.appliedFilters), presetDates);
   assert.equal(await page.evaluate(() => window.request.appliedFilters.endDate), "2026-11-03T16:00:00");
+  await page.clock.setFixedTime(new Date("2026-11-04T16:00:00Z"));
+  await assertExport("Ventas - 20-10-2026 al 03-11-2026");
+  const fallback = await page.evaluate(async () => {
+    const { appliedFilters } = window.request;
+    await window.exportFile({ ...window.request, appliedFilters: { ...appliedFilters, endDate: "" } });
+    return window.downloads.at(-1).fileName;
+  });
+  assert.equal(fallback, "Lista de ventas");
   assert.deepEqual(errors, []);
 });
 

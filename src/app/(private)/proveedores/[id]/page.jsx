@@ -9,7 +9,7 @@ const Supplier = async ({ params }) => {
     responseEntity: ENTITIES.SUPPLIER,
   });
 
-  return <SupplierPageClient supplier={supplier} />;
+  return <SupplierPageClient supplier={supplier} supplierId={params.id} />;
 };
 
 export default Supplier;

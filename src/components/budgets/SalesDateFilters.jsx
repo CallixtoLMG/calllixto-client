@@ -5,7 +5,7 @@ import { CONTENT_SIZES, ERROR_MESSAGES } from "@/common/constants";
 import { Controller, useFormContext } from "react-hook-form";
 import { getBudgetDateRangeError, getManualBudgetDate, parseBudgetDate } from "./salesDateRange";
 
-const SalesDateFilters = ({ presets = [], disabled }) => {
+const SalesDateFilters = ({ presets = [], disabled, optional = false }) => {
   const { control, getValues, setValue } = useFormContext();
   return <>
     <DropdownControlled
@@ -19,9 +19,16 @@ const SalesDateFilters = ({ presets = [], disabled }) => {
     />
     {[["startDate", "Desde"], ["endDate", "Hasta"]].map(([name, label]) => (
       <Controller key={name} name={name} control={control}
-        rules={{ required: ERROR_MESSAGES.REQUIRED_FIELD_SHORT, validate: () => getBudgetDateRangeError(getValues()) || true }}
+        rules={{
+          required: !optional && ERROR_MESSAGES.REQUIRED_FIELD_SHORT,
+          validate: () => {
+            const dates = getValues();
+            if (optional && !dates.startDate && !dates.endDate) return true;
+            return getBudgetDateRangeError(dates) || true;
+          },
+        }}
         render={({ field: { value, onChange }, fieldState: { error } }) => (
-          <FormField control={DatePicker} label={label} required $width="130px" disabled={disabled}
+          <FormField control={DatePicker} label={label} required={!optional} $width="160px" disabled={disabled}
             selected={parseBudgetDate(value)} dateFormat="dd-MM-yyyy"
             error={error && { content: error.message, pointing: "above" }}
             onChange={(date) => {

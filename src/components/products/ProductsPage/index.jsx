@@ -6,7 +6,7 @@ import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { ModalAction, ModalMultiDelete } from "@/common/components/modals";
 import { Filters, Table } from "@/common/components/table";
-import { CONTENT_SIZES, COLORS, SORTING, FIELD_LABELS, ICONS, PAGES, TOOLTIPS } from "@/common/constants";
+import { CONTENT_SIZES, COLORS, FIELD_LABELS, ICONS, PAGES, TOOLTIPS, toUiSorting } from "@/common/constants";
 import { formatCount, pluralize } from "@/common/utils/pluralization";
 import { OnlyPrint, useListPageSideActions } from "@/components/layout";
 import { RULES } from "@/roles";
@@ -18,7 +18,7 @@ import { useReactToPrint } from "react-to-print";
 import { Form } from "semantic-ui-react";
 import { PRODUCT_SORT_FIELDS, PRODUCT_COLUMNS, PRODUCT_STATES, PRODUCT_STATES_OPTIONS } from "../products.constants";
 
-const ProductsPage = ({ products = [], isLoading, list, total, sideActions = [] }) => {
+const ProductsPage = ({ productsList = [], isLoading, list, total, sideActions = [] }) => {
   const { role } = useUserContext();
   const printRef = useRef();
   const deleteProduct = useDeleteProduct();
@@ -250,7 +250,7 @@ const ProductsPage = ({ products = [], isLoading, list, total, sideActions = [] 
         <Table
           isLoading={isLoading || deleteIsPending || recoverIsPending}
           headers={PRODUCT_COLUMNS}
-          elements={products}
+          elements={productsList}
           page={PAGES.PRODUCTS}
           actions={actions}
           selection={selectedProducts}
@@ -264,7 +264,7 @@ const ProductsPage = ({ products = [], isLoading, list, total, sideActions = [] 
             hydrated, pageNumber: list.pageNumber, pageSize: list.pageSize, total,
             sorting: {
               key: Object.keys(PRODUCT_SORT_FIELDS).find((key) => PRODUCT_SORT_FIELDS[key] === list.sort),
-              direction: list.order === "desc" ? SORTING.DESC : SORTING.ASC,
+              direction: toUiSorting(list.order),
             },
             sortFields: PRODUCT_SORT_FIELDS,
             onPageChange: list.setPageNumber, onPageSizeChange: list.setPageSize, onSortChange: list.setSorting,

@@ -1,12 +1,12 @@
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
-import { CONTENT_SIZES, FIELD_LABELS, PAGES, SORTING } from "@/common/constants";
+import { CONTENT_SIZES, FIELD_LABELS, PAGES, toUiSorting } from "@/common/constants";
 import { useListPageSideActions } from "@/components/layout";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
 import { BRAND_COLUMNS, BRAND_SORT_FIELDS, BRAND_STATES_OPTIONS } from "../brands.constants";
 
-const BrandsPage = ({ brands = [], isLoading, list, total, sideActions = [] }) => {
+const BrandsPage = ({ brandsList = [], isLoading, list, total, sideActions = [] }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -54,7 +54,7 @@ const BrandsPage = ({ brands = [], isLoading, list, total, sideActions = [] }) =
       <Table
         isLoading={isLoading}
         headers={BRAND_COLUMNS}
-        elements={brands}
+        elements={brandsList}
         page={PAGES.BRANDS}
         paginate
         serverPagination={{
@@ -64,7 +64,7 @@ const BrandsPage = ({ brands = [], isLoading, list, total, sideActions = [] }) =
           total,
           sorting: {
             key: Object.keys(BRAND_SORT_FIELDS).find((key) => BRAND_SORT_FIELDS[key] === list.sort),
-            direction: list.order === "desc" ? SORTING.DESC : SORTING.ASC,
+            direction: toUiSorting(list.order),
           },
           sortFields: BRAND_SORT_FIELDS,
           onPageChange: list.setPageNumber,

@@ -90,7 +90,7 @@ const Suppliers = () => {
   return (
     <SuppliersPage
       isLoading={!hydrated || isFetching}
-      suppliers={data?.items ?? []}
+      suppliersList={data?.items ?? []}
       list={list}
       total={total}
       sideActions={sideActions}

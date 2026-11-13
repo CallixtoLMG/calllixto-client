@@ -71,6 +71,26 @@ export const getAddressesForDisplay = (addresses) => {
   return { primaryAddress, additionalAddresses };
 };
 
+const ENTITY_EXCEL_NAMES = {
+  customer: { title: "Presupuestos" },
+  brand: { title: "Productos", label: "Marca" },
+  supplier: { title: "Productos", label: "Proveedor" },
+};
+
+const cleanFileNamePart = (value) => String(value ?? "")
+  .replace(/[\u0000-\u001f\u007f<>:"/\\|?*]/g, " ")
+  .replace(/\s+/g, " ")
+  .replace(/-(?: *-)+/g, "-")
+  .replace(/^[ .-]+|[ .-]+$/g, "");
+
+export const getEntityExcelFileName = (entity, name, id) => {
+  const { title, label } = ENTITY_EXCEL_NAMES[entity];
+  const safeName = cleanFileNamePart(name);
+  const safeId = cleanFileNamePart(id);
+  const subject = [label, safeName || safeId].filter(Boolean).join(" ");
+  return [title, subject, safeName && safeName !== safeId ? safeId : ""].filter(Boolean).join(" - ");
+};
+
 export const downloadExcel = (data, fileName) => {
   const ws = XLSX.utils.aoa_to_sheet(data);
   const wb = XLSX.utils.book_new();
